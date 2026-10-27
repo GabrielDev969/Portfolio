@@ -3,8 +3,10 @@ import { useEffect } from 'react'
 import { useViewMode } from '@/lib/view-mode'
 
 /**
- * Opens the masking bars as soon as the page leaves the top and closes them back at the top.
- * A 1px sentinel and an IntersectionObserver do it, so the peak never waits for GSAP to load.
+ * Opens the masking bars as soon as the page leaves the top and closes them back at the top,
+ * and again once the end credits ([data-bars-close]) reach the top of the screen, the way a
+ * cinema masks down for the credits. IntersectionObservers do it, so the peak never waits
+ * for GSAP to load.
  */
 export function BarsState() {
   const mode = useViewMode()
@@ -26,12 +28,29 @@ export function BarsState() {
       pointerEvents: 'none',
     })
     document.body.prepend(sentinel)
-    const observer = new IntersectionObserver(([entry]) => {
-      root.dataset.bars = entry?.isIntersecting ? 'closed' : 'open'
+    let atTop = false
+    let inCredits = false
+    const update = () => {
+      root.dataset.bars = atTop || inCredits ? 'closed' : 'open'
+    }
+    const top = new IntersectionObserver(([entry]) => {
+      atTop = entry?.isIntersecting ?? false
+      update()
     })
-    observer.observe(sentinel)
+    top.observe(sentinel)
+    // The root is the top 1% of the screen: the credits intersect it once their top has passed.
+    const credits = new IntersectionObserver(
+      ([entry]) => {
+        inCredits = entry?.isIntersecting ?? false
+        update()
+      },
+      { rootMargin: '0px 0px -99% 0px' },
+    )
+    const end = document.querySelector('[data-bars-close]')
+    if (end) credits.observe(end)
     return () => {
-      observer.disconnect()
+      top.disconnect()
+      credits.disconnect()
       sentinel.remove()
     }
   }, [mode])

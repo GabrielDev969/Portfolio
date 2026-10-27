@@ -804,6 +804,176 @@
       font-style: normal;
     }
   }
+
+  /* ---- End credits / Contact ----
+   The ground fades to black as the section arrives: --fade runs 0 → 1, scrubbed. Without JS
+   it stays at 1, so the credits are simply light on black. */
+  .credits {
+    --fade: 1;
+    /* Mixed in OKLab, which has no hue: in OKLCH, black's hue of 0 would tint the fade pink. */
+    background: color-mix(
+      in oklab,
+      var(--color-house) calc(var(--fade) * 100%),
+      var(--color-screen)
+    );
+    color: color-mix(in oklab, var(--color-screen) calc(var(--fade) * 100%), var(--color-ink));
+
+    :focus-visible {
+      outline-color: var(--color-screen);
+    }
+  }
+
+  .credits-roll {
+    text-align: center;
+  }
+
+  /* Film credits: the role on the left of a central gutter, the names on the right. */
+  .credit-list {
+    display: grid;
+    gap: 2rem;
+    margin-block: 0 4rem;
+  }
+
+  .credit {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 1.5rem;
+    text-align: left;
+
+    dt {
+      grid-row: 1 / span 20;
+      font-size: var(--text-small);
+      font-style: italic;
+      line-height: var(--text-body--line-height);
+      text-align: right;
+    }
+
+    dd {
+      grid-column: 2;
+    }
+  }
+
+  .credits-heading {
+    margin-bottom: 2rem;
+    font-family: var(--font-display);
+    font-size: var(--text-scene);
+    font-weight: 700;
+    line-height: var(--text-scene--line-height);
+    text-transform: uppercase;
+  }
+
+  .credits-end {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    margin-top: clamp(4rem, 10vw, 8rem);
+  }
+
+  /* The one action, at title size: screen on a solid velvet plate (6.3:1; velvet text on black
+   would be 2.8:1). */
+  .write-to-me {
+    display: inline-block;
+    margin-block: 1.5rem 1rem;
+    padding: 0.12em 0.25em 0.04em;
+    border-radius: 2px;
+    background: var(--color-velvet);
+    color: var(--color-screen);
+    font-family: var(--font-display);
+    font-size: var(--text-title);
+    font-weight: 800;
+    line-height: var(--text-title--line-height);
+    letter-spacing: var(--text-title--letter-spacing);
+    text-transform: uppercase;
+    transition: opacity var(--dur-ui) var(--ease-out);
+
+    &:hover {
+      opacity: 0.88;
+    }
+  }
+
+  /* A deliberate rest of black, then one card; the bottom bar is closed by now. */
+  .post-credits {
+    display: grid;
+    padding: 60svh var(--page-margin) calc(var(--bar-closed) + 4rem);
+    text-align: center;
+  }
+
+  .post-credits-card {
+    min-height: calc(100svh - 2 * var(--bar-closed) - 4rem);
+    display: grid;
+    place-content: center;
+    justify-items: center;
+  }
+
+  /* Quick view: a plain contact block on the ground. */
+  [data-view='quick'] {
+    .credits {
+      --fade: 0;
+      padding-bottom: 4rem;
+    }
+
+    .credits-roll,
+    .credit {
+      text-align: left;
+    }
+
+    .credit-list {
+      gap: 0.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* The crew credits belong to the film; Quick view starts at the facts, with the cast. */
+    .credit-list.crew {
+      display: none;
+    }
+
+    .credit {
+      display: block;
+
+      dt {
+        display: inline;
+        font-size: inherit;
+        font-weight: 600;
+
+        &::after {
+          content: ': ';
+        }
+      }
+
+      dd {
+        display: inline;
+
+        &:not(:last-child)::after {
+          content: ', ';
+        }
+      }
+    }
+
+    .credits-heading {
+      margin-bottom: 0.5rem;
+      font-family: var(--font-text);
+      font-size: var(--text-body);
+      font-weight: 600;
+      line-height: var(--text-body--line-height);
+      text-transform: none;
+    }
+
+    .credits-end {
+      justify-items: start;
+      margin-top: 1.5rem;
+    }
+
+    .write-to-me {
+      margin: 0;
+      padding: 0.6rem 1.5rem;
+      font-family: var(--font-text);
+      font-size: var(--text-body);
+      font-weight: 600;
+      line-height: var(--text-body--line-height);
+      letter-spacing: normal;
+      text-transform: none;
+    }
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

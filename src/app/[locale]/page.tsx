@@ -4,8 +4,8 @@ import { CueMark } from '@/components/cinema/CueMark'
 import { FilmGrain } from '@/components/cinema/FilmGrain'
 import { Letterbox } from '@/components/cinema/Letterbox'
 import { Vignette } from '@/components/cinema/Vignette'
-import { Baseline } from '@/components/sections/Baseline'
 import { ColdOpen } from '@/components/sections/ColdOpen'
+import { Contact } from '@/components/sections/Contact'
 import { Experience } from '@/components/sections/Experience'
 import { Hero } from '@/components/sections/Hero'
 import { HowIWork } from '@/components/sections/HowIWork'
@@ -29,7 +29,7 @@ export default async function LocalePage({ params }: Props) {
         <Experience content={content} />
         <Projects content={content} />
         <HowIWork content={content} />
-        <Baseline content={content} />
+        <Contact content={content} />
       </main>
       <CueMark />
       <Vignette />
