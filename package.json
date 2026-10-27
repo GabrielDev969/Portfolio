@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "Gabriel Santos' portfolio: a film in three acts.",
+  "type": "module",
   "packageManager": "pnpm@12.15.0",
   "engines": {
     "node": ">=24"
@@ -16,7 +17,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "tsx --test tests/unit/*.test.ts",
-    "todos": "tsx scripts/list-todos.ts"
+    "todos": "tsx scripts/list-todos.ts",
+    "gate": "tsx scripts/gate-screenshots.ts",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@gsap/react": "2.1.2",
