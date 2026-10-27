@@ -26,7 +26,7 @@ Motion families (see COMMIT-SHEET §5): **A** mask rise · **B** reel (linear sc
   - Chapters opens a plain list (Experience, Projects, How I work, Contact) using Motion `clip-path`, 220 ms ease-out. Keyboard: Enter/Space opens it, Esc closes it and focus returns to the button.
   - **Quick view** is a real toggle (`aria-pressed`). Its label reads "Quick view" in film mode and "Film view" in Quick view. Flipping it switches modes in place, with no reload, and keeps the reader's current section in view.
 - **Scroll:** the bars are 13.5 vh tall each while closed (the hero; 9 vh on phones) and 44 px each once open. The size change uses `scaleY` on the bar background; the HUD rows translate, so nothing triggers layout.
-- **Reduced:** the timecode still updates (it is information, not movement). The bars change size with an opacity crossfade between two states instead of a scale.
+- **Reduced:** the timecode still updates (it is information, not movement). The bars switch between their two states in place, with no movement.
 - **Quick view:** the bars become one plain solid top bar (wordmark, Chapters, toggle, language). The timecode, bottom bar, grain and vignette are removed.
 - **No-JS:** the bars are static at 44 px. The timecode shows `00:00:00:00`. Chapters is a plain anchor list. Quick view is hidden, because it needs JS to remember the choice.
 
@@ -54,7 +54,10 @@ Motion families (see COMMIT-SHEET §5): **A** mask rise · **B** reel (linear sc
   CSS shows the overlay only under that attribute, so there is no flash.
 
 - **Reduced, Quick view, deep link, No-JS:** never runs.
-- **Risk to measure in phase 2:** the effect on LCP. The hero `h1` is painted underneath at full opacity from the first frame.
+- **Measured in phase 2** (`pnpm measure:vitals`; a 390 px phone with Slow 4G and a 4× CPU slowdown, median of 5 runs):
+  - without the cold open: LCP 1.33 s, CLS 0.001
+  - with it: LCP 1.94 s, CLS 0.000
+- **Cut and controls:** CSS performs the cut (`animation: cut` with a delay of `--dur-intro`), and the head script wires Skip and Esc, so the intro ends on time even before hydration.
 
 ## 1 · Title sequence / Hero (intensity 5, the peak)
 
@@ -77,7 +80,8 @@ Motion families (see COMMIT-SHEET §5): **A** mask rise · **B** reel (linear sc
   - Scrolling back to the top closes the bars again.
   - It is a one-shot toggle, not a scrub, so it feels like an event.
 - **Test:** at 390 × 844, 768 × 1024, 1440 × 900, 1366 × 768 and 1280 × 720, in both film mode and Quick view, all six facts and both buttons are inside the viewport and not covered. "Not covered" is checked with `elementFromPoint` at each element's center: before the peak, mid-peak and after it.
-- **Reduced:** the name is visible immediately, and the bars swap states with an opacity crossfade.
+- **Reduced:** the name is visible immediately and does not grow, and the bars switch states in place.
+- **Built in CSS, not GSAP:** the name's rise, the bars parting and the 1.06 scale are CSS animations and transitions keyed to `html[data-intro]` and `html[data-bars]`. The bars open from an IntersectionObserver on a 1 px sentinel. So the peak works from first paint, before the GSAP runtime has loaded. After the cold open the rise waits for the cut (its delay includes `--dur-intro`).
 - **No-JS:** all text is visible, with the bars at 44 px.
 
 ## 2 · Chapter card "Act I / Experience" (intensity 2)

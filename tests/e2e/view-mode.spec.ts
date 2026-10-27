@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, skipColdOpen, test } from './fixtures'
 
 test('Quick view switches in place, is remembered, and switches back', async ({ page }) => {
   await page.goto('en/')
@@ -13,7 +13,7 @@ test('Quick view switches in place, is remembered, and switches back', async ({ 
     'true',
   )
   await expect(page.locator('.bar-bottom')).toBeHidden()
-  await expect(page.locator('.film-grain')).toBeHidden()
+  await expect(page.locator('body > .film-grain')).toBeHidden()
 
   await page.reload()
   await expect(html).toHaveAttribute('data-view', 'quick')
@@ -27,6 +27,7 @@ test('Quick view switches in place, is remembered, and switches back', async ({ 
 test('both modes expose the same headings and links', async ({ browser }) => {
   const read = async (mode: 'film' | 'quick') => {
     const context = await browser.newContext()
+    await skipColdOpen(context)
     await context.addInitScript((m) => localStorage.setItem('viewMode', m), mode)
     const page = await context.newPage()
     await page.goto('en/')

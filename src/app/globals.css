@@ -30,6 +30,11 @@
   --text-title: min(30vw, 22svh, 13rem);
   --text-title--line-height: 0.86;
   --text-title--letter-spacing: -0.03em;
+  /* Chapter titles are single long words ("Experience"), which cannot wrap: same role as the
+     title, capped by width so the word never spills past the screen edge. */
+  --text-chapter: min(22vw, 22svh, 13rem);
+  --text-chapter--line-height: 0.86;
+  --text-chapter--letter-spacing: -0.03em;
   --text-scene: clamp(2.75rem, 6vw, 5rem);
   --text-scene--line-height: 0.95;
   --text-scene--letter-spacing: -0.02em;
@@ -111,6 +116,8 @@
   animation: grain 1s steps(10) infinite;
 }
 
+/* The texture is twice the screen (inset -50%), so a shift of up to ±25% of its size still
+   covers it; stay within ±15% so no edge of the frame is ever left without grain. */
 @keyframes grain {
   0% {
     transform: translate(0, 0);
@@ -125,7 +132,7 @@
     transform: translate(6%, -14%);
   }
   40% {
-    transform: translate(-4%, 18%);
+    transform: translate(-4%, 15%);
   }
   50% {
     transform: translate(-14%, 8%);
@@ -137,7 +144,7 @@
     transform: translate(0, 12%);
   }
   80% {
-    transform: translate(3%, 28%);
+    transform: translate(3%, 15%);
   }
   90% {
     transform: translate(-8%, 8%);
@@ -188,17 +195,135 @@
   transform: none;
 }
 
+/* ---- Cold open: shown only under html[data-intro]; CSS performs the cut ---- */
+.cold-open {
+  display: none;
+}
+
+:root[data-intro] .cold-open {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  animation: cut 0s linear var(--dur-intro) forwards;
+}
+
+@keyframes cut {
+  to {
+    visibility: hidden;
+  }
+}
+
+/* Light, not glow: a soft cone from the booth, warming up in two steps. */
+.cold-open-beam {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 55% 95% at 90% 0%,
+    oklch(0.94 0.006 240 / 0.5),
+    transparent 72%
+  );
+  clip-path: polygon(86% 0, 95% 0, 72% 100%, 18% 100%);
+  opacity: 0;
+  animation: lamp 400ms steps(1, end) forwards;
+}
+
+@keyframes lamp {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.45;
+  }
+  55% {
+    opacity: 0.15;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* The grain tile is dark; on black it has to be inverted to read. Kept faint so the black
+   stays black instead of turning into a tinted near-black. */
+.cold-open .film-grain {
+  filter: invert(1);
+  opacity: 0.05;
+}
+
+.cold-open-card {
+  opacity: 0;
+  animation: appear 1ms linear 400ms forwards;
+}
+
+@keyframes appear {
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---- Hero: family A, the name rises from behind its mask (CSS, so first paint needs no JS) ---- */
+.rise-line {
+  display: block;
+  overflow: hidden;
+  /* Room for the cap tops at leading 0.86 so the mask does not crop them. */
+  padding-top: 0.06em;
+  margin-top: -0.06em;
+}
+
+.rise-line > span {
+  display: inline-block;
+}
+
+:root[data-js] .rise-line > span {
+  animation: rise var(--dur-reveal) var(--ease-expo) both;
+  animation-delay: calc(var(--i, 0) * var(--stagger-lines));
+}
+
+:root[data-js][data-intro] .rise-line > span {
+  animation-delay: calc(var(--dur-intro) + var(--i, 0) * var(--stagger-lines));
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(110%);
+  }
+}
+
+/* The peak: as the bars part, the name grows upward into the space the top bar gave up. */
+.hero-name {
+  transform-origin: 0 100%;
+  transition: transform var(--dur-bars) var(--ease-expo);
+}
+
+:root[data-bars='open'] .hero-name {
+  transform: scale(1.06);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .film-grain {
     animation: none;
   }
-  .bar {
+  /* No movement: the bars switch state in place and the name neither rises nor grows. */
+  .bar,
+  .hero-name {
     transition: none;
+  }
+  :root[data-js] .rise-line > span {
+    animation: none;
+  }
+  :root[data-bars='open'] .hero-name {
+    transform: none;
   }
 }
 
 [data-view='quick'] :is(.film-grain, .vignette, .bar-bottom) {
   display: none;
+}
+
+[data-view='quick'] :is(.rise-line > span, .hero-name) {
+  animation: none;
+  transform: none;
+  transition: none;
 }
 
 [data-view='quick'] .bar-top {

@@ -77,6 +77,7 @@ Commitment tier: **restrained.** Three colors plus true black for the masking.
 - **No mono face.** The timecode is set in Big Shoulders. Phase 1 measured that the font has **no tabular figures**: at 100 px, "1111" is 82 px wide and "0000" is 153 px. So each character sits in its own fixed-width slot, and only changed digits are rewritten. The clock holds 102.06 px from `00:00:00:00` to `00:03:00:00`. This removes the "mono service label" tell instead of arguing for it.
 - **Scale:** three sizes do the visible work.
   - **Title:** `min(30vw, 22svh, 13rem)`, Big Shoulders 800 in capitals, tracking −0.03em, leading 0.86. Used for the hero and chapter-card titles. It was tuned at the phase 1 gate: 117 px on a 390 px phone, 198 px at 1440 × 900.
+    - **Chapter titles** use the same face and settings at `min(22vw, 22svh, 13rem)`. A single long word such as "Experience" cannot wrap, and at the full title size it spilled past a 390 px screen and made the page scroll sideways (found in phase 2; a test now guards it).
     - It is capped by height as well as width so the 5-second test passes on short laptop screens (1366 × 768, 1280 × 720) with the bars closed.
   - **Scene:** `clamp(2.75rem, 6vw, 5rem)`, Big Shoulders 700, tracking −0.02em, leading 0.95. Used for project titles, milestone years and Quick view headings.
   - **Text:** `1.1875rem` (19 px) Newsreader 400, leading 1.55, measure `62ch`.

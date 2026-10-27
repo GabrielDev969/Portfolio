@@ -17,7 +17,7 @@ export function ChapterCard({ id, act, title }: Props) {
         <h2
           id={id}
           data-split
-          className="font-display text-title font-extrabold uppercase quick:text-scene"
+          className="font-display text-chapter font-extrabold uppercase quick:text-scene"
         >
           {title}
         </h2>

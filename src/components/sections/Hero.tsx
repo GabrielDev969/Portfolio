@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import type { SiteContent } from '@/content/schema'
 import { languageTags, type Locale } from '@/lib/i18n'
 import { asset } from '@/lib/site'
@@ -28,11 +29,11 @@ export function Hero({ locale, content }: Props) {
       <h1
         id="hero-name"
         data-fact="name"
-        className="col-span-12 font-display text-title font-extrabold uppercase lg:col-span-7 quick:col-span-12 quick:text-scene"
+        className="hero-name col-span-12 w-fit justify-self-start font-display text-title font-extrabold uppercase lg:col-span-7 quick:col-span-12 quick:text-scene"
       >
-        {person.name.split(' ').map((word) => (
-          <span key={word} className="block">
-            {word}
+        {person.name.split(' ').map((word, i) => (
+          <span key={word} className="rise-line">
+            <span style={{ '--i': i } as CSSProperties}>{word}</span>
           </span>
         ))}
       </h1>

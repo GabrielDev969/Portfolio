@@ -3,3 +3,6 @@
 
 /** localStorage: 'film' | 'quick'. */
 export const viewModeStorageKey = 'viewMode'
+
+/** sessionStorage: set once the cold open has played (or been decided against) this session. */
+export const introSeenStorageKey = 'introSeen'
