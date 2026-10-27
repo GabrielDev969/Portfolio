@@ -18,7 +18,7 @@ Motion families (see COMMIT-SHEET §5): **A** mask rise · **B** reel (linear sc
 ## HUD (persistent, intensity 1)
 
 - **Sees:** the HUD lives inside the black masking bars, never over content.
-  - **Top bar:** the wordmark "Gabriel Santos" (links to the top), a "Chapters" button, a **"Quick view"** toggle and the PT / EN / ES switcher.
+  - **Top bar:** the wordmark "Gabriel Santos" (links to the top), a "Chapters" button, a **"Quick view"** toggle and the PT / EN / ES switcher. Before them in the tab order comes a "Skip to content" link, visible only on focus.
   - **Bottom bar:** the timecode `00:01:24:12` with the current section next to it ("Act II · Projects"). On the right is one plain availability line: "Available for new projects" (ES: "Disponible · Santiago, Chile").
 - **Moves:**
   - The timecode is family B: written through a ref from scroll progress, 24 fps over a 3-minute "runtime".
@@ -59,15 +59,15 @@ Motion families (see COMMIT-SHEET §5): **A** mask rise · **B** reel (linear sc
 ## 1 · Title sequence / Hero (intensity 5, the peak)
 
 - **Sees (the 5-second test):** the narrow band between the closed bars holds, at every width and without scrolling:
-  - **"Gabriel / Santos"** in two lines at title size, ink on silver, left-aligned on columns 1–10
+  - **"Gabriel / Santos"** in two lines at title size, in capitals, ink on silver. It spans columns 1–7 from 1024 px up and the full width below that.
   - **Role:** "Full Stack Developer"
   - **Core stack**, as one plain sentence: "Next.js, React, Node.js, NestJS, TypeScript and PostgreSQL."
   - **Place and mode:** "Salvador, Brazil. **Remote.**"
-  - **Hero line:** "From the database to the screen."
+  - **Hero line:** "From the database to the screen.", Newsreader italic at scene size. From 1024 px up it sits **beside the name** on columns 8–12, on the name's last baseline, like a poster title. Below 1024 px it comes after the buttons.
   - **Two primary buttons** of the same size:
     - **Contact** (velvet, solid; jumps to the Contact credits)
     - **Download CV** (ink, solid; the PDF for the current locale)
-  - **Scroll cue:** "Watch the trailer", quiet text at text-small size with a small down-pointing reel mark. It scrolls to Experience with `lenis.scrollTo`. It is a cue, not a button.
+  - **Scroll cue:** "Watch the trailer", quiet text at text-small size with a small reel mark, in the band's bottom-right corner from 1024 px up. It scrolls to Experience with `lenis.scrollTo`. It is a cue, not a button.
 - **Moves on load:**
   - The name uses family A: its lines rise from behind their masks, stagger 60 ms.
   - The info block and buttons are **visible from the first frame**: they are not animated in, so they are never late or hidden.

@@ -103,6 +103,7 @@ export type SiteContent = {
   }
   ui: {
     skipIntro: string
+    skipToContent: string
     quickView: string
     filmView: string
     chapters: string
@@ -114,7 +115,10 @@ export type SiteContent = {
     close: string
     internalNoLink: string
     rewind: string
-    timecodeLabel: string
+    /** HUD label while the hero is on screen. */
+    openingTitles: string
+    chaptersNav: string
+    languageNav: string
     bts: {
       problem: string
       role: string

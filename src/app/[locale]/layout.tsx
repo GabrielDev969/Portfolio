@@ -1,8 +1,13 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { getContent } from '@/content'
 import { isLocale, languageTags, locales } from '@/lib/i18n'
+import { MotionProvider } from '@/motion/MotionProvider'
+import { SmoothScroll } from '@/motion/SmoothScroll'
+import { motionCssVars } from '@/motion/tokens'
+import { display, text } from '../fonts'
+import { headScript } from './head-script'
 
 export const dynamicParams = false
 
@@ -24,8 +29,20 @@ export default async function LocaleLayout({ children, params }: Props) {
   if (!isLocale(locale)) notFound()
 
   return (
-    <html lang={languageTags[locale]}>
-      <body>{children}</body>
+    // The head script sets data-js, data-view and data-bars before React hydrates.
+    <html
+      lang={languageTags[locale]}
+      className={`${display.variable} ${text.variable}`}
+      style={motionCssVars as CSSProperties}
+      suppressHydrationWarning
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: headScript }} />
+      </head>
+      <body>
+        <MotionProvider>{children}</MotionProvider>
+        <SmoothScroll />
+      </body>
     </html>
   )
 }

@@ -35,6 +35,7 @@ export const en: SiteContent = {
   },
   ui: {
     skipIntro: 'Skip intro',
+    skipToContent: 'Skip to content',
     quickView: 'Quick view',
     filmView: 'Film view',
     chapters: 'Chapters',
@@ -46,7 +47,9 @@ export const en: SiteContent = {
     close: 'Close',
     internalNoLink: 'Internal system, no public link',
     rewind: 'Rewind the reel',
-    timecodeLabel: 'Page progress',
+    openingTitles: 'Opening titles',
+    chaptersNav: 'Sections',
+    languageNav: 'Choose a language',
     bts: {
       problem: 'The problem',
       role: 'My role',

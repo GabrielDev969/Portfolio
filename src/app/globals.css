@@ -1,3 +1,215 @@
 @import 'tailwindcss';
+@import 'lenis/dist/lenis.css';
 
-/* Design tokens arrive in phase 1 (design/COMMIT-SHEET.md). */
+/* Quick view, and print, which uses the same compact layout. */
+@custom-variant quick {
+  &:where([data-view='quick'], [data-view='quick'] *) {
+    @slot;
+  }
+  @media print {
+    @slot;
+  }
+}
+
+/* Only when JavaScript runs (set by the head script). */
+@custom-variant js (&:where([data-js], [data-js] *));
+
+/* Tokens from design/COMMIT-SHEET.md. tests/unit/contrast.test.ts checks every text pairing. */
+@theme {
+  --color-*: initial;
+  --color-screen: oklch(0.94 0.006 240);
+  --color-screen-2: oklch(0.895 0.008 240);
+  --color-ink: oklch(0.22 0.025 255);
+  --color-ink-2: oklch(0.42 0.02 255);
+  --color-velvet: oklch(0.47 0.17 22);
+  --color-house: oklch(0 0 0);
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  /* Title: capped by height too, so the 5-second test passes on short laptop screens. */
+  --text-title: min(30vw, 22svh, 13rem);
+  --text-title--line-height: 0.86;
+  --text-title--letter-spacing: -0.03em;
+  --text-scene: clamp(2.75rem, 6vw, 5rem);
+  --text-scene--line-height: 0.95;
+  --text-scene--letter-spacing: -0.02em;
+  --text-body: 1.1875rem;
+  --text-body--line-height: 1.55;
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.4;
+}
+
+@theme inline {
+  --font-display: var(--font-big-shoulders), 'Arial Narrow', sans-serif;
+  --font-text: var(--font-newsreader), Georgia, serif;
+}
+
+:root {
+  /* Masking bars: closed around the hero, open everywhere else. */
+  --bar-open: 44px;
+  --bar-closed: 9svh;
+  --page-margin: clamp(16px, 4vw, 64px);
+  --grid-gap: clamp(12px, 1.6vw, 24px);
+  scroll-padding-top: calc(var(--bar-open) + 16px);
+  color-scheme: light;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --bar-closed: 13.5svh;
+  }
+}
+
+@layer base {
+  body {
+    background: var(--color-screen);
+    color: var(--color-ink);
+    font-family: var(--font-text);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: var(--color-ink);
+    color: var(--color-screen);
+  }
+}
+
+/* 12 columns with equal outer margins (design/COMMIT-SHEET.md §4). */
+@utility page-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--grid-gap);
+  padding-inline: var(--page-margin);
+}
+
+@utility measure {
+  max-width: 62ch;
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* ---- Cinema devices ---- */
+
+/* Film grain: a noise tile stepped at 10 fps. Smooth grain reads as video noise. */
+.film-grain {
+  position: fixed;
+  inset: -50%;
+  z-index: 40;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.6 -0.3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 1s steps(10) infinite;
+}
+
+@keyframes grain {
+  0% {
+    transform: translate(0, 0);
+  }
+  10% {
+    transform: translate(-5%, -8%);
+  }
+  20% {
+    transform: translate(-12%, 4%);
+  }
+  30% {
+    transform: translate(6%, -14%);
+  }
+  40% {
+    transform: translate(-4%, 18%);
+  }
+  50% {
+    transform: translate(-14%, 8%);
+  }
+  60% {
+    transform: translate(12%, 0);
+  }
+  70% {
+    transform: translate(0, 12%);
+  }
+  80% {
+    transform: translate(3%, 28%);
+  }
+  90% {
+    transform: translate(-8%, 8%);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+/* Projector falloff toward the edges of the screen. */
+.vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 39;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 120% 90% at 50% 50%,
+    transparent 58%,
+    oklch(0 0 0 / 0.16) 100%
+  );
+}
+
+/*
+ * Masking bars. Each plate is as tall as the closed bar; opening slides it out of the frame
+ * (transform only), so its 44px HUD row stays in view. No JS: bars stay open.
+ */
+.bar {
+  position: fixed;
+  inset-inline: 0;
+  z-index: 50;
+  height: var(--bar-closed);
+  background: var(--color-house);
+  color: var(--color-screen);
+  transition: transform var(--dur-bars) var(--ease-expo);
+}
+
+.bar-top {
+  top: 0;
+  transform: translateY(calc(var(--bar-open) - var(--bar-closed)));
+}
+
+.bar-bottom {
+  bottom: 0;
+  transform: translateY(calc(var(--bar-closed) - var(--bar-open)));
+}
+
+:root[data-bars='closed'] .bar {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .film-grain {
+    animation: none;
+  }
+  .bar {
+    transition: none;
+  }
+}
+
+[data-view='quick'] :is(.film-grain, .vignette, .bar-bottom) {
+  display: none;
+}
+
+[data-view='quick'] .bar-top {
+  transform: translateY(calc(var(--bar-open) - var(--bar-closed)));
+  transition: none;
+}
+
+@media print {
+  .film-grain,
+  .vignette,
+  .bar {
+    display: none;
+  }
+}
