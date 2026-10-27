@@ -194,15 +194,20 @@ The same device, with its own cue mark.
     4. I review the diff
     5. I run the tests
     6. Merge
-  - Under the sheet is one line at scene size: "AI speeds things up. The judgment is mine."
+  - Under the sheet is one line at scene size, in Newsreader italic like the hero line: "AI speeds things up. The judgment is mine."
+  - **The drawings:** a checklist, the plan under a magnifying glass, a code window, a diff in two panes, three passing checks, and a branch with two commits merging into the main line.
 - **Moves:** family B. A pencil stroke draws each panel's frame, then its drawing, in order, mapped linearly to scroll (`stroke-dashoffset`). There is no pin: the sheet draws while it scrolls past.
+  - The pencil finishes by the time the sheet's last row is three quarters up the screen, so the closing line never arrives over an unfinished panel. This was found in the phase 5 review.
 - **Reduced:** the drawings are complete and the panels fade in.
 - **Quick view:** a six-item numbered list plus the closing line. There are no drawings.
 - **No-JS:** the drawings are complete.
 
 ## 8 · End credits / Contact (intensity 3)
 
-- **Sees:** a fade to black. As the section arrives, the ground crossfades from `--screen` to `--house`, using a scrubbed CSS variable over 40 vh. The masking bars close back to 13.5 vh. The section heading is **"Contact"**. The credits run centred in screen color:
+- **Sees:** a fade to black. As the section arrives, the ground crossfades from `--screen` to `--house`, using a scrubbed CSS variable over 40 vh. The text crossfades from ink to screen with it.
+  - The mix is done in OKLab. In OKLCH, black's hue of 0 tinted the fade pink (found in phase 5).
+  - The masking bars close back to 13.5 vh once the section's top reaches the top of the screen.
+  - The section heading is **"Contact"**. The credits run centred in screen color:
   - Directed by Gabriel Santos · Written by Gabriel Santos · Shot by Gabriel Santos
   - Cast: the technical credits as five credit blocks (Frontend, Backend, Data, DevOps & automation, Architecture)
   - Languages: Portuguese (native), Spanish and English (studying)
@@ -216,7 +221,7 @@ The same device, with its own cue mark.
 
 - **Moves:** family B, but **not pinned**. The page scrolls natively, which already reads as a credits roll, and the credit blocks drift upward slightly faster than the scroll (`yPercent`, linear) for the feel of a roll. Nothing is held.
 - **Reduced:** no drift. The black fade is kept (it is a color change).
-- **Quick view:** a plain Contact block on the ground: email, links and CV, with no fade to black and no credits styling.
+- **Quick view:** a plain Contact block on the ground, with no fade to black and no credits styling. The crew credits (Directed, Written, Shot by) are left out. The cast stays as one line per area ("Frontend: Next.js, React, …"), because that is the full skill list a recruiter looks for. Then come the email, the links and the CV.
 - **No-JS:** a static centred column on black.
 
 ## 9 · Post-credits (intensity 2, decided)
@@ -224,7 +229,8 @@ The same device, with its own cue mark.
 - **Sees:** about 60 vh of black, a deliberate rest and the only blank stretch on the page. Then one card: "Gabriel Santos will return in your next project." Below it is the action "Rewind the reel".
 - **Moves:**
   - The card fades in (opacity, 600 ms).
-  - Rewind runs `lenis.scrollTo(0, { duration: 1.6 })`. The timecode counts back to zero along with the scroll, and the bars close at the top.
+  - Rewind runs `lenis.scrollTo(0, { duration: 1.6 })` with an ease-in-out, so the reel spins up and then settles. The timecode counts back to zero along with the scroll, and the bars close at the top.
+  - Focus moves to the main content, so keyboard and screen reader users start again from the top too.
 - **Reduced:** the card fades in, and Rewind jumps instantly.
 - **Quick view:** hidden.
 - **No-JS:** Rewind is an `#top` anchor.

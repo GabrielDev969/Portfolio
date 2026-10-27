@@ -127,8 +127,9 @@ Each pin is the newest stable release that is **at least 2 weeks old** (as of 20
 | Phase 2 | **175.6 KB**         | GSAP and Lenis load after first paint through `motion/runtime.ts`; `@gsap/react` is dropped because it imports GSAP statically, and `useScrollScene` does the same scoped `gsap.context()` cleanup over the lazy runtime |
 | Phase 3 | 176.8 KB             | The Act I reel                                                                                                                                                                                                           |
 | Phase 4 | **177.7 KB**         | Act II: the drawer switch and the push-in scene. The drawer animates in CSS, and the mockups and diagrams are server-rendered SVG, so they add HTML, not JS                                                              |
+| Phase 5 | **178.4 KB**         | Act III's pencil, the credits roll and the rewind. The drawings and the credits are server-rendered                                                                                                                      |
 
-The margin is 2.3 KB. **Standing rule (from Gabriel):** if a later phase goes over 180 KB, Motion is replaced by CSS transitions (`@starting-style` for the menu and panels) without asking.
+The margin is 1.6 KB. Phase 6 should add almost no JS, since translations are content. **Standing rule (from Gabriel):** if a later phase goes over 180 KB, Motion is replaced by CSS transitions (`@starting-style` for the menu and panels) without asking.
 
 A Quick view reader on a return visit downloads the same JS (one bundle) but runs none of the motion code.
 
@@ -137,6 +138,7 @@ A Quick view reader on a return visit downloads the same JS (one bundle) but run
 `pnpm measure:vitals` loads the page on a 390 px phone with Slow 4G (150 ms latency, 1.6 Mbps) and a 4× CPU slowdown, five times with the cold open and five without. It prints the median and the range of the runs.
 
 - **Gzip, from phase 4.** `pnpm preview` now gzips text the way GitHub Pages does. Before, the HTML arrived uncompressed and competed with the render-blocking CSS for the throttled bandwidth. When Act II grew the HTML from 64 KB to 177 KB raw, some runs reached 3–4 s although the gzipped page is 27 KB. Numbers before phase 4 (1.33 s and 1.94 s in phase 2, 1.52 s in phase 3) come from that uncompressed setup.
+- **Phase 5:** LCP 0.69 s (range 0.68–1.10 s), 0.70 s with the cold open; CLS 0.002.
 - **Phase 4, same machine, gzip:**
   - phase 3 build: LCP 0.65 s (range 0.64–0.90 s)
   - phase 4 build: LCP 0.70 s (range 0.67–1.04 s)
