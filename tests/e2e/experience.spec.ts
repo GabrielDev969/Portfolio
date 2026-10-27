@@ -139,3 +139,22 @@ test.describe('deep links after the reel is pinned', () => {
     })
   }
 })
+
+test('the HUD names the section that crosses the middle of the screen', async ({ page }) => {
+  // Every section here sits after the Act I pin: a trigger measured before the pin existed
+  // named each of them about 850 px early.
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('en/')
+  await expect(strip(page)).toHaveAttribute('data-strip', 'on')
+  for (const [id, label] of [
+    ['projects', 'Projects'],
+    ['how-i-work', 'How I work'],
+    ['contact', 'Contact'],
+  ] as const) {
+    await page.evaluate((target) => {
+      const top = document.getElementById(target)!.getBoundingClientRect().top + scrollY
+      scrollTo(0, top - innerHeight / 2 + 40)
+    }, id)
+    await expect(page.locator('.bar-bottom')).toContainText(label)
+  }
+})

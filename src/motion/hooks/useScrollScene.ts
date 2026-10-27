@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, type RefObject } from 'react'
 import { useViewMode } from '@/lib/view-mode'
-import { useMotion, type MotionRuntime } from '../runtime'
+import { refreshSoon, useMotion, type MotionRuntime } from '../runtime'
 
 export type SceneConditions = {
   /** prefers-reduced-motion: no-preference */
@@ -44,6 +44,7 @@ export function useScrollScene(
         (media) => setup(media.conditions as SceneConditions, runtime),
       )
     }, element)
+    refreshSoon()
     return () => context.revert()
     // `setup` is a fresh closure on every render; the scene re-runs only when these change.
     // eslint-disable-next-line react-hooks/exhaustive-deps

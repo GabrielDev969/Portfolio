@@ -19,6 +19,25 @@ export function peekMotion(): MotionRuntime | null {
   return loaded
 }
 
+let refreshQueued = false
+
+/**
+ * Scenes mount in no particular order, and ScrollTrigger measures triggers in the order they
+ * were created: a trigger created before the Act I pin, but placed after it on the page, would
+ * miss the pin's length (the HUD named each later section about 850 px early). Once the
+ * frame's last scene has mounted, put every trigger in page order and measure them again.
+ */
+export function refreshSoon() {
+  if (refreshQueued) return
+  refreshQueued = true
+  requestAnimationFrame(() => {
+    refreshQueued = false
+    if (!loaded) return
+    loaded.ScrollTrigger.sort()
+    loaded.ScrollTrigger.refresh()
+  })
+}
+
 /** Null on the first render (so it never runs during hydration), the runtime once it is fetched. */
 export function useMotion(): MotionRuntime | null {
   const [runtime, setRuntime] = useState<MotionRuntime | null>(loaded)

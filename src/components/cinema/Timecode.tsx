@@ -2,7 +2,7 @@
 import { useEffect, useRef } from 'react'
 import { formatTimecode } from '@/lib/timecode'
 import { useViewMode } from '@/lib/view-mode'
-import { useMotion } from '@/motion/runtime'
+import { refreshSoon, useMotion } from '@/motion/runtime'
 import { timecode } from '@/motion/tokens'
 
 type Props = { openingTitles: string }
@@ -59,6 +59,7 @@ export function Timecode({ openingTitles }: Props) {
         }),
       )
     }
+    refreshSoon()
     return () => triggers.forEach((t) => t.kill())
   }, [mode, runtime])
 
