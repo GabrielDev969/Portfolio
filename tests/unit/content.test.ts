@@ -18,10 +18,47 @@ function shape(value: unknown): unknown {
   return typeof value === 'string' ? 'text' : typeof value
 }
 
+/** Every string leaf with its path, skipping todo() placeholders. */
+function strings(value: unknown, path = ''): [string, string][] {
+  if (isTodo(value)) return []
+  if (typeof value === 'string') return [[path, value]]
+  if (Array.isArray(value)) return value.flatMap((v, i) => strings(v, `${path}.${i}`))
+  if (value && typeof value === 'object') {
+    return Object.entries(value).flatMap(([key, v]) => strings(v, `${path}.${key}`))
+  }
+  return []
+}
+
+// Proper names stay as they are in every language.
+const untranslated =
+  /\.(name|names\.\d+|organization|email|href|still|mockup|id|kind)$|^\.projects\.\d+\.title$/
+
 describe('content', () => {
   it('every locale has the same shape as English', () => {
     const reference = shape(getContent('en'))
     for (const locale of locales) assert.deepEqual(shape(getContent(locale)), reference, locale)
+  })
+
+  it('the translations leave no English phrase behind', () => {
+    const english = new Map(strings(getContent('en')))
+    for (const locale of ['pt', 'es'] as const) {
+      const content = getContent(locale)
+      assert.equal(content.translation, 'needs-review', locale)
+      const leftovers = strings(content).filter(
+        ([path, value]) =>
+          english.get(path) === value && !untranslated.test(path) && value.split(' ').length >= 3,
+      )
+      assert.deepEqual(leftovers, [], locale)
+    }
+  })
+
+  it('the Spanish keeps no Portuguese spelling', () => {
+    // Letters and words Spanish never uses; many other words are the same in both languages.
+    const portuguese = /[ãõçê]|\b(em|um|uma|do|dos|das|na|seu|sua)\b|tetura\b/
+    const leftovers = strings(getContent('es')).filter(
+      ([path, value]) => !untranslated.test(path) && portuguese.test(value),
+    )
+    assert.deepEqual(leftovers, [])
   })
 
   it('only Spanish mentions relocation', () => {

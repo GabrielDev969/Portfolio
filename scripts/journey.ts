@@ -1,16 +1,18 @@
 /**
  * pnpm journey — scrolls the page with the mouse wheel at 390, 768 and 1440 px, with and without
  * reduced motion, and saves a frame every 0.6 screens to qa/journey/. SECTION=<id> limits it to
- * one section (from just above it to its end). Needs `pnpm build && pnpm preview`.
+ * one section (from just above it to its end); LOCALE=pt|es picks the language and saves to
+ * qa/journey-<locale>/. Needs `pnpm build && pnpm preview`.
  * Every frame is meant to be looked at (landing-page-qa).
  */
 import { mkdirSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 import { chromium } from '@playwright/test'
 
-const base = process.env.BASE_URL ?? 'http://localhost:4173/Portfolio/en/'
+const locale = process.env.LOCALE ?? 'en'
+const base = process.env.BASE_URL ?? `http://localhost:4173/Portfolio/${locale}/`
 const section = process.env.SECTION
-const out = join(import.meta.dirname, '..', 'qa', 'journey')
+const out = join(import.meta.dirname, '..', 'qa', locale === 'en' ? 'journey' : `journey-${locale}`)
 rmSync(out, { recursive: true, force: true })
 mkdirSync(out, { recursive: true })
 
@@ -53,4 +55,4 @@ for (const width of [390, 768, 1440]) {
 }
 
 await browser.close()
-console.log(`${frames} frames in qa/journey/`)
+console.log(`${frames} frames in ${out}`)

@@ -20,6 +20,7 @@
     "format:check": "prettier --check .",
     "test": "tsx --test tests/unit/*.test.ts",
     "todos": "tsx scripts/list-todos.ts",
+    "copy": "tsx scripts/export-copy.ts",
     "gate": "tsx scripts/gate-screenshots.ts",
     "test:e2e": "playwright test",
     "measure:js": "tsx scripts/measure-js.ts",
