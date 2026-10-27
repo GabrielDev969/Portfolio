@@ -115,7 +115,7 @@ export function renderCopy(locale: Locale): string {
       line(`    ${label.get(e.from)} → ${label.get(e.to)}${e.label ? ` (${e.label})` : ''}`)
     }
     line(`  ${ui.bts.decisions}:`)
-    for (const d of bts.decisions) line(`    - ${text(d.what)} ${text(d.why)}`)
+    for (const d of bts.decisions) line(`    - ${text(d.what)}${d.why ? ` ${text(d.why)}` : ''}`)
     line(`  ${ui.bts.testingAndDeploy}: ${prose(bts.testing)} ${prose(bts.deploy)}`)
     line(`  ${ui.bts.outcome}: ${prose(bts.outcome)}`)
     if (isTodo(p.links)) line(`  ${ui.bts.links}: ${text(p.links)}`)

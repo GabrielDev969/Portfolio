@@ -255,7 +255,7 @@ export const en: SiteContent = {
         kind: 'mockup',
         mockup: 'hostly-schedule',
         description:
-          'A robot schedule screen with a fictional campaign playlist, standing in for the client system.',
+          'A robot schedule screen with a fictional campaign playlist, standing in for the real system.',
       },
       links: { kind: 'internal' },
       behindTheScenes: {
@@ -277,8 +277,7 @@ export const en: SiteContent = {
         },
         decisions: [
           {
-            what: 'The robot app reaches RobotOS (OrionStar LuckiBot Plus) through an abstraction layer.',
-            why: 'So it can move to AgentOS later.',
+            what: 'The robot app reaches RobotOS (OrionStar LuckiBot Plus) through an abstraction layer, so it can move to AgentOS later.',
           },
           {
             what: 'A backend on a VPS, and an admin panel to schedule ad campaigns and music.',

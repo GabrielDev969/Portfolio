@@ -2,7 +2,7 @@ import { languageTags, type Locale } from '@/lib/i18n'
 import { mockupCopy } from './copy'
 import { MockupFrame } from './MockupFrame'
 
-// Fictional numbers and invented media buyers: the real dashboards hold client data.
+// Fictional numbers and invented media buyers: the real dashboards hold the company's campaign data.
 const weeks = [
   { revenue: 42, spend: 30 },
   { revenue: 48, spend: 32 },

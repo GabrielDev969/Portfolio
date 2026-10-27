@@ -13,7 +13,10 @@ type Props = { project: Project; ui: SiteContent['ui'] }
 export function BehindTheScenesParts({ project, ui }: Props) {
   const bts = project.behindTheScenes
   const decisions = bts.decisions
-    .map((d) => ({ what: resolveText(d.what), why: resolveText(d.why) }))
+    .map((d) => ({
+      what: resolveText(d.what),
+      why: d.why === undefined ? null : resolveText(d.why),
+    }))
     .filter((d): d is { what: string; why: string | null } => d.what !== null)
   const paragraph = (label: string, sentences: string[]) =>
     sentences.length > 0 ? (

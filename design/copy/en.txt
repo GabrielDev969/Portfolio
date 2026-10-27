@@ -113,7 +113,7 @@ Cast: Next.js, NestJS, PostgreSQL, Prisma, Stripe, Zendrop
 
 -- Hostly (IA Robots Solutions) --
 A system for OrionStar service robots: an admin panel that schedules ad campaigns and music, a backend on a VPS, and a RobotOS app that plays them and talks to people.
-[still] A robot schedule screen with a fictional campaign playlist, standing in for the client system.
+[still] A robot schedule screen with a fictional campaign playlist, standing in for the real system.
 [mockup words] Today · Campaign · Music · Welcome message · Lobby set A · Spring offer · Lunch menu · Lobby set B · Now playing · Campaign, 30 seconds · Up next · Morning light · Open doors · Quiet hour · Second floor · Late check-in
 Cast: RobotOS, [TODO(gabriel): the rest of the Hostly stack]
 [button] Behind the scenes
@@ -124,7 +124,7 @@ Cast: RobotOS, [TODO(gabriel): the rest of the Hostly stack]
     Robot app → Backend (VPS)
     Robot app → RobotOS on OrionStar LuckiBot Plus (abstraction layer)
   Key decisions:
-    - The robot app reaches RobotOS (OrionStar LuckiBot Plus) through an abstraction layer. So it can move to AgentOS later.
+    - The robot app reaches RobotOS (OrionStar LuckiBot Plus) through an abstraction layer, so it can move to AgentOS later.
     - A backend on a VPS, and an admin panel to schedule ad campaigns and music. [TODO(gabriel): why this split]
     - Designed to become a multi-company SaaS later. [TODO(gabriel): what that changed in the design today]
   Testing and deploy: [TODO(gabriel): how it is tested] The backend is hosted on a VPS.

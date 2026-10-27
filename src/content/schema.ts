@@ -49,7 +49,8 @@ export type Architecture = {
   confirmed: boolean
 }
 
-export type Decision = { what: Text; why: Text }
+/** `why` is left out when `what` already gives the reason in one sentence. */
+export type Decision = { what: Text; why?: Text }
 
 export type BehindTheScenes = {
   problem: Prose

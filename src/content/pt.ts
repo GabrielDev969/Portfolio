@@ -23,7 +23,8 @@ const experience: Record<string, Partial<Milestone>> = {
   'group-wave': { title: 'Desenvolvedor Full Stack', place: 'Remoto' },
   'ia-robots': {
     title: 'Consultor e Desenvolvedor de Software (contrato)',
-    summary: 'Configuração e operação de robôs de atendimento OrionStar, além do Hostly.',
+    summary:
+      'Configuração e operação de robôs de atendimento OrionStar, e desenvolvimento do Hostly.',
   },
   unipds: { title: 'Pós-graduação em Engenharia de Software com IA Aplicada' },
 }
@@ -45,7 +46,7 @@ export const pt: SiteContent = {
     heroLine: 'Do banco de dados à tela.',
     availability: 'Disponível para novos projetos',
     about:
-      'Desenvolvedor Full Stack com cerca de 5 anos de experiência: 4 como Analista de Sistemas e mais de 1 trabalhando remoto. Construo produtos completos, do banco de dados à interface: frontends e dashboards com Next.js e React, APIs com Node.js e NestJS, e dados em PostgreSQL. Uso agentes de IA para programar todos os dias, para ir mais rápido sem abrir mão do julgamento técnico, e faço pós-graduação em Engenharia de Software com IA Aplicada.',
+      'Desenvolvedor Full Stack com cerca de 5 anos de experiência: 4 como Analista de Sistemas e mais de 1 trabalhando remoto. Construo produtos completos, do banco de dados à interface: frontends e dashboards com Next.js e React, APIs com Node.js e NestJS, e dados em PostgreSQL. Programo todos os dias com agentes de IA para ir mais rápido sem abrir mão do critério técnico, e faço pós-graduação em Engenharia de Software com IA Aplicada.',
     photo: {
       still: en.person.photo.still,
       alt: 'Gabriel Santos, sorrindo, de blazer azul e óculos.',
@@ -207,7 +208,7 @@ export const pt: SiteContent = {
         kind: 'mockup',
         mockup: 'hostly-schedule',
         description:
-          'Uma tela de agenda do robô com uma playlist de campanhas fictícia, no lugar do sistema do cliente.',
+          'Uma tela de agenda do robô com uma playlist de campanhas fictícia, no lugar do sistema real.',
       },
       behindTheScenes: {
         problem: missing.problem(),
@@ -228,8 +229,7 @@ export const pt: SiteContent = {
         },
         decisions: [
           {
-            what: 'O app do robô acessa o RobotOS (OrionStar LuckiBot Plus) por uma camada de abstração.',
-            why: 'Para poder migrar para o AgentOS depois.',
+            what: 'O app do robô acessa o RobotOS (OrionStar LuckiBot Plus) por uma camada de abstração, para poder migrar para o AgentOS depois.',
           },
           {
             what: 'Um backend em uma VPS e um painel administrativo para agendar campanhas de anúncios e músicas.',
@@ -287,7 +287,7 @@ export const pt: SiteContent = {
       'Rodo os testes',
       'Merge',
     ],
-    closing: 'A IA acelera. O julgamento é meu.',
+    closing: 'A IA acelera. O critério é meu.',
   },
   credits: {
     crew: [

@@ -176,7 +176,7 @@ The same device as card 2, with its own cue mark.
   | Hostly       | Admin panel and robot app → backend on a VPS; the app reaches RobotOS (OrionStar LuckiBot Plus) through an abstraction layer  | The abstraction layer lets it move to AgentOS later; the admin panel schedules ad campaigns and music; designed to become a multi-company SaaS later                                                     |
   | BookOwl      | A Python/Django app; the database is `TODO`                                                                                   | Open source on GitHub, built for a real church library                                                                                                                                                   |
 
-- **Internal systems** (Sistema Wave, Campaign BI, Hostly) show architecture only: no real names, numbers, screenshots or client data. Their stills stay stylized mockups with fictional data.
+- **Internal systems** (Sistema Wave, Campaign BI, Hostly) show architecture only: no real names, numbers, screenshots or data. Their stills stay stylized mockups with fictional data.
 - **Reduced:** no push-in. The still crossfades in, the cast appears all at once, and the drawer opens with opacity only.
 - **Quick view:** each project is a compact block with the title, logline, stack as a sentence and the six behind-the-scenes parts shown **inline**, with a small diagram. There are no stills and no cast panel, and the links appear once, on the project.
 - **No-JS:** everything is visible. The behind-the-scenes content is in the HTML as a `<details>` element that opens in place. The same server-rendered parts fill the `<details>`, the drawer and the Quick view block.

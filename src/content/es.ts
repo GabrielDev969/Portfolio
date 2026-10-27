@@ -24,7 +24,7 @@ const experience: Record<string, Partial<Milestone>> = {
   'group-wave': { title: 'Desarrollador Full Stack', place: 'Remoto' },
   'ia-robots': {
     title: 'Consultor y Desarrollador de Software (contrato)',
-    summary: 'Configuración y operación de robots de servicio OrionStar, además de Hostly.',
+    summary: 'Configuración y operación de robots de servicio OrionStar, y desarrollo de Hostly.',
   },
   unipds: { title: 'Posgrado en Ingeniería de Software con IA Aplicada' },
 }
@@ -47,7 +47,7 @@ export const es: SiteContent = {
     heroLine: 'De la base de datos a la pantalla.',
     availability: 'Disponible · Santiago, Chile',
     about:
-      'Desarrollador Full Stack con unos 5 años de experiencia: 4 como Analista de Sistemas y más de 1 trabajando en remoto. Construyo productos completos, de la base de datos a la interfaz: frontends y dashboards con Next.js y React, APIs con Node.js y NestJS, y datos en PostgreSQL. Uso agentes de IA para programar a diario, para avanzar más rápido sin renunciar al criterio técnico, y curso un posgrado en Ingeniería de Software con IA Aplicada.',
+      'Desarrollador Full Stack con unos 5 años de experiencia: 4 como Analista de Sistemas y más de 1 trabajando en remoto. Construyo productos completos, de la base de datos a la interfaz: frontends y dashboards con Next.js y React, APIs con Node.js y NestJS, y datos en PostgreSQL. Programo a diario con agentes de IA para avanzar más rápido sin renunciar al criterio técnico, y curso un posgrado en Ingeniería de Software con IA Aplicada.',
     photo: {
       still: en.person.photo.still,
       alt: 'Gabriel Santos, sonriendo, con blazer azul y lentes.',
@@ -146,7 +146,7 @@ export const es: SiteContent = {
           },
           { what: 'Pipelines de n8n alimentan PostgreSQL.', why: todo('why n8n and PostgreSQL') },
           {
-            what: 'Un script de asignación por el método del resto mayor para conversiones e ingresos.',
+            what: 'Un script de asignación por el método de los restos mayores para conversiones e ingresos.',
             why: 'Las métricas estaban infladas. El script corrigió los números, y los resultados se conciliaron con las planillas de referencia.',
           },
         ],
@@ -209,7 +209,7 @@ export const es: SiteContent = {
         kind: 'mockup',
         mockup: 'hostly-schedule',
         description:
-          'Una pantalla de programación del robot con una playlist de campañas ficticia, en lugar del sistema del cliente.',
+          'Una pantalla de programación del robot con una playlist de campañas ficticia, en lugar del sistema real.',
       },
       behindTheScenes: {
         problem: missing.problem(),
@@ -230,8 +230,7 @@ export const es: SiteContent = {
         },
         decisions: [
           {
-            what: 'La app del robot accede a RobotOS (OrionStar LuckiBot Plus) a través de una capa de abstracción.',
-            why: 'Para poder migrar a AgentOS más adelante.',
+            what: 'La app del robot accede a RobotOS (OrionStar LuckiBot Plus) a través de una capa de abstracción, para poder migrar a AgentOS más adelante.',
           },
           {
             what: 'Un backend en un VPS y un panel de administración para programar campañas publicitarias y música.',
