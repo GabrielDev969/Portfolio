@@ -145,7 +145,7 @@ export const pt: SiteContent = {
           },
           { what: 'Pipelines no n8n alimentam o PostgreSQL.', why: todo('why n8n and PostgreSQL') },
           {
-            what: 'Um script de alocação pelo método do maior resto para conversões e receita.',
+            what: 'Um script de alocação pelo método dos maiores restos para conversões e receita.',
             why: 'As métricas estavam infladas. O script corrigiu os números, e os resultados foram conferidos com as planilhas de referência.',
           },
         ],

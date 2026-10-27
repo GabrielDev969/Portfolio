@@ -91,7 +91,7 @@ export const en: SiteContent = {
       end: 'present',
       title: 'Consultant & Software Developer (contract)',
       organization: 'IA Robots Solutions',
-      summary: 'Robot setup and operation for OrionStar service robots, plus Hostly.',
+      summary: 'Robot setup and operation for OrionStar service robots, and Hostly development.',
     },
     {
       id: 'unipds',

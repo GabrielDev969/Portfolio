@@ -43,7 +43,7 @@ From the database to the screen.
 2025–present · Full Stack Developer · Group Wave Enterprise
   Remote
 2026–present · Consultant & Software Developer (contract) · IA Robots Solutions
-  Robot setup and operation for OrionStar service robots, plus Hostly.
+  Robot setup and operation for OrionStar service robots, and Hostly development.
 2026–2027 · Postgraduate degree in Software Engineering for Applied AI · UNIPDS
 
 == Act II · Projects ==

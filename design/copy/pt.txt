@@ -82,7 +82,7 @@ Elenco: RedTrack, n8n, PostgreSQL, [TODO(gabriel): what the dashboards are built
   Decisões principais:
     - Dashboards sobre os dados do RedTrack, com visões mensais e semanais e o desempenho de cada media buyer. [TODO(gabriel): why these views]
     - Pipelines no n8n alimentam o PostgreSQL. [TODO(gabriel): why n8n and PostgreSQL]
-    - Um script de alocação pelo método do maior resto para conversões e receita. As métricas estavam infladas. O script corrigiu os números, e os resultados foram conferidos com as planilhas de referência.
+    - Um script de alocação pelo método dos maiores restos para conversões e receita. As métricas estavam infladas. O script corrigiu os números, e os resultados foram conferidos com as planilhas de referência.
   Testes e deploy: [TODO(gabriel): how it is tested] [TODO(gabriel): how it is deployed]
   Resultado: [TODO(gabriel): the outcome, ideally with a number]
   Sistema interno, sem link público
