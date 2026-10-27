@@ -158,4 +158,5 @@ Commitment tier: **restrained.** Three colors plus true black for the masking.
 - **Numbered sequence markers in Act I and Act III:** both are real sequences (a dated timeline and a six-step workflow), so they are real `<ol>`s. Storyboard panels are numbered on real storyboards.
 - **One small-caps line** (the cold open card), argued under Type.
 - **Interface mockups with fictional data** (Act II stills of Sistema Wave, Campaign BI, Zibby and Hostly). The anti-generic list bans fake dashboards, but these are not decoration. Three are internal client systems whose real screens and numbers cannot be shown, and Zibby's catalogue is not public. Each is a specific screen of that project (a request board, a performance chart by media buyer, a storefront with its order list, a robot's schedule), drawn in the site's own type and tones and labeled as fictional in its text description. None uses gradients, glow or placeholder bars.
+  The words inside the mockups stay in English in all three languages: they are pictures of screens (hidden from assistive technology, described by the translated text), not copy.
 - None of the other banned devices survive.

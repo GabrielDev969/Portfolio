@@ -18,7 +18,7 @@ Motion families (see COMMIT-SHEET §5): **A** mask rise · **B** reel (linear sc
 ## HUD (persistent, intensity 1)
 
 - **Sees:** the HUD lives inside the black masking bars, never over content.
-  - **Top bar:** the wordmark "Gabriel Santos" (links to the top), a "Chapters" button, a **"Quick view"** toggle and the PT / EN / ES switcher. Before them in the tab order comes a "Skip to content" link, visible only on focus.
+  - **Top bar:** the wordmark "Gabriel Santos" (links to the top; the monogram "GS" below 640 px, so the row fits a 360 px phone in all three languages, with the full name kept as its accessible name), a "Chapters" button, a **"Quick view"** toggle and the PT / EN / ES switcher. Before them in the tab order comes a "Skip to content" link, visible only on focus.
   - **Bottom bar:** the timecode `00:01:24:12` with the current section next to it ("Act II · Projects"). On the right is one plain availability line: "Available for new projects" (ES: "Disponible · Santiago, Chile").
 - **Moves:**
   - The timecode is family B: written through a ref from scroll progress, 24 fps over a 3-minute "runtime".
@@ -67,7 +67,8 @@ Motion families (see COMMIT-SHEET §5): **A** mask rise · **B** reel (linear sc
   - **Role:** "Full Stack Developer"
   - **Core stack**, as one plain sentence: "Next.js, React, Node.js, NestJS, TypeScript and PostgreSQL."
   - **Place and mode:** "Salvador, Brazil. **Remote.**"
-  - **Hero line:** "From the database to the screen.", Newsreader italic at scene size. From 1024 px up it sits **beside the name** on columns 8–12, on the name's last baseline, like a poster title. Below 1024 px it comes after the buttons.
+  - **Hero line:** "From the database to the screen.", Newsreader italic at scene size. From 1024 px up it sits **beside the name** on columns 8–12, on the name's last baseline, like a poster title. From 768 to 1023 px it sits beside the facts on columns 8–12, so a standing tablet keeps it inside the bars in every language. Below 768 px it comes after the buttons.
+  - **Spanish only:** the relocation line, "Disponible para trasladarme a Santiago, Chile.", after the place. On phones it is capped at 30ch, so it sets in two lines in the fallback font and in Newsreader alike and the font swap cannot rewrap it (it once cost a CLS of 0.23).
   - **Two primary buttons** of the same size:
     - **Contact** (velvet, solid; jumps to the Contact credits)
     - **Download CV** (ink, solid; the PDF for the current locale)
@@ -81,13 +82,14 @@ Motion families (see COMMIT-SHEET §5): **A** mask rise · **B** reel (linear sc
   - Scrolling back to the top closes the bars again.
   - It is a one-shot toggle, not a scrub, so it feels like an event.
 - **Test:** at 390 × 844, 768 × 1024, 1440 × 900, 1366 × 768 and 1280 × 720, in both film mode and Quick view, all six facts and both buttons are inside the viewport and not covered. "Not covered" is checked with `elementFromPoint` at each element's center: before the peak, mid-peak and after it.
+- **Phones:** the band is aligned to the top instead of centred, so if a fact rewraps when the text font arrives, only what is below it moves, never the name.
 - **Reduced:** the name is visible immediately and does not grow, and the bars switch states in place.
 - **Built in CSS, not GSAP:** the name's rise, the bars parting and the 1.06 scale are CSS animations and transitions keyed to `html[data-intro]` and `html[data-bars]`. The bars open from an IntersectionObserver on a 1 px sentinel. So the peak works from first paint, before the GSAP runtime has loaded. After the cold open the rise waits for the cut (its delay includes `--dur-intro`).
 - **No-JS:** all text is visible, with the bars at 44 px.
 
 ## 2 · Chapter card "Act I / Experience" (intensity 2)
 
-- **Sees:** "Act I" in Newsreader italic at text size above **"Experience"** at title size, set centred-left on columns 2–11. The card is about 70 vh tall and has no hold, so it costs one flick of the wheel.
+- **Sees:** "Act I" in Newsreader italic at text size above **"Experience"** at chapter size, set centred-left on columns 2–11. The size shrinks only when the title's longest word would overflow its column (a container query on the word's length): "Experiencia" and "Experiência" are wider than "Experience". The card is about 70 vh tall and has no hold, so it costs one flick of the wheel.
 - **Moves:**
   - As the card enters the frame, the **cue mark** (a velvet dot in the right page margin, up to 28 px and never wider than three quarters of the margin, so it never covers a word) flashes twice for 120 ms each. It is the reel-change signal.
   - The heading then rises (family A).
@@ -251,7 +253,7 @@ The same device, with its own cue mark.
   - The inline `<head>` script reads it and sets `html[data-view]` before first paint, so a returning Quick view reader never sees the film flash.
   - Sections use a Tailwind `quick:` variant on the same markup. The content is not duplicated in the DOM.
   - `useScrollScene` reads the mode. Switching to Quick view reverts every GSAP context and stops Lenis. Switching back recreates them and calls `ScrollTrigger.refresh()`.
-- **Print:** `@media print` uses the Quick view layout, so printing the page gives a clean one-pager.
+- **Print:** paper always gets Quick view. `@media print` applies the `quick:` layout, and on `beforeprint` the page also switches to Quick view without saving the choice, because scenes that already ran leave GSAP's inline styles behind (hidden chapter titles, the horizontal strip, pin spacers). On `afterprint` it returns to the film on the same section. The bars, grain, vignette, cold open and skip link are not printed, and the velvet and ink buttons print as ink outlines, since paper drops backgrounds.
 
 ---
 
