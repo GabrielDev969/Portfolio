@@ -57,6 +57,7 @@ Motion families (see COMMIT-SHEET §5): **A** mask rise · **B** reel (linear sc
 - **Measured in phase 2** (`pnpm measure:vitals`; a 390 px phone with Slow 4G and a 4× CPU slowdown, median of 5 runs):
   - without the cold open: LCP 1.33 s, CLS 0.001
   - with it: LCP 1.94 s, CLS 0.000
+  - These runs fetched the HTML uncompressed. From phase 4 the preview gzips text the way GitHub Pages does (design/PLAN.md, JS budget), and the same phase 2 to 3 build measures about 0.65 s.
 - **Cut and controls:** CSS performs the cut (`animation: cut` with a delay of `--dur-intro`), and the head script wires Skip and Esc, so the intro ends on time even before hydration.
 
 ## 1 · Title sequence / Hero (intensity 5, the peak)
@@ -98,7 +99,7 @@ The cards for Act II / **Projects** and Act III / **How I work** repeat this com
 ## 3 · Act I · Experience, the film strip (intensity 3)
 
 - **Sees:** a full-bleed horizontal 35 mm strip with sprocket rows top and bottom. There are five milestones in chronological order, as a real `<ol>`. Each milestone is:
-  - **a 2.39:1 frame** holding the start year at scene size, with the end ("–2025", "–present") at text size below it. Frame 1 also holds **the protagonist's still**: the GitHub portrait, served from `assets/stills/` as AVIF/WebP (7.6 KB), muted to `saturate(0.7)`. `TODO(gabriel)`: a professional photo.
+  - **a 2.39:1 frame** holding the start year at scene size, with the end ("–2025", "–present") at text size below it. Frame 1 also holds **the protagonist's still**: the GitHub portrait, served from `assets/stills/` as AVIF/WebP (7.6 KB), muted to `saturate(0.7)`. Gabriel kept it at the phase 3 gate, so the photo TODO is closed.
   - **under the frame, on the strip margin and at text size:** the role and organisation, one sentence from the content, and the place
   - an edge code (like film-stock edge print) showing the frame's year
 
@@ -127,11 +128,12 @@ The same device as card 2, with its own cue mark.
 ## 5 · Act II · Projects (intensity 3)
 
 - **Sees:** five projects, each sized to its content (about 100 vh) and **not pinned**. Each project is built the same way, because a set shares one treatment:
-  - **Still:** a 2.39:1 frame (4:3 on mobile) that bleeds off the left page edge to column 8. It has grain, `saturate(0.75)`, and lifts to full color when hovered or focused. The color lift is an opacity crossfade of a desaturating overlay, so `filter` is never animated.
-  - **Title** at scene size on the ground, columns 9–12.
+  - **Still:** a 2.39:1 frame (4:3 on mobile) on a black mat, bleeding off the left page edge to column 8. The mat came out of the phase 4 review: without it a light screenshot melted into the light page and stopped reading as a picture. It has grain and a desaturating layer that lifts to full color while the project is hovered or holds focus. The lift is an opacity crossfade, so `filter` is never animated.
+  - **Title** at scene size on the ground, columns 9–12, with the organisation above it in `--ink-2`.
   - **Logline** in Newsreader, 2–3 lines.
-  - **Cast block:** a `--screen-2` panel overlapping the still's right edge, columns 8–11, set as credits ("Cast" as the role, then one stack item per line).
-  - **"Behind the scenes" button:** ink outline.
+  - **Cast block:** a `--screen-2` panel overlapping the still's bottom-right corner, columns 8–10, set as a credit block: "Cast" as the role on the left, one stack item per line on the right. Below 1024 px it follows the logline, sized to its credits.
+  - **"Behind the scenes" button:** ink outline, under the cast block, next to the public link or the note "Internal system, no public link".
+  - **Phones and tablets (< 1024 px):** the parts stack in order (still at full bleed, title, logline, cast, actions). The side-by-side layout needs about 1024 px before the logline crowds the cast.
 - **The stills:**
   1. **Sistema Wave:** a stylized request board in HTML/SVG with fictional teams and tasks.
   2. **Campaign BI:** a real chart rendered from fictional weekly numbers and invented media-buyer names, with no grey placeholder bars.
@@ -141,8 +143,15 @@ The same device as card 2, with its own cue mark.
 
   All mockups are real markup marked `aria-hidden`, and each frame carries a text description.
 
-- **Moves:** family C, a scrubbed timeline per project as it crosses the viewport, with no pin. The still pushes in (`scale 1.12 → 1`) while the cast lines rise one by one like credits. The logline uses family A (a one-shot rise) when the project's top crosses 70%.
-- **Behind the scenes:** the button opens a native `<dialog>` drawer from the right, using Motion `clip-path` at 220 ms. Esc closes it and focus returns to the button. The drawer is `data-lenis-prevent`, so it scrolls natively. It always holds the same six parts, in this order:
+  - **How they are drawn:** inline SVG on one 1200 × 502 canvas, in the site's own type and tones, so they belong to the film instead of looking pasted in.
+  - **The 4:3 phone crop** keeps 670 of the 1200 units. Wave and Campaign BI keep the left edge, where their titles are. Zibby and Hostly keep the middle, where the storefront meets its admin and where the robot screen sits.
+  - **BookOwl on phones** is letterboxed on the black mat instead of cropped, so its welcome text stays whole.
+
+- **Moves:** family C, a scrubbed timeline per project as it crosses the viewport, with no pin. The still pushes in (`scale 1.12 → 1`) while the cast lines rise one by one like credits. The logline uses family A (a one-shot rise, SplitText lines behind masks) when the project's top crosses 70%.
+- **Behind the scenes:** the button opens a native modal `<dialog>` drawer from the right. It wipes in with `clip-path` over 220 ms through CSS `@starting-style`, so the drawer adds no JS.
+  - Esc, the Close button and a click on the backdrop close it, and focus returns to the button.
+  - The drawer is `data-lenis-prevent` and scrolls natively, while the page behind it stays still.
+  - It always holds the same six parts, in this order:
   1. **The problem:** what was wrong or missing before.
   2. **My role:** what Gabriel owned.
   3. **Architecture:** a small diagram, an inline SVG of 3–6 boxes and arrows rendered from content data. It comes with the same information as a text list, for screen readers and Quick view.
@@ -152,20 +161,23 @@ The same device as card 2, with its own cue mark.
 
   Links follow, or the note "Internal system, no public link".
 
-- **Facts already known** (everything else is `TODO(gabriel)`; Gabriel sends the decisions before phase 4):
+  - **In production, a part with no facts yet is left out with its heading**, and a decision whose reason is missing shows the decision alone. Nothing unfinished reaches the live site; `pnpm todos` lists every gap.
+  - **The diagram** is laid out at build time from the content data: rows follow the data flow, services are solid, data stores carry a lid line, external services are dashed, devices are rounded, and arrow labels sit on their line. Every diagram is marked unconfirmed until Gabriel checks it against the real system.
 
-  | Project      | Architecture from the brief                                                                                 | Other known facts                             |
-  | ------------ | ----------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
-  | Sistema Wave | Next.js/React web → NestJS API → PostgreSQL                                                                 | —                                             |
-  | Campaign BI  | RedTrack data → dashboards. The stack between them is `TODO`                                                | —                                             |
-  | Zibby        | Monorepo: storefront and admin (Next.js) → NestJS API → PostgreSQL via Prisma, plus Stripe and Zendrop      | Hosted on a VPS; automated tests; own project |
-  | Hostly       | Admin panel → backend on a VPS ← RobotOS app on OrionStar robots (scheduled campaigns, music, conversation) | —                                             |
-  | BookOwl      | A Python/Django app; the database is `TODO`                                                                 | Open source                                   |
+- **Facts, from the brief and from Gabriel's phase 4 notes** (everything else is `TODO(gabriel)`):
+
+  | Project      | Architecture                                                                                                                  | Decisions and other facts                                                                                                                                                                                |
+  | ------------ | ----------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+  | Sistema Wave | Next.js/React web → NestJS API → PostgreSQL                                                                                   | All `TODO`                                                                                                                                                                                               |
+  | Campaign BI  | RedTrack → n8n pipelines → PostgreSQL → dashboards                                                                            | Monthly, weekly and per-media-buyer views; n8n feeds PostgreSQL; a largest-remainder allocation script corrected inflated conversion and revenue metrics, reconciled against the reference spreadsheets  |
+  | Zibby        | pnpm monorepo, modular monolith: storefront and admin (Next.js) → NestJS API → PostgreSQL via Prisma, plus Stripe and Zendrop | Own product, built in phases with AI coding agents (plan → review → implement → tests → diff review → merge); automated tests; hosted on a VPS; **launched in October 2026** (the server is off for now) |
+  | Hostly       | Admin panel and robot app → backend on a VPS; the app reaches RobotOS (OrionStar LuckiBot Plus) through an abstraction layer  | The abstraction layer lets it move to AgentOS later; the admin panel schedules ad campaigns and music; designed to become a multi-company SaaS later                                                     |
+  | BookOwl      | A Python/Django app; the database is `TODO`                                                                                   | Open source on GitHub, built for a real church library                                                                                                                                                   |
 
 - **Internal systems** (Sistema Wave, Campaign BI, Hostly) show architecture only: no real names, numbers, screenshots or client data. Their stills stay stylized mockups with fictional data.
 - **Reduced:** no push-in. The still crossfades in, the cast appears all at once, and the drawer opens with opacity only.
-- **Quick view:** each project is a compact block with the title, logline, stack as a sentence and the six behind-the-scenes parts shown **inline**, with a small diagram. There are no stills.
-- **No-JS:** everything is visible. The behind-the-scenes content is in the HTML as a `<details>` element.
+- **Quick view:** each project is a compact block with the title, logline, stack as a sentence and the six behind-the-scenes parts shown **inline**, with a small diagram. There are no stills and no cast panel, and the links appear once, on the project.
+- **No-JS:** everything is visible. The behind-the-scenes content is in the HTML as a `<details>` element that opens in place. The same server-rendered parts fill the `<details>`, the drawer and the Quick view block.
 
 ## 6 · Chapter card "Act III / How I work" (intensity 2)
 

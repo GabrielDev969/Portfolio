@@ -86,7 +86,7 @@ Commitment tier: **restrained.** Three colors plus true black for the masking.
 
 ## 4. Grid break
 
-**Act II project stills bleed off the left edge of the viewport** (from the page edge to the end of column 8). The cast block, the stack set as credits on a `--screen-2` panel, **overlaps the still's right edge by exactly one column** (columns 8–11).
+**Act II project stills bleed off the left edge of the viewport** (from the page edge to the end of column 8). The cast block, the stack set as credits on a `--screen-2` panel, **overlaps the still's bottom-right corner by exactly one column** (columns 8–10, narrowed from 8–11 at the phase 4 review, where a four-column panel held a short credit list and a wide empty band).
 
 - Nothing sits on a headline. The overlap is on the image, and the title stays on the ground in columns 9–12.
 - Everything else sits on a strict 12-column grid with equal outer margins.
@@ -105,7 +105,8 @@ Commitment tier: **restrained.** Three colors plus true black for the masking.
   - Keyboard, find-in-page, anchors and the scrollbar behave natively. There is no snapping and no velocity tricks.
   - Total pinned scroll on the page is **≤ 1 viewport height** (Act I only), and a test enforces it.
 - **Not scroll-driven:**
-  - Motion handles the chapter menu, the language switcher, the Quick view toggle and the behind-the-scenes drawer (`clip-path` and opacity, 220 ms ease-out).
+  - Motion handles the chapter menu, the language switcher and the Quick view toggle (`clip-path` and opacity, 220 ms ease-out).
+  - The behind-the-scenes drawer uses the same wipe with CSS `@starting-style` on a native `<dialog>`, so it costs no JS.
   - Grain is stepped at 10 fps in CSS.
 - **No fade-up on any section.** A chapter card's heading rises, a milestone frame slides in on the reel, a project pushes in and a storyboard panel is drawn: each reveal fits what it reveals.
 - **Quick view** turns every family off. So does reduced motion, apart from opacity and color.
@@ -156,4 +157,5 @@ Commitment tier: **restrained.** Three colors plus true black for the masking.
 
 - **Numbered sequence markers in Act I and Act III:** both are real sequences (a dated timeline and a six-step workflow), so they are real `<ol>`s. Storyboard panels are numbered on real storyboards.
 - **One small-caps line** (the cold open card), argued under Type.
+- **Interface mockups with fictional data** (Act II stills of Sistema Wave, Campaign BI, Zibby and Hostly). The anti-generic list bans fake dashboards, but these are not decoration. Three are internal client systems whose real screens and numbers cannot be shown, and Zibby's catalogue is not public. Each is a specific screen of that project (a request board, a performance chart by media buyer, a storefront with its order list, a robot's schedule), drawn in the site's own type and tones and labeled as fictional in its text description. None uses gradients, glow or placeholder bars.
 - None of the other banned devices survive.
