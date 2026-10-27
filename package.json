@@ -23,7 +23,8 @@
     "gate": "tsx scripts/gate-screenshots.ts",
     "test:e2e": "playwright test",
     "measure:js": "tsx scripts/measure-js.ts",
-    "measure:vitals": "tsx scripts/measure-vitals.ts"
+    "measure:vitals": "tsx scripts/measure-vitals.ts",
+    "journey": "tsx scripts/journey.ts"
   },
   "dependencies": {
     "gsap": "3.15.0",
