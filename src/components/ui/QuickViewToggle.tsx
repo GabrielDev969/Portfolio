@@ -1,14 +1,8 @@
 'use client'
-import { setViewMode, useViewMode } from '@/lib/view-mode'
+import { currentSection, setViewMode, useViewMode } from '@/lib/view-mode'
 import { peekMotion } from '@/motion/runtime'
 
 type Props = { quickView: string; filmView: string }
-
-/** The section the reader is in: the last one whose top has passed the top bar. */
-function currentSection() {
-  const sections = [...document.querySelectorAll<HTMLElement>('[data-section]')]
-  return sections.filter((s) => s.getBoundingClientRect().top <= 60).at(-1) ?? null
-}
 
 /** Film view ↔ Quick view, switched in place, keeping the reader's section on screen. */
 export function QuickViewToggle({ quickView, filmView }: Props) {

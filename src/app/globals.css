@@ -1036,11 +1036,20 @@
   transition: none;
 }
 
+/* Paper gets Quick view (the quick: variant) without the film's furniture: no bars, grain,
+   vignette or cold open, even if the reader prints while the intro is still running. */
 @media print {
   .film-grain,
   .vignette,
-  .bar {
-    display: none;
+  .bar,
+  .cold-open,
+  a[href='#main'] {
+    display: none !important;
+  }
+
+  .write-to-me {
+    border: 1px solid;
+    color: var(--color-ink);
   }
 }
 

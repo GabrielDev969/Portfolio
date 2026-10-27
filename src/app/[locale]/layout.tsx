@@ -6,6 +6,7 @@ import { isLocale, languageTags, locales, type Locale } from '@/lib/i18n'
 import { siteUrl } from '@/lib/site'
 import { KeepAnchor } from '@/motion/KeepAnchor'
 import { MotionProvider } from '@/motion/MotionProvider'
+import { PrintAsQuickView } from '@/motion/PrintAsQuickView'
 import { SmoothScroll } from '@/motion/SmoothScroll'
 import { motionCssVars } from '@/motion/tokens'
 import { display, text } from '../fonts'
@@ -78,6 +79,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         <MotionProvider>{children}</MotionProvider>
         <SmoothScroll />
         <KeepAnchor />
+        <PrintAsQuickView />
       </body>
     </html>
   )

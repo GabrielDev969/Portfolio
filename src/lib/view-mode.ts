@@ -11,14 +11,23 @@ function read(): ViewMode {
   return document.documentElement.dataset.view === 'quick' ? 'quick' : 'film'
 }
 
-export function setViewMode(mode: ViewMode) {
+/** Switches the page in place; `remember: false` is for printing, which must not change the choice. */
+export function setViewMode(mode: ViewMode, { remember = true } = {}) {
   document.documentElement.dataset.view = mode
-  try {
-    localStorage.setItem(viewModeStorageKey, mode)
-  } catch {
-    // Storage can be blocked; the mode still applies for this page.
+  if (remember) {
+    try {
+      localStorage.setItem(viewModeStorageKey, mode)
+    } catch {
+      // Storage can be blocked; the mode still applies for this page.
+    }
   }
   window.dispatchEvent(new Event(changeEvent))
+}
+
+/** The section the reader is in: the last one whose top has passed the top bar. */
+export function currentSection() {
+  const sections = [...document.querySelectorAll<HTMLElement>('[data-section]')]
+  return sections.filter((s) => s.getBoundingClientRect().top <= 60).at(-1) ?? null
 }
 
 export function useViewMode(): ViewMode {

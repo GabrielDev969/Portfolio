@@ -49,3 +49,30 @@ test('the first Tab reaches "Skip to content", which moves focus to the main con
   await page.keyboard.press('Enter')
   await expect(page.locator('main')).toBeFocused()
 })
+
+test('printing gives Quick view on paper and returns to the film', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 })
+  await page.goto('en/')
+  // Let every scene run first, as for a reader who prints from the end credits.
+  await page.keyboard.press('End')
+  await expect(page.locator('#contact')).toBeInViewport()
+
+  await page.evaluate(() => dispatchEvent(new Event('beforeprint')))
+  await page.emulateMedia({ media: 'print' })
+  await expect(page.locator('html')).toHaveAttribute('data-view', 'quick')
+  await expect(page.locator('.pin-spacer')).toHaveCount(0)
+  for (const heading of await page.getByRole('heading', { level: 2 }).all()) {
+    await expect(heading).toBeVisible()
+    expect(
+      await heading.evaluate((el) => el.querySelector('span span')?.getAttribute('style') ?? ''),
+    ).not.toMatch(/translate/)
+  }
+  await expect(page.locator('.cold-open, .bar').first()).toBeHidden()
+  const contact = page.locator('[data-fact="contact"]')
+  expect(await contact.evaluate((el) => getComputedStyle(el).borderTopWidth)).toBe('1px')
+
+  await page.emulateMedia({ media: 'screen' })
+  await page.evaluate(() => dispatchEvent(new Event('afterprint')))
+  await expect(page.locator('html')).toHaveAttribute('data-view', 'film')
+  expect(await page.evaluate(() => localStorage.getItem('viewMode'))).toBeNull()
+})

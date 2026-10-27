@@ -4,8 +4,9 @@ type Variant = 'velvet' | 'ink' | 'outline'
 
 const variants: Record<Variant, string> = {
   // The contact action, and nothing else, is velvet (design/COMMIT-SHEET.md §2).
-  velvet: 'bg-velvet text-screen',
-  ink: 'bg-ink text-screen',
+  // Paper drops backgrounds, so printed buttons are outlined in ink.
+  velvet: 'bg-velvet text-screen print:border print:text-ink',
+  ink: 'bg-ink text-screen print:border print:text-ink',
   outline: 'border border-current text-ink',
 }
 
