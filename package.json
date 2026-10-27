@@ -10,6 +10,8 @@
   },
   "scripts": {
     "dev": "next dev",
+    "images": "tsx scripts/optimize-images.ts",
+    "prebuild": "pnpm images",
     "build": "next build",
     "preview": "tsx scripts/preview.ts",
     "lint": "eslint .",
