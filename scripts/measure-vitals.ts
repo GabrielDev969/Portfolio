@@ -64,10 +64,14 @@ const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[Math.floor(xs.len
 for (const intro of [false, true]) {
   const results = []
   for (let i = 0; i < runs; i++) results.push(await measure(intro))
-  const lcp = median(results.map((r) => r.lcp))
+  const lcps = results.map((r) => r.lcp)
+  const lcp = median(lcps)
+  // The range shows when runs split into two groups (font swap before or after the intro's cut),
+  // which a median alone hides.
+  const range = `${(Math.min(...lcps) / 1000).toFixed(2)}–${(Math.max(...lcps) / 1000).toFixed(2)} s`
   const cls = median(results.map((r) => r.cls))
   const elements = [...new Set(results.map((r) => r.element))].join(', ')
   console.log(
-    `${intro ? 'with cold open   ' : 'without cold open'}  LCP ${(lcp / 1000).toFixed(2)} s (element: ${elements})  CLS ${cls.toFixed(3)}  [${runs} runs]`,
+    `${intro ? 'with cold open   ' : 'without cold open'}  LCP ${(lcp / 1000).toFixed(2)} s (range ${range}, element: ${elements})  CLS ${cls.toFixed(3)}  [${runs} runs]`,
   )
 }

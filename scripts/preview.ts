@@ -5,6 +5,7 @@
 import { createReadStream, existsSync, statSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { extname, join, normalize } from 'node:path'
+import { createGzip } from 'node:zlib'
 import { basePath } from '../src/lib/site'
 
 const out = join(import.meta.dirname, '..', 'out')
@@ -42,6 +43,16 @@ createServer((req, res) => {
   if (existsSync(file) && statSync(file).isDirectory()) file = join(file, 'index.html')
   const status = existsSync(file) ? 200 : 404
   if (status === 404) file = join(out, '404.html')
-  res.writeHead(status, { 'content-type': types[extname(file)] ?? 'application/octet-stream' })
-  createReadStream(file).pipe(res)
+  const type = types[extname(file)] ?? 'application/octet-stream'
+  // GitHub Pages gzips text; without it a throttled LCP run measures a page nobody downloads.
+  const gzip =
+    /^(text\/|application\/(json|xml)|image\/svg)/.test(type) &&
+    /\bgzip\b/.test(String(req.headers['accept-encoding'] ?? ''))
+  res.writeHead(status, {
+    'content-type': type,
+    ...(gzip ? { 'content-encoding': 'gzip', vary: 'accept-encoding' } : {}),
+  })
+  const body = createReadStream(file)
+  if (gzip) body.pipe(createGzip()).pipe(res)
+  else body.pipe(res)
 }).listen(port, () => console.log(`Serving out/ at http://localhost:${port}${basePath}/`))
