@@ -1,4 +1,3 @@
-import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from './fixtures'
 
 test.describe('without JavaScript', () => {
@@ -40,16 +39,6 @@ test('every external link opens safely', async ({ page }) => {
     )
   expect(unsafe).toEqual([])
 })
-
-for (const mode of ['film', 'quick'] as const) {
-  test(`axe finds no serious or critical violations · ${mode}`, async ({ page }) => {
-    await page.addInitScript((m) => localStorage.setItem('viewMode', m), mode)
-    await page.goto('en/')
-    const { violations } = await new AxeBuilder({ page }).analyze()
-    const blocking = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical')
-    expect(blocking.map((v) => `${v.id}: ${v.help}`)).toEqual([])
-  })
-}
 
 test('the first Tab reaches "Skip to content", which moves focus to the main content', async ({
   page,

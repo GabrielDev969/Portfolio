@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import type { CreditBlock, SiteContent } from '@/content/schema'
 import { asset } from '@/lib/site'
 import { ChapterCard } from '../cinema/ChapterCard'
@@ -56,7 +57,11 @@ export function Contact({ content }: Props) {
             <div className="credits-end">
               <p>{contact.basedIn}</p>
               {person.relocation ? <p>{person.relocation}.</p> : null}
-              <a href={`mailto:${contact.email}`} className="write-to-me">
+              <a
+                href={`mailto:${contact.email}`}
+                className="write-to-me"
+                style={{ '--chars': contact.cta.length } as CSSProperties}
+              >
                 {contact.cta}
               </a>
               <p>{contact.email}</p>

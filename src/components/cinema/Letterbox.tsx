@@ -34,7 +34,15 @@ export function Letterbox({ locale, content }: Props) {
             href="#top"
             className="font-display text-body font-bold tracking-[0.01em] whitespace-nowrap"
           >
-            {person.name}
+            {/* Phones get the initials, so the menu, Quick view and all three languages fit
+                at 360 px in every locale; the full name stays the link's accessible name. */}
+            <span aria-hidden="true" className="sm:hidden">
+              {person.name
+                .split(' ')
+                .map((word) => word[0])
+                .join('')}
+            </span>
+            <span className="max-sm:sr-only">{person.name}</span>
           </a>
           <div className="flex items-center sm:gap-3">
             <ChapterNav label={ui.chapters} navLabel={ui.chaptersNav} chapters={sections} />

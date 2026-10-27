@@ -10,6 +10,8 @@ type Props = { locale: Locale; content: SiteContent }
  * The title sequence, and the 5-second test: name, role, core stack, "Remote", Contact and
  * Download CV all sit inside the band between the closed bars at every width, without scrolling.
  * The facts and buttons are never animated in and never covered (design/STORYBOARD.md §1).
+ * Phones align it to the top instead of centring it: if the text font swaps in and a fact
+ * rewraps, only what is below that line moves, not the name.
  */
 export function Hero({ locale, content }: Props) {
   const { person, ui, contact, chapters } = content
@@ -24,7 +26,7 @@ export function Hero({ locale, content }: Props) {
       data-act=""
       data-act-title={ui.openingTitles}
       aria-labelledby="hero-name"
-      className="page-grid min-h-svh content-center gap-y-[clamp(16px,3svh,32px)] py-[calc(var(--bar-closed)+clamp(12px,3svh,40px))] quick:min-h-0 quick:pt-[calc(var(--bar-open)+48px)] quick:pb-8"
+      className="page-grid min-h-svh content-center gap-y-[clamp(16px,3svh,32px)] py-[calc(var(--bar-closed)+clamp(12px,3svh,40px))] max-md:content-start quick:min-h-0 quick:pt-[calc(var(--bar-open)+48px)] quick:pb-8"
     >
       <h1
         id="hero-name"
@@ -49,7 +51,10 @@ export function Hero({ locale, content }: Props) {
             {person.workMode}.
           </span>
         </p>
-        {person.relocation ? <p>{person.relocation}.</p> : null}
+        {/* Two lines on phones in either font (ch scales with the font), so the swap cannot rewrap it. */}
+        {person.relocation ? (
+          <p className="text-balance max-sm:max-w-[30ch]">{person.relocation}.</p>
+        ) : null}
         <div className="mt-[clamp(16px,2.5svh,28px)] flex flex-wrap gap-3">
           <Button variant="velvet" href="#contact" data-fact="contact">
             {ui.contact}
@@ -60,8 +65,9 @@ export function Hero({ locale, content }: Props) {
         </div>
       </div>
 
-      {/* On wide screens the line sits beside the name, on its last baseline, like a poster title. */}
-      <p className="col-span-12 self-end font-text text-scene text-balance italic md:col-span-9 lg:col-span-5 lg:col-start-8 lg:row-start-1 lg:pb-[0.1em] quick:col-span-12 quick:col-start-1 quick:row-start-auto quick:pb-0 quick:text-body">
+      {/* On wide screens the line sits beside the name, on its last baseline, like a poster title.
+          On tablets it sits beside the facts, so the stack stays inside the bars when standing up. */}
+      <p className="col-span-12 self-end font-text text-scene text-balance italic md:col-span-5 md:col-start-8 md:row-start-2 lg:col-span-5 lg:col-start-8 lg:row-start-1 lg:pb-[0.1em] quick:col-span-12 quick:col-start-1 quick:row-start-auto quick:pb-0 quick:text-body">
         {person.heroLine}
       </p>
 

@@ -30,8 +30,8 @@
   --text-title: min(30vw, 22svh, 13rem);
   --text-title--line-height: 0.86;
   --text-title--letter-spacing: -0.03em;
-  /* Chapter titles are single long words ("Experience"), which cannot wrap: same role as the
-     title, capped by width so the word never spills past the screen edge. */
+  /* Chapter titles: same role as the title. .chapter-title shrinks it further when the longest
+     word would spill out of its column ("Experiencia" is wider than "Experience"). */
   --text-chapter: min(22vw, 22svh, 13rem);
   --text-chapter--line-height: 0.86;
   --text-chapter--letter-spacing: -0.03em;
@@ -871,6 +871,14 @@
 
   /* The one action, at title size: screen on a solid velvet plate (6.3:1; velvet text on black
    would be 2.8:1). */
+  /* Chapter size, unless the longest word (--chars, set by ChapterCard) would overflow its
+     column: "EXPERIENCIA" is wider than "EXPERIENCE". 0.44 em is the widest letter average. */
+  .chapter-title {
+    font-size: min(var(--text-chapter), calc(100cqi / (var(--chars) * 0.44)));
+    line-height: var(--text-chapter--line-height);
+    letter-spacing: var(--text-chapter--letter-spacing);
+  }
+
   .write-to-me {
     display: inline-block;
     margin-block: 1.5rem 1rem;
@@ -879,7 +887,13 @@
     background: var(--color-velvet);
     color: var(--color-screen);
     font-family: var(--font-display);
-    font-size: var(--text-title);
+    /* One line at any width and in any language: the plate shrinks to fit its label
+       (--chars, set by Contact) where the title size would overflow. Big Shoulders caps
+       run at most 0.44 em a letter; the padding adds 0.5 em. */
+    font-size: min(
+      var(--text-title),
+      calc((100vw - 2 * var(--page-margin)) / (var(--chars) * 0.44 + 0.5))
+    );
     font-weight: 800;
     line-height: var(--text-title--line-height);
     letter-spacing: var(--text-title--letter-spacing);
