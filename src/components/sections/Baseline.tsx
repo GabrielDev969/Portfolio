@@ -3,7 +3,7 @@ import { asset } from '@/lib/site'
 import { ChapterCard } from '../cinema/ChapterCard'
 
 // Temporary: every fact after the hero, in plain semantic HTML on the design tokens.
-// Phase 5 replaces How I work and Contact.
+// Phase 5 replaces Contact next.
 
 const body = 'col-span-12 md:col-span-8 md:col-start-2 measure quick:col-start-1'
 
@@ -12,26 +12,6 @@ export function Baseline({ content: c }: { content: SiteContent }) {
 
   return (
     <>
-      <section
-        id="how-i-work"
-        data-section
-        data-act={chapters.howIWork.act}
-        data-act-title={chapters.howIWork.title}
-        aria-labelledby="how-i-work-title"
-      >
-        <ChapterCard id="how-i-work-title" {...chapters.howIWork} />
-        <div className="page-grid pb-32 quick:pb-8">
-          <div className={body}>
-            <ol className="list-decimal space-y-1 pl-6">
-              {c.workflow.steps.map((step) => (
-                <li key={step}>{step}</li>
-              ))}
-            </ol>
-            <p className="mt-6 font-semibold">{c.workflow.closing}</p>
-          </div>
-        </div>
-      </section>
-
       <section
         id="contact"
         data-section
