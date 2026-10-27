@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import { PersonJsonLd } from '@/components/PersonJsonLd'
 import { BarsState } from '@/components/cinema/BarsState'
 import { CueMark } from '@/components/cinema/CueMark'
 import { FilmGrain } from '@/components/cinema/FilmGrain'
@@ -22,6 +23,7 @@ export default async function LocalePage({ params }: Props) {
 
   return (
     <>
+      <PersonJsonLd locale={locale} content={content} />
       <ColdOpen production={content.production} skip={content.ui.skipIntro} />
       <Letterbox locale={locale} content={content} />
       <main id="main" tabIndex={-1} className="outline-none">
