@@ -9,6 +9,12 @@ export const stills = {
     height: 460,
     widths: [240, 460],
   },
+  bookowl: {
+    source: 'assets/scenes/bookowl.png',
+    width: 817,
+    height: 331,
+    widths: [480, 817],
+  },
 } as const
 
 export type StillId = keyof typeof stills

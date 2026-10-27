@@ -30,7 +30,6 @@ export const en: SiteContent = {
     photo: {
       still: 'gabriel',
       alt: 'Gabriel Santos, smiling, in a blue blazer and glasses.',
-      pending: todo('replace the GitHub avatar with a professional photo'),
     },
   },
   ui: {
@@ -153,7 +152,7 @@ export const en: SiteContent = {
       organization: 'Group Wave Enterprise',
       logline:
         "Dashboards built on RedTrack data: monthly and weekly analysis, and each media buyer's performance by the campaigns they launched.",
-      stack: ['RedTrack', todo('the rest of the Campaign BI stack')],
+      stack: ['RedTrack', 'n8n', 'PostgreSQL', todo('what the dashboards are built with')],
       internal: true,
       still: {
         kind: 'mockup',
@@ -168,20 +167,28 @@ export const en: SiteContent = {
         architecture: {
           nodes: [
             { id: 'redtrack', label: 'RedTrack', kind: 'external' },
-            {
-              id: 'pipeline',
-              label: todo('what sits between RedTrack and the dashboards'),
-              kind: 'service',
-            },
+            { id: 'n8n', label: 'n8n pipelines', kind: 'service' },
+            { id: 'db', label: 'PostgreSQL', kind: 'data' },
             { id: 'dashboards', label: 'Dashboards', kind: 'client' },
           ],
           edges: [
-            { from: 'redtrack', to: 'pipeline' },
-            { from: 'pipeline', to: 'dashboards' },
+            { from: 'redtrack', to: 'n8n' },
+            { from: 'n8n', to: 'db' },
+            { from: 'db', to: 'dashboards' },
           ],
           confirmed: false,
         },
-        decisions: [missing.decision(), missing.decision()],
+        decisions: [
+          {
+            what: "Dashboards on RedTrack data, with monthly and weekly views and each media buyer's performance.",
+            why: todo('why these views'),
+          },
+          { what: 'n8n pipelines feed PostgreSQL.', why: todo('why n8n and PostgreSQL') },
+          {
+            what: 'A largest-remainder allocation script for conversions and revenue.',
+            why: 'The metrics were inflated. The script corrected them, and the results were reconciled against the reference spreadsheets.',
+          },
+        ],
         testing: missing.testing(),
         deploy: missing.deploy(),
         outcome: missing.outcome(),
@@ -191,8 +198,8 @@ export const en: SiteContent = {
       id: 'zibby',
       title: 'Zibby',
       logline:
-        'My own multi-store e-commerce platform: a storefront and an admin panel, Stripe payments and a Zendrop integration.',
-      stack: ['Next.js', 'NestJS', 'PostgreSQL', 'Prisma', 'Stripe'],
+        'My own multi-store e-commerce platform, launched in October 2026: a storefront, an admin panel, Stripe payments and Zendrop fulfillment.',
+      stack: ['Next.js', 'NestJS', 'PostgreSQL', 'Prisma', 'Stripe', 'Zendrop'],
       internal: false,
       still: {
         kind: 'mockup',
@@ -202,15 +209,18 @@ export const en: SiteContent = {
       links: todo('a public link for Zibby, if there is one'),
       behindTheScenes: {
         problem: missing.problem(),
-        role: missing.role(),
+        role: [
+          'My own product.',
+          'I built it in phases with AI coding agents, and every phase went plan → review → implement → tests → diff review → merge.',
+        ],
         architecture: {
           nodes: [
-            { id: 'storefront', label: 'Storefront', kind: 'client' },
-            { id: 'admin', label: 'Admin panel', kind: 'client' },
-            { id: 'api', label: 'API (NestJS)', kind: 'service' },
+            { id: 'storefront', label: 'Storefront (Next.js)', kind: 'client' },
+            { id: 'admin', label: 'Admin panel (Next.js)', kind: 'client' },
+            { id: 'api', label: 'API (NestJS, modular monolith)', kind: 'service' },
             { id: 'db', label: 'PostgreSQL (Prisma)', kind: 'data' },
-            { id: 'stripe', label: 'Stripe', kind: 'external' },
-            { id: 'zendrop', label: 'Zendrop', kind: 'external' },
+            { id: 'stripe', label: 'Stripe (payments)', kind: 'external' },
+            { id: 'zendrop', label: 'Zendrop (fulfillment)', kind: 'external' },
           ],
           edges: [
             { from: 'storefront', to: 'api' },
@@ -221,10 +231,24 @@ export const en: SiteContent = {
           ],
           confirmed: false,
         },
-        decisions: [missing.decision(), missing.decision()],
-        testing: 'Automated tests across the monorepo.',
+        decisions: [
+          {
+            what: 'A pnpm monorepo with the NestJS API and the Next.js storefront and admin, organized as a modular monolith.',
+            why: todo('why a modular monolith in one monorepo'),
+          },
+          { what: 'PostgreSQL with Prisma.', why: todo('why PostgreSQL and Prisma') },
+          {
+            what: 'Stripe for payments and Zendrop for fulfillment.',
+            why: todo('why Stripe and Zendrop'),
+          },
+        ],
+        testing:
+          'Automated tests across the monorepo; each phase passed them before its diff review.',
         deploy: 'Deployed to a VPS.',
-        outcome: missing.outcome(),
+        outcome: [
+          'Launched in October 2026.',
+          todo('one number, if you want it: orders, products or uptime'),
+        ],
       },
     },
     {
@@ -232,7 +256,7 @@ export const en: SiteContent = {
       title: 'Hostly',
       organization: 'IA Robots Solutions',
       logline:
-        'A system for OrionStar service robots: an admin panel, a backend on a VPS and a RobotOS app that plays scheduled campaigns and music and talks to people.',
+        'A system for OrionStar service robots: an admin panel that schedules ad campaigns and music, a backend on a VPS, and a RobotOS app that plays them and talks to people.',
       stack: ['RobotOS', todo('the rest of the Hostly stack')],
       internal: true,
       still: {
@@ -248,16 +272,31 @@ export const en: SiteContent = {
         architecture: {
           nodes: [
             { id: 'admin', label: 'Admin panel', kind: 'client' },
+            { id: 'app', label: 'Robot app', kind: 'client' },
             { id: 'backend', label: 'Backend (VPS)', kind: 'service' },
-            { id: 'robot', label: 'RobotOS app on OrionStar robots', kind: 'device' },
+            { id: 'robot', label: 'RobotOS on OrionStar LuckiBot Plus', kind: 'device' },
           ],
           edges: [
-            { from: 'admin', to: 'backend' },
-            { from: 'robot', to: 'backend' },
+            { from: 'admin', to: 'backend', label: 'campaigns, music' },
+            { from: 'app', to: 'backend' },
+            { from: 'app', to: 'robot', label: 'abstraction layer' },
           ],
           confirmed: false,
         },
-        decisions: [missing.decision(), missing.decision()],
+        decisions: [
+          {
+            what: 'The robot app reaches RobotOS (OrionStar LuckiBot Plus) through an abstraction layer.',
+            why: 'So it can move to AgentOS later.',
+          },
+          {
+            what: 'A backend on a VPS, and an admin panel to schedule ad campaigns and music.',
+            why: todo('why this split'),
+          },
+          {
+            what: 'Designed to become a multi-company SaaS later.',
+            why: todo('what that changed in the design today'),
+          },
+        ],
         testing: missing.testing(),
         deploy: 'The backend is hosted on a VPS.',
         outcome: missing.outcome(),
@@ -266,13 +305,14 @@ export const en: SiteContent = {
     {
       id: 'bookowl',
       title: 'BookOwl',
-      logline: 'An open source library management system in Python and Django.',
+      logline:
+        'An open source library management system in Python and Django, built for a real church library.',
       stack: ['Python', 'Django'],
       internal: false,
       still: {
         kind: 'image',
-        src: 'scenes/bookowl',
-        alt: 'The BookOwl library management interface.',
+        still: 'bookowl',
+        alt: 'The BookOwl home screen: the owl logo over a welcome message.',
       },
       links: {
         kind: 'public',
@@ -289,7 +329,10 @@ export const en: SiteContent = {
           edges: [{ from: 'app', to: 'db' }],
           confirmed: false,
         },
-        decisions: [missing.decision(), missing.decision()],
+        decisions: [
+          { what: 'Python and Django.', why: todo('why Python and Django') },
+          { what: 'Open source, on GitHub.', why: todo('why open source') },
+        ],
         testing: missing.testing(),
         deploy: todo('how BookOwl is deployed'),
         outcome: missing.outcome(),

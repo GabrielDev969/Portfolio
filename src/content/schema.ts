@@ -7,6 +7,8 @@ import type { StillId } from '@/lib/stills'
  */
 export type Todo = { readonly todo: string }
 export type Text = string | Todo
+/** One or more sentences, set as a paragraph; a missing one drops out on its own. */
+export type Prose = Text | Text[]
 
 export function todo(what: string): Todo {
   return { todo: what }
@@ -50,20 +52,20 @@ export type Architecture = {
 export type Decision = { what: Text; why: Text }
 
 export type BehindTheScenes = {
-  problem: Text
-  role: Text
+  problem: Prose
+  role: Prose
   architecture: Architecture
   /** Two or three entries; enforced by tests/unit/content.test.ts. */
   decisions: Decision[]
-  testing: Text
-  deploy: Text
-  outcome: Text
+  testing: Prose
+  deploy: Prose
+  outcome: Prose
 }
 
 export type MockupId = 'wave-board' | 'campaign-chart' | 'zibby-store' | 'hostly-schedule'
 
 export type Still =
-  | { kind: 'image'; src: string; alt: string }
+  | { kind: 'image'; still: StillId; alt: string }
   | { kind: 'mockup'; mockup: MockupId; description: string }
 
 export type ProjectLinks = { kind: 'public'; links: Link[] } | { kind: 'internal' } | Todo
@@ -100,7 +102,7 @@ export type SiteContent = {
     heroLine: string
     availability: string
     about: string
-    photo: { still: StillId; alt: string; pending: Todo }
+    photo: { still: StillId; alt: string }
   }
   ui: {
     skipIntro: string

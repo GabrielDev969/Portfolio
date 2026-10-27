@@ -1,7 +1,7 @@
 import type { ProjectLinks, SiteContent } from '@/content/schema'
 import { isTodo } from '@/content/schema'
 import { asset } from '@/lib/site'
-import { resolveText } from '@/lib/text'
+import { resolveProse, resolveText } from '@/lib/text'
 import { ChapterCard } from '../cinema/ChapterCard'
 
 // Temporary: every fact after the hero, in plain semantic HTML on the design tokens.
@@ -72,7 +72,7 @@ export function Baseline({ content: c }: { content: SiteContent }) {
                     <summary className="cursor-pointer font-semibold">{ui.behindTheScenes}</summary>
                     <div className="mt-3 space-y-2 border-t border-ink/20 pt-3">
                       {parts.map(([label, value], i) => {
-                        const text = resolveText(value)
+                        const text = resolveProse(value).join(' ')
                         return text ? (
                           <p key={i}>
                             <strong>{label}:</strong> {text}
