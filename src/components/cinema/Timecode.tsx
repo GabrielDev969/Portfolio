@@ -1,8 +1,8 @@
 'use client'
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { formatTimecode } from '@/lib/timecode'
 import { useViewMode } from '@/lib/view-mode'
-import { ScrollTrigger, useGSAP } from '@/motion/gsap'
+import { useMotion } from '@/motion/runtime'
 import { timecode } from '@/motion/tokens'
 
 type Props = { openingTitles: string }
@@ -22,14 +22,17 @@ export function Timecode({ openingTitles }: Props) {
   const act = useRef<HTMLSpanElement>(null)
   const title = useRef<HTMLSpanElement>(null)
   const mode = useViewMode()
+  const runtime = useMotion()
 
-  useGSAP(
-    () => {
-      if (mode === 'quick') return
-      const show = (actText: string, titleText: string) => {
-        if (act.current) act.current.textContent = actText
-        if (title.current) title.current.textContent = titleText
-      }
+  useEffect(() => {
+    if (mode === 'quick' || !runtime) return
+    const { ScrollTrigger } = runtime
+    const triggers: ReturnType<typeof ScrollTrigger.create>[] = []
+    const show = (actText: string, titleText: string) => {
+      if (act.current) act.current.textContent = actText
+      if (title.current) title.current.textContent = titleText
+    }
+    triggers.push(
       ScrollTrigger.create({
         start: 0,
         end: 'max',
@@ -42,8 +45,10 @@ export function Timecode({ openingTitles }: Props) {
           }
           text.current = next
         },
-      })
-      for (const section of document.querySelectorAll<HTMLElement>('[data-act-title]')) {
+      }),
+    )
+    for (const section of document.querySelectorAll<HTMLElement>('[data-act-title]')) {
+      triggers.push(
         ScrollTrigger.create({
           trigger: section,
           start: 'top center',
@@ -51,11 +56,11 @@ export function Timecode({ openingTitles }: Props) {
           onToggle: (self) => {
             if (self.isActive) show(section.dataset.act ?? '', section.dataset.actTitle ?? '')
           },
-        })
-      }
-    },
-    { dependencies: [mode], revertOnUpdate: true },
-  )
+        }),
+      )
+    }
+    return () => triggers.forEach((t) => t.kill())
+  }, [mode, runtime])
 
   return (
     <p className="flex items-baseline gap-3 text-small">

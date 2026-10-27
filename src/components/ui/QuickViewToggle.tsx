@@ -1,6 +1,6 @@
 'use client'
-import { ScrollTrigger } from '@/motion/gsap'
 import { setViewMode, useViewMode } from '@/lib/view-mode'
+import { peekMotion } from '@/motion/runtime'
 
 type Props = { quickView: string; filmView: string }
 
@@ -20,7 +20,7 @@ export function QuickViewToggle({ quickView, filmView }: Props) {
     setViewMode(quick ? 'film' : 'quick')
     requestAnimationFrame(() => {
       section?.scrollIntoView({ block: 'start' })
-      ScrollTrigger.refresh()
+      peekMotion()?.ScrollTrigger.refresh()
     })
   }
 

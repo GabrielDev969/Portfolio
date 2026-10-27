@@ -95,7 +95,6 @@ Each pin is the newest stable release that is **at least 2 weeks old** (as of 20
 | next                                   | 16.3.8        | 2026-09-30                     |
 | react / react-dom                      | 19.3.0        | 2026-09-09                     |
 | gsap                                   | 3.15.0        | 2026-04-13                     |
-| @gsap/react                            | 2.1.2         | 2025-01-15                     |
 | lenis                                  | 1.3.26        | 2026-08-05                     |
 | motion                                 | 14.1.1        | 2026-10-13                     |
 | **dev:** typescript                    | 6.0.3         | 2026-04-16                     |
@@ -118,16 +117,14 @@ Each pin is the newest stable release that is **at least 2 weeks old** (as of 20
 
 ## JS budget (≤ 180 KB gzipped, initial)
 
-| Item                                   | Estimate                                                           |
-| -------------------------------------- | ------------------------------------------------------------------ |
-| Next + React runtime                   | ≈ 95 KB                                                            |
-| GSAP core, ScrollTrigger and SplitText | ≈ 50 KB                                                            |
-| Lenis                                  | ≈ 5 KB                                                             |
-| Motion                                 | `LazyMotion` + `m` with `domAnimation` loaded async ≈ 6 KB initial |
-| App code                               | ≈ 15 KB                                                            |
-| **Total**                              | **≈ 170 KB**                                                       |
+**Measured, not estimated.** `pnpm measure:js` counts the scripts a modern browser downloads for first paint. It leaves out `noModule` polyfills, and CI fails the build above 180 KB.
 
-This is tight. The budget is enforced in `ci.yml`. If it is exceeded, the first cut is to load SplitText and the Projects timelines through dynamic import after first paint.
+| When    | Initial JS (gzipped) | What changed                                                                                                                                                                                                             |
+| ------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Phase 1 | 226.2 KB             | Next + React alone are about 130 KB (the plan had guessed 95); GSAP, ScrollTrigger and Lenis were in the first bundle                                                                                                    |
+| Phase 2 | **175.6 KB**         | GSAP and Lenis load after first paint through `motion/runtime.ts`; `@gsap/react` is dropped because it imports GSAP statically, and `useScrollScene` does the same scoped `gsap.context()` cleanup over the lazy runtime |
+
+The margin is 4.4 KB. **Standing rule (from Gabriel):** if a later phase goes over 180 KB, Motion is replaced by CSS transitions (`@starting-style` for the menu and panels) without asking.
 
 A Quick view reader on a return visit downloads the same JS (one bundle) but runs none of the motion code.
 

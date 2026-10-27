@@ -1,7 +1,7 @@
 'use client'
-import type { RefObject } from 'react'
+import { useEffect, type RefObject } from 'react'
 import { useViewMode } from '@/lib/view-mode'
-import { gsap, useGSAP } from '../gsap'
+import { useMotion, type MotionRuntime } from '../runtime'
 
 export type SceneConditions = {
   /** prefers-reduced-motion: no-preference */
@@ -18,29 +18,34 @@ type Options = {
 }
 
 /**
- * Every scroll scene goes through here: scoped to its component, cleaned up on unmount,
- * re-run on breakpoint and reduced-motion changes, and never run in Quick view.
+ * Every scroll scene goes through here. It waits for the lazily loaded GSAP runtime, scopes
+ * selectors to the component, re-runs on breakpoint and reduced-motion changes, reverts
+ * everything on unmount, and never runs in Quick view. (It does what @gsap/react's useGSAP
+ * does, without importing GSAP into the first-paint bundle.)
  */
 export function useScrollScene(
-  setup: (conditions: SceneConditions) => void | (() => void),
+  setup: (conditions: SceneConditions, runtime: MotionRuntime) => void | (() => void),
   { scope, dependencies = [] }: Options,
 ) {
   const mode = useViewMode()
+  const runtime = useMotion()
 
-  useGSAP(
-    () => {
-      if (mode === 'quick' || !scope.current) return
-      const mm = gsap.matchMedia(scope.current)
-      mm.add(
+  useEffect(() => {
+    const element = scope.current
+    if (!runtime || mode === 'quick' || !element) return
+    const { gsap } = runtime
+    const context = gsap.context(() => {
+      gsap.matchMedia(element).add(
         {
           motion: '(prefers-reduced-motion: no-preference)',
           reduced: '(prefers-reduced-motion: reduce)',
           desktop: '(min-width: 768px)',
         },
-        (context) => setup(context.conditions as SceneConditions),
+        (media) => setup(media.conditions as SceneConditions, runtime),
       )
-      return () => mm.revert()
-    },
-    { scope, dependencies: [mode, ...dependencies], revertOnUpdate: true },
-  )
+    }, element)
+    return () => context.revert()
+    // `setup` is a fresh closure on every render; the scene re-runs only when these change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [runtime, mode, scope, ...dependencies])
 }

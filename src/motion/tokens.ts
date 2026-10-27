@@ -16,6 +16,8 @@ export const dur = {
   reveal: 1.1,
   bars: 1.2,
   rewind: 1.6,
+  /** The cold open's hard cut; the brief caps the whole intro at 1.5 s. */
+  intro: 1.3,
 } as const
 
 export const stagger = { lines: 0.06, credits: 0.05 } as const
@@ -36,6 +38,9 @@ export const motionCssVars = {
   '--dur-ui': `${dur.ui * 1000}ms`,
   '--dur-fade': `${dur.fade * 1000}ms`,
   '--dur-bars': `${dur.bars * 1000}ms`,
+  '--dur-reveal': `${dur.reveal * 1000}ms`,
+  '--dur-intro': `${dur.intro * 1000}ms`,
+  '--stagger-lines': `${stagger.lines * 1000}ms`,
   '--ease-out': cssEase.out,
   '--ease-expo': cssEase.expo,
 } as const
