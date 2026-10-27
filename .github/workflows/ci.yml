@@ -35,8 +35,13 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
       - name: End-to-end tests (5-second test, view modes, no-JS)
         run: pnpm test:e2e
+      # Runs even after a failure; any test that needed its retry is listed, never hidden.
+      - name: Tests that passed only on retry
+        id: flaky
+        if: always()
+        run: pnpm --silent flaky
       - name: Upload the Playwright report
-        if: failure()
+        if: failure() || steps.flaky.outputs.flaky != '0'
         uses: actions/upload-artifact@v7
         with:
           name: playwright-report

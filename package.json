@@ -24,6 +24,7 @@
     "og": "tsx scripts/og-posters.ts",
     "gate": "tsx scripts/gate-screenshots.ts",
     "test:e2e": "playwright test",
+    "flaky": "tsx scripts/flaky-report.ts",
     "measure:js": "tsx scripts/measure-js.ts",
     "measure:vitals": "tsx scripts/measure-vitals.ts",
     "journey": "tsx scripts/journey.ts"
