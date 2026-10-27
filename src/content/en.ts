@@ -28,14 +28,15 @@ export const en: SiteContent = {
     about:
       'Full Stack Developer with about 5 years of experience: 4 as a Systems Analyst and over 1 working remotely. I build complete products, from the database to the interface: frontends and dashboards with Next.js and React, APIs with Node.js and NestJS, and data in PostgreSQL. I use AI coding agents daily to move faster without giving up technical judgment, and I am pursuing a postgraduate degree in Software Engineering for Applied AI.',
     photo: {
-      src: 'https://github.com/GabrielDev969.png',
-      alt: 'Gabriel Santos',
+      still: 'gabriel',
+      alt: 'Gabriel Santos, smiling, in a blue blazer and glasses.',
       pending: todo('replace the GitHub avatar with a professional photo'),
     },
   },
   ui: {
     skipIntro: 'Skip intro',
     skipToContent: 'Skip to content',
+    present: 'present',
     quickView: 'Quick view',
     filmView: 'Film view',
     chapters: 'Chapters',

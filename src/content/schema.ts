@@ -1,4 +1,5 @@
 import type { Locale } from '@/lib/i18n'
+import type { StillId } from '@/lib/stills'
 
 /**
  * A fact Gabriel still has to provide. In development it renders as a marked
@@ -99,11 +100,13 @@ export type SiteContent = {
     heroLine: string
     availability: string
     about: string
-    photo: { src: string; alt: string; pending: Todo }
+    photo: { still: StillId; alt: string; pending: Todo }
   }
   ui: {
     skipIntro: string
     skipToContent: string
+    /** For date ranges that are still open: "2025–present". */
+    present: string
     quickView: string
     filmView: string
     chapters: string

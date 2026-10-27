@@ -1,15 +1,11 @@
-import type { Milestone, ProjectLinks, SiteContent } from '@/content/schema'
+import type { ProjectLinks, SiteContent } from '@/content/schema'
 import { isTodo } from '@/content/schema'
 import { asset } from '@/lib/site'
 import { resolveText } from '@/lib/text'
 import { ChapterCard } from '../cinema/ChapterCard'
 
 // Temporary: every fact after the hero, in plain semantic HTML on the design tokens.
-// Phases 3–5 replace one section at a time (Experience, Projects, How I work, Contact).
-
-function years({ start, end }: Milestone, present: string) {
-  return `${start}–${end === 'present' ? present : end}`
-}
+// Phases 4–5 replace one section at a time (Projects, How I work, Contact).
 
 function Links({ links, internalNote }: { links: ProjectLinks; internalNote: string }) {
   if (isTodo(links)) return null
@@ -39,30 +35,6 @@ export function Baseline({ content: c }: { content: SiteContent }) {
 
   return (
     <>
-      <section
-        id="experience"
-        data-section
-        data-act={chapters.experience.act}
-        data-act-title={chapters.experience.title}
-        aria-labelledby="experience-title"
-      >
-        <ChapterCard id="experience-title" {...chapters.experience} />
-        <div className="page-grid pb-32 quick:pb-8">
-          <ol className={`${body} space-y-8`}>
-            {c.experience.map((m) => (
-              <li key={m.id}>
-                <p className="font-display text-body font-bold tabular">{years(m, 'present')}</p>
-                <h3 className="font-semibold">
-                  {m.title}, {m.organization}
-                </h3>
-                {m.summary ? <p>{m.summary}</p> : null}
-                {m.place ? <p className="text-small text-ink-2">{m.place}</p> : null}
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
       <section
         id="projects"
         data-section

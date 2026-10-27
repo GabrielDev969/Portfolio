@@ -52,7 +52,8 @@
 :root {
   /* Masking bars: closed around the hero, open everywhere else. */
   --bar-open: 44px;
-  --bar-closed: 9svh;
+  /* Whole pixels: a half-pixel bar edge rasterizes unevenly across GPU tiles (a stray line). */
+  --bar-closed: round(9svh, 1px);
   --page-margin: clamp(16px, 4vw, 64px);
   --grid-gap: clamp(12px, 1.6vw, 24px);
   scroll-padding-top: calc(var(--bar-open) + 16px);
@@ -61,7 +62,7 @@
 
 @media (min-width: 768px) {
   :root {
-    --bar-closed: 13.5svh;
+    --bar-closed: round(13.5svh, 1px);
   }
 }
 
@@ -264,7 +265,10 @@
 /* ---- Hero: family A, the name rises from behind its mask (CSS, so first paint needs no JS) ---- */
 .rise-line {
   display: block;
-  overflow: hidden;
+  /* The mask only needs to hide the line below it. Clip vertically, never sideways: a single
+     long word ("Experience") can be wider than its column and must stay whole. */
+  overflow-x: visible;
+  overflow-y: clip;
   /* Room for the cap tops at leading 0.86 so the mask does not crop them. */
   padding-top: 0.06em;
   margin-top: -0.06em;
@@ -274,12 +278,12 @@
   display: inline-block;
 }
 
-:root[data-js] .rise-line > span {
+:root[data-js] .hero-name .rise-line > span {
   animation: rise var(--dur-reveal) var(--ease-expo) both;
   animation-delay: calc(var(--i, 0) * var(--stagger-lines));
 }
 
-:root[data-js][data-intro] .rise-line > span {
+:root[data-js][data-intro] .hero-name .rise-line > span {
   animation-delay: calc(var(--dur-intro) + var(--i, 0) * var(--stagger-lines));
 }
 
@@ -299,6 +303,222 @@
   transform: scale(1.06);
 }
 
+/* The cue mark lives in the right page margin, centred in it and never wider than three
+   quarters of it, so it can flash without covering a word (28px on desktop, 12px on phones). */
+.cue-mark {
+  --cue-size: min(28px, calc(var(--page-margin) * 0.75));
+  top: calc(var(--bar-open) + 24px);
+  right: calc((var(--page-margin) - var(--cue-size)) / 2);
+  width: var(--cue-size);
+  height: var(--cue-size);
+}
+
+/* ---- Act I · Experience: a 35 mm strip ----
+   The default is a vertical strip (phones, reduced motion, no JS). ExperienceStrip sets
+   data-strip="on" when it pins the reel, and only then is the strip laid out sideways. */
+.strip {
+  padding-bottom: clamp(5rem, 12vw, 12rem);
+}
+
+.strip-pin {
+  padding-inline: var(--page-margin);
+}
+
+.strip-track {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  max-width: 64rem;
+  margin-inline: auto;
+}
+
+.strip-item {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .strip-item {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    column-gap: var(--grid-gap);
+    align-items: center;
+  }
+}
+
+.strip-cell {
+  position: relative;
+  padding: 0.75rem 1.75rem;
+  background: var(--color-house);
+  color: var(--color-screen);
+}
+
+/* Sprocket holes: the ground showing through the film base, down both edges. */
+.strip-cell::before,
+.strip-cell::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  width: 0.5rem;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 0.4rem,
+    var(--color-screen) 0.4rem 0.8rem,
+    transparent 0.8rem 1.25rem
+  );
+}
+
+.strip-cell::before {
+  left: 0.6rem;
+}
+
+.strip-cell::after {
+  right: 0.6rem;
+}
+
+.strip-frame {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  aspect-ratio: 2.39 / 1;
+  overflow: hidden;
+  padding: clamp(0.75rem, 1.4vw, 1.25rem);
+  background: var(--color-screen);
+  color: var(--color-ink);
+}
+
+/* The protagonist's still: the same muted treatment as every frame on the site. */
+.strip-still {
+  position: absolute;
+  inset-block: 0;
+  right: 0;
+  width: 42%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 20%;
+  filter: saturate(0.7) contrast(1.05);
+}
+
+/* Edge print: the frame's year, like the code printed along the film stock. */
+.strip-edge {
+  margin-top: 0.35rem;
+  font-size: var(--text-small);
+  letter-spacing: 0.2em;
+}
+
+/* Years are drawn in the frame; the caption carries them for screen readers and Quick view. */
+.strip-years {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+[data-strip='on'] {
+  /* The pinned frame already leaves space below the reel; more would open a blank stretch. */
+  padding-bottom: 0;
+
+  .strip-pin {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: calc(100svh - 2 * var(--bar-open));
+    padding-inline: 0;
+    overflow-x: clip;
+  }
+
+  .strip-track {
+    flex-direction: row;
+    gap: 0;
+    width: max-content;
+    max-width: none;
+    margin-inline: 0;
+    padding-inline: var(--page-margin);
+  }
+
+  /* min(28vw, 420px) keeps the reel's overflow, and so the pin, within one screen height. */
+  .strip-item {
+    display: flex;
+    flex-direction: column;
+    /* The vertical layout centres items; the reel needs the cell at the item's full width. */
+    align-items: stretch;
+    width: calc(min(28vw, 420px) + 2vw);
+  }
+
+  .strip-cell {
+    padding: 1.9rem 1vw;
+  }
+
+  .strip-cell::before,
+  .strip-cell::after {
+    inset-inline: 0;
+    inset-block: 0.7rem auto;
+    width: auto;
+    height: 0.5rem;
+    background: repeating-linear-gradient(
+      to right,
+      transparent 0 0.4rem,
+      var(--color-screen) 0.4rem 0.8rem,
+      transparent 0.8rem 1.25rem
+    );
+  }
+
+  .strip-cell::after {
+    inset-block: auto 0.7rem;
+  }
+
+  .strip-caption {
+    padding: 1.5rem 1vw 0;
+  }
+}
+
+/* Quick view: a dated list, one milestone per line. */
+[data-view='quick'] {
+  .strip {
+    padding-bottom: 2rem;
+  }
+
+  .strip-cell {
+    display: none;
+  }
+
+  .strip-track {
+    gap: 0.75rem;
+    max-width: 62ch;
+    margin-inline: 0;
+  }
+
+  .strip-item {
+    display: block;
+  }
+
+  .strip-caption > * {
+    display: inline;
+  }
+
+  .strip-years {
+    position: static;
+    width: auto;
+    height: auto;
+    margin-right: 0.5em;
+    clip-path: none;
+    font-weight: 700;
+  }
+
+  .strip-caption h3::after {
+    content: ', ';
+  }
+
+  .strip-caption h3 + p::after {
+    content: '. ';
+  }
+
+  .strip-summary::after {
+    content: ' ';
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .film-grain {
     animation: none;
@@ -308,7 +528,7 @@
   .hero-name {
     transition: none;
   }
-  :root[data-js] .rise-line > span {
+  :root[data-js] .hero-name .rise-line > span {
     animation: none;
   }
   :root[data-bars='open'] .hero-name {
@@ -320,7 +540,7 @@
   display: none;
 }
 
-[data-view='quick'] :is(.rise-line > span, .hero-name) {
+[data-view='quick'] :is(.hero-name .rise-line > span, .hero-name) {
   animation: none;
   transform: none;
   transition: none;

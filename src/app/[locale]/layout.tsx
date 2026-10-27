@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import type { CSSProperties, ReactNode } from 'react'
 import { getContent } from '@/content'
 import { isLocale, languageTags, locales } from '@/lib/i18n'
+import { KeepAnchor } from '@/motion/KeepAnchor'
 import { MotionProvider } from '@/motion/MotionProvider'
 import { SmoothScroll } from '@/motion/SmoothScroll'
 import { motionCssVars } from '@/motion/tokens'
@@ -42,6 +43,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       <body>
         <MotionProvider>{children}</MotionProvider>
         <SmoothScroll />
+        <KeepAnchor />
       </body>
     </html>
   )

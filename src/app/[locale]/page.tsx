@@ -6,6 +6,7 @@ import { Letterbox } from '@/components/cinema/Letterbox'
 import { Vignette } from '@/components/cinema/Vignette'
 import { Baseline } from '@/components/sections/Baseline'
 import { ColdOpen } from '@/components/sections/ColdOpen'
+import { Experience } from '@/components/sections/Experience'
 import { Hero } from '@/components/sections/Hero'
 import { getContent } from '@/content'
 import { isLocale } from '@/lib/i18n'
@@ -23,6 +24,7 @@ export default async function LocalePage({ params }: Props) {
       <Letterbox locale={locale} content={content} />
       <main id="main" tabIndex={-1} className="outline-none">
         <Hero locale={locale} content={content} />
+        <Experience content={content} />
         <Baseline content={content} />
       </main>
       <CueMark />

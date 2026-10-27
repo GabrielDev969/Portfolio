@@ -88,7 +88,7 @@ Motion families (see COMMIT-SHEET §5): **A** mask rise · **B** reel (linear sc
 
 - **Sees:** "Act I" in Newsreader italic at text size above **"Experience"** at title size, set centred-left on columns 2–11. The card is about 70 vh tall and has no hold, so it costs one flick of the wheel.
 - **Moves:**
-  - Shortly before the card, the **cue mark** (a velvet dot, 28 px, top-right of the content frame) flashes twice for 120 ms each. It is the reel-change signal.
+  - As the card enters the frame, the **cue mark** (a velvet dot in the right page margin, up to 28 px and never wider than three quarters of the margin, so it never covers a word) flashes twice for 120 ms each. It is the reel-change signal.
   - The heading then rises (family A).
 - **Reduced:** the cue mark shows as a static dot with an opacity pulse, and the heading fades in.
 - **Quick view:** the card collapses to a plain section heading: "Experience" at scene size, with no act label and no cue mark.
@@ -98,11 +98,11 @@ The cards for Act II / **Projects** and Act III / **How I work** repeat this com
 ## 3 · Act I · Experience, the film strip (intensity 3)
 
 - **Sees:** a full-bleed horizontal 35 mm strip with sprocket rows top and bottom. There are five milestones in chronological order, as a real `<ol>`. Each milestone is:
-  - **a 2.39:1 frame** holding the year range at scene size, with "present" written out. Frame 1 also holds **the protagonist's still**: the GitHub avatar, desaturated with grain. `TODO(gabriel)`: a professional photo.
+  - **a 2.39:1 frame** holding the start year at scene size, with the end ("–2025", "–present") at text size below it. Frame 1 also holds **the protagonist's still**: the GitHub portrait, served from `assets/stills/` as AVIF/WebP (7.6 KB), muted to `saturate(0.7)`. `TODO(gabriel)`: a professional photo.
   - **under the frame, on the strip margin and at text size:** the role and organisation, one sentence from the content, and the place
   - an edge code (like film-stock edge print) showing the frame's year
 
-  Frames are about `min(29vw, 440px)` wide.
+  Frames are `min(28vw, 420px)` wide. At 1440 × 900 that makes the reel's overflow, and so the pin, 850 px.
 
 - **The milestones:**
   1. 2021–2025, Systems Analyst at Fator
@@ -114,7 +114,9 @@ The cards for Act II / **Projects** and Act III / **How I work** repeat this com
   - **The pin is short:** the frame width is chosen so the track's overflow, and with it the pinned scroll, stays **≤ 1 viewport height** at 1440 × 900. This is the only pin on the page.
   - Each frame's caption slides in from 40 px to the right as the frame crosses 85% of the viewport horizontally (`containerAnimation`).
 - **Mobile (< 768 px):** the strip turns vertical, with sprocket rows down the left and right edges and frames stacked. There is no pin. Each caption uses an opacity fade only.
-- **Reduced:** the vertical layout at every width, with no pin.
+- **How it degrades:** the vertical strip is the markup's default. The horizontal reel exists only while `ExperienceStrip` has set `data-strip="on"`, so if GSAP never loads nothing is cut off.
+- **Deep links:** pinning adds about a screen of space above every later section. `KeepAnchor` puts a `#hash` target back on screen after each ScrollTrigger refresh, until the visitor first scrolls, taps or types.
+- **Reduced:** the vertical layout at every width (from 768 px up, the caption sits beside its frame), with no pin.
 - **Quick view:** a dated list, one line per milestone. Years at text size, bold.
 - **No-JS:** the vertical layout.
 
