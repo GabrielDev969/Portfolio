@@ -1,0 +1,33 @@
+'use client'
+import { useSyncExternalStore } from 'react'
+import { viewModeStorageKey } from './storage-keys'
+
+/** Film is the default; Quick view turns all motion off and shows a compact summary. */
+export type ViewMode = 'film' | 'quick'
+
+const changeEvent = 'viewmodechange'
+
+function read(): ViewMode {
+  return document.documentElement.dataset.view === 'quick' ? 'quick' : 'film'
+}
+
+export function setViewMode(mode: ViewMode) {
+  document.documentElement.dataset.view = mode
+  try {
+    localStorage.setItem(viewModeStorageKey, mode)
+  } catch {
+    // Storage can be blocked; the mode still applies for this page.
+  }
+  window.dispatchEvent(new Event(changeEvent))
+}
+
+export function useViewMode(): ViewMode {
+  return useSyncExternalStore(
+    (onChange) => {
+      window.addEventListener(changeEvent, onChange)
+      return () => window.removeEventListener(changeEvent, onChange)
+    },
+    read,
+    () => 'film',
+  )
+}
