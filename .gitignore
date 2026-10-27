@@ -1,0 +1,21 @@
+# dependencies
+node_modules/
+
+# next.js build output
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# local preview of the static export
+.preview/
+
+# test and audit output
+playwright-report/
+test-results/
+qa/
+.lighthouseci/
+
+# environment and OS
+.env*
+.DS_Store
