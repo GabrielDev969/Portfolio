@@ -26,6 +26,7 @@ let refreshQueued = false
  * were created: a trigger created before the Act I pin, but placed after it on the page, would
  * miss the pin's length (the HUD named each later section about 850 px early). Once the
  * frame's last scene has mounted, put every trigger in page order and measure them again.
+ * Then html[data-motion="ready"] says every scene is in place (tests wait for it).
  */
 export function refreshSoon() {
   if (refreshQueued) return
@@ -35,6 +36,7 @@ export function refreshSoon() {
     if (!loaded) return
     loaded.ScrollTrigger.sort()
     loaded.ScrollTrigger.refresh()
+    document.documentElement.dataset.motion = 'ready'
   })
 }
 

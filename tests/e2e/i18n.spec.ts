@@ -3,7 +3,7 @@ import { getContent } from '../../src/content'
 import { isTodo } from '../../src/content/schema'
 import { languageTags, locales } from '../../src/lib/i18n'
 import { expect, test } from './fixtures'
-import { startInViewMode, viewports } from './helpers'
+import { overflowing, settled, startInViewMode, viewports } from './helpers'
 
 /** English sentences of three words or more: none may show on a translated page. */
 function englishPhrases() {
@@ -99,16 +99,9 @@ for (const locale of locales) {
   test(`the top bar fits a 360 px phone · ${locale}`, async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 780 })
     await page.goto(`${locale}/`)
-    await page.evaluate(() => document.fonts.ready)
-    const overflow = await page
-      .locator('header.bar-top a, header.bar-top button')
-      .evaluateAll((els) =>
-        els
-          .filter((el) => el.getBoundingClientRect().width > 0)
-          .filter((el) => el.getBoundingClientRect().right > innerWidth + 0.5)
-          .map((el) => `${el.textContent} ends at ${Math.round(el.getBoundingClientRect().right)}`),
-      )
-    expect(overflow).toEqual([])
+    await settled(page)
+    const wide = await overflowing(page, 'header.bar-top', '.sr-only')
+    expect(wide, `Wider than the screen:\n${wide.join('\n')}`).toEqual([])
   })
 }
 
@@ -117,17 +110,13 @@ for (const locale of locales) {
     test(`no sideways scroll at ${width} px · ${locale}`, async ({ page }) => {
       await page.setViewportSize({ width, height: 800 })
       await page.goto(`${locale}/`)
-      await page.evaluate(() => document.fonts.ready)
-      const wide = await page.evaluate(() =>
-        [...document.querySelectorAll<HTMLElement>('main *')]
-          .filter((el) => !el.closest('.project-still, .strip-track, [aria-hidden="true"]'))
-          .filter((el) => el.getBoundingClientRect().right > innerWidth + 0.5)
-          .map(
-            (el) => `${el.tagName.toLowerCase()}.${el.className} "${el.textContent?.slice(0, 30)}"`,
-          )
-          .slice(0, 5),
+      await settled(page)
+      const wide = await overflowing(
+        page,
+        'main',
+        '.project-still, .strip-track, [aria-hidden="true"]',
       )
-      expect(wide).toEqual([])
+      expect(wide, `Wider than the screen:\n${wide.join('\n')}`).toEqual([])
     })
   }
 }
