@@ -1,19 +1,18 @@
+import type { Locale } from '@/lib/i18n'
+import { mockupCopy } from './copy'
 import { MockupFrame } from './MockupFrame'
 
 // A fictional catalogue and fictional orders.
-const products = [
-  { name: 'Ceramic mug', price: '$24' },
-  { name: 'Desk lamp', price: '$58' },
-  { name: 'Linen tote', price: '$32' },
-]
+// The words are in copy.ts.
+const prices = ['$24', '$58', '$32']
 
 const orders = [
-  { id: '#1048', total: '$56.00', status: 'Sent to Zendrop' },
-  { id: '#1047', total: '$24.00', status: 'Paid' },
-  { id: '#1046', total: '$90.00', status: 'Shipped' },
-  { id: '#1045', total: '$32.00', status: 'Shipped' },
-  { id: '#1044', total: '$58.00', status: 'Delivered' },
-]
+  { id: '#1048', total: '$56.00', status: 'sent' },
+  { id: '#1047', total: '$24.00', status: 'paid' },
+  { id: '#1046', total: '$90.00', status: 'shipped' },
+  { id: '#1045', total: '$32.00', status: 'shipped' },
+  { id: '#1044', total: '$58.00', status: 'delivered' },
+] as const
 
 /** Line drawings standing in for product photos. */
 function Product({ index, cx, cy }: { index: number; cx: number; cy: number }) {
@@ -44,7 +43,12 @@ function Product({ index, cx, cy }: { index: number; cx: number; cy: number }) {
 }
 
 /** Zibby: the storefront, with its admin panel open on top of it. */
-export function ZibbyStore() {
+export function ZibbyStore({ locale }: { locale: Locale }) {
+  const copy = mockupCopy[locale].zibby
+  // Menu items sit one word-width apart (Newsreader averages about half an em a letter).
+  const navX = copy.nav.map((_, i) =>
+    copy.nav.slice(0, i).reduce((x, item) => x + item.length * 17 * 0.5 + 28, 200),
+  )
   return (
     <MockupFrame>
       <rect width="1200" height="502" className="fill-screen-2" />
@@ -54,13 +58,13 @@ export function ZibbyStore() {
       <text x="60" y="76" fontSize="34" className="fill-ink font-display font-extrabold">
         ZIBBY
       </text>
-      {['New', 'Home', 'Kitchen'].map((item, i) => (
-        <text key={item} x={200 + i * 84} y="72" fontSize="17" className="fill-ink">
+      {copy.nav.map((item, i) => (
+        <text key={item} x={navX[i]} y="72" fontSize="17" className="fill-ink">
           {item}
         </text>
       ))}
       <text x="764" y="72" fontSize="17" textAnchor="end" className="fill-ink">
-        Cart (2)
+        {copy.cart}
       </text>
       <line x1="32" x2="792" y1="98" y2="98" className="stroke-ink/15" />
       {/* Centred, so the 4:3 phone crop (x 265–935) keeps it whole. */}
@@ -71,26 +75,29 @@ export function ZibbyStore() {
         textAnchor="middle"
         className="fill-ink font-display font-bold"
       >
-        Made for every day
+        {copy.headline}
       </text>
-      {products.map((p, i) => {
+      {copy.products.map((name, i) => {
         const px = 60 + i * 238
         return (
-          <g key={p.name}>
+          <g key={name}>
             <rect x={px} y="182" width="218" height="214" className="fill-screen-2" />
             <Product index={i} cx={px + 109} cy={288} />
             <text x={px} y="424" fontSize="17" className="fill-ink">
-              {p.name}
+              {name}
             </text>
-            <text
-              x={px + 218}
-              y="424"
-              fontSize="17"
-              textAnchor="end"
-              className="fill-ink font-semibold"
-            >
-              {p.price}
-            </text>
+            {/* The admin panel covers the last price, so it is not drawn. */}
+            {px + 218 < 648 ? (
+              <text
+                x={px + 218}
+                y="424"
+                fontSize="17"
+                textAnchor="end"
+                className="fill-ink font-semibold"
+              >
+                {prices[i]}
+              </text>
+            ) : null}
           </g>
         )
       })}
@@ -98,10 +105,10 @@ export function ZibbyStore() {
       {/* Admin */}
       <rect x="648" y="120" width="520" height="382" className="fill-ink" />
       <text x="676" y="166" fontSize="30" className="fill-screen font-display font-bold">
-        Orders
+        {copy.orders}
       </text>
       <text x="1140" y="164" fontSize="14" textAnchor="end" className="fill-screen/70 italic">
-        Admin
+        {copy.admin}
       </text>
       {orders.map((o, i) => {
         const rowY = 216 + i * 52
@@ -112,7 +119,7 @@ export function ZibbyStore() {
               {o.id}
             </text>
             <text x="770" y={rowY} fontSize="17" className="fill-screen">
-              {o.status}
+              {copy.status[o.status]}
             </text>
             <text x="1140" y={rowY} fontSize="17" textAnchor="end" className="fill-screen">
               {o.total}

@@ -1,19 +1,39 @@
 /**
  * pnpm copy — the page's words for one locale as plain text, in the order a reader meets them,
  * so a translation can be reviewed without opening the site. Writes design/copy/<locale>.txt.
- * Missing facts show as [TODO(gabriel): …]; the production page leaves them out.
+ * Missing facts show as [TODO(gabriel): …]; the production page leaves them out. The words drawn
+ * inside each mockup (components/mockups/copy.ts) follow its still description.
  * tests/unit/copy.test.ts fails when a file falls behind the content.
  */
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
+import { mockupCopy, type MockupCopy } from '../src/components/mockups/copy'
 import { getContent } from '../src/content'
-import { isTodo, type CreditBlock, type Prose, type Text } from '../src/content/schema'
+import {
+  isTodo,
+  type CreditBlock,
+  type MockupId,
+  type Prose,
+  type Text,
+} from '../src/content/schema'
 import { languageTags, locales, type Locale } from '../src/lib/i18n'
 
 const text = (value: Text) => (isTodo(value) ? `[TODO(gabriel): ${value.todo}]` : value)
 const prose = (value: Prose) => (Array.isArray(value) ? value : [value]).map(text).join(' ')
 const credit = (block: CreditBlock) => `${block.role}: ${block.names.join(', ')}`
+
+const mockupKey: Record<MockupId, keyof MockupCopy> = {
+  'wave-board': 'wave',
+  'campaign-chart': 'chart',
+  'zibby-store': 'zibby',
+  'hostly-schedule': 'hostly',
+}
+/** Every word drawn in a mockup, deduplicated, in the order copy.ts lists them. */
+const words = (value: unknown): string[] =>
+  typeof value === 'string'
+    ? [value]
+    : Object.values(value as object).flatMap((v: unknown) => words(v))
 
 export function renderCopy(locale: Locale): string {
   const c = getContent(locale)
@@ -81,6 +101,10 @@ export function renderCopy(locale: Locale): string {
     const bts = p.behindTheScenes
     line(`-- ${p.title}${p.organization ? ` (${p.organization})` : ''} --`, p.logline)
     line(p.still.kind === 'image' ? `[still alt] ${p.still.alt}` : `[still] ${p.still.description}`)
+    if (p.still.kind === 'mockup') {
+      const drawn = [...new Set(words(mockupCopy[locale][mockupKey[p.still.mockup]]))]
+      line(`[mockup words] ${drawn.join(' · ')}`)
+    }
     line(`${c.credits.castLabel}: ${p.stack.map(text).join(', ')}`)
     line(`[button] ${ui.behindTheScenes}`)
     line(`  ${ui.bts.problem}: ${prose(bts.problem)}`)

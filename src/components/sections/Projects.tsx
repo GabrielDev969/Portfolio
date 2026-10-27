@@ -1,4 +1,5 @@
 import type { Project, SiteContent } from '@/content/schema'
+import type { Locale } from '@/lib/i18n'
 import { resolveText } from '@/lib/text'
 import { ChapterCard } from '../cinema/ChapterCard'
 import { FilmFrame } from '../cinema/FilmFrame'
@@ -10,7 +11,7 @@ import { ProjectPushIn } from './ProjectPushIn'
 
 type Props = { content: SiteContent }
 
-function ProjectStill({ project }: { project: Project }) {
+function ProjectStill({ project, locale }: { project: Project; locale: Locale }) {
   const { still } = project
   if (still.kind === 'image') {
     return (
@@ -32,7 +33,7 @@ function ProjectStill({ project }: { project: Project }) {
   return (
     <FilmFrame description={still.description}>
       <div className="project-still-inner">
-        <Mockup />
+        <Mockup locale={locale} />
       </div>
     </FilmFrame>
   )
@@ -67,7 +68,7 @@ export function Projects({ content }: Props) {
                 className="project group/project page-grid"
               >
                 <div className="project-still quick:hidden">
-                  <ProjectStill project={project} />
+                  <ProjectStill project={project} locale={content.locale} />
                 </div>
 
                 <header className="project-head">

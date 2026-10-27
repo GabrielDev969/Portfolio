@@ -1,3 +1,5 @@
+import { languageTags, type Locale } from '@/lib/i18n'
+import { mockupCopy } from './copy'
 import { MockupFrame } from './MockupFrame'
 
 // Fictional numbers and invented media buyers: the real dashboards hold client data.
@@ -34,22 +36,24 @@ const x = (i: number) => left + 18 + (i * (right - left - 36)) / (weeks.length -
 const y = (v: number) => bottom - (v / max) * (bottom - top)
 
 /** Campaign BI: weekly revenue against spend, and each media buyer's return. */
-export function CampaignChart() {
+export function CampaignChart({ locale }: { locale: Locale }) {
+  const copy = mockupCopy[locale].chart
+  const roas = new Intl.NumberFormat(languageTags[locale], { minimumFractionDigits: 1 })
   const line = weeks.map((w, i) => `${i === 0 ? 'M' : 'L'}${x(i)} ${y(w.revenue)}`).join(' ')
   return (
     <MockupFrame crop="left">
       <rect width="1200" height="502" className="fill-screen" />
 
       <text x="40" y="62" fontSize="36" className="fill-ink font-display font-bold">
-        Campaign performance
+        {copy.title}
       </text>
       <rect x="452" y="34" width="196" height="36" rx="2" className="fill-screen-2" />
       <rect x="550" y="38" width="94" height="28" rx="2" className="fill-ink" />
       <text x="501" y="58" fontSize="15" textAnchor="middle" className="fill-ink">
-        Monthly
+        {copy.monthly}
       </text>
       <text x="597" y="58" fontSize="15" textAnchor="middle" className="fill-screen font-semibold">
-        Weekly
+        {copy.weekly}
       </text>
 
       {/* Grid and axis */}
@@ -71,7 +75,8 @@ export function CampaignChart() {
             className="fill-ink/18"
           />
           <text x={x(i)} y={bottom + 24} fontSize="13" textAnchor="middle" className="fill-ink-2">
-            W{i + 1}
+            {copy.week}
+            {i + 1}
           </text>
         </g>
       ))}
@@ -89,18 +94,18 @@ export function CampaignChart() {
       <g fontSize="14" className="fill-ink">
         <line x1={left} x2={left + 28} y1="100" y2="100" strokeWidth="3" className="stroke-ink" />
         <text x={left + 36} y="105">
-          Revenue
+          {copy.revenue}
         </text>
         <rect x={left + 120} y="92" width="16" height="16" className="fill-ink/18" />
         <text x={left + 144} y="105">
-          Spend
+          {copy.spend}
         </text>
       </g>
 
       {/* By media buyer */}
       <rect x="800" y="96" width="368" height="372" rx="2" className="fill-screen-2" />
       <text x="824" y="134" fontSize="18" className="fill-ink font-semibold">
-        By media buyer
+        {copy.byBuyer}
       </text>
       <text x="1144" y="134" fontSize="13" textAnchor="end" className="fill-ink-2 italic">
         ROAS
@@ -113,7 +118,7 @@ export function CampaignChart() {
               {b.name}
             </text>
             <text x="824" y={rowY + 22} fontSize="13" className="fill-ink-2">
-              {b.campaigns} campaigns
+              {b.campaigns} {copy.campaigns}
             </text>
             <rect x="960" y={rowY - 12} width="130" height="10" className="fill-ink/12" />
             <rect
@@ -130,7 +135,7 @@ export function CampaignChart() {
               textAnchor="end"
               className="fill-ink font-display font-bold"
             >
-              {b.roas.toFixed(1)}×
+              {roas.format(b.roas)}×
             </text>
           </g>
         )

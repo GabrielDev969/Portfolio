@@ -51,6 +51,7 @@ From the database to the screen.
 -- Sistema Wave (Group Wave Enterprise) --
 An internal platform to publish campaigns, manage requests between teams (ClickUp-style), generate reports and track results on a dashboard.
 [still] A stylized request board with fictional teams and tasks, standing in for the internal system.
+[mockup words] Campaigns · Requests · Reports · Dashboard · All teams · This week · New request · Requested · In progress · Review · Done · Creative · Data · Copy · Media · Mon · Tue · Wed · Thu · Fri · Today · Launch banners, 6 sizes · UTM audit, spring offers · Email sequence, 3 parts · Video cut, 15 seconds · Landing page headline · Offer page, mobile · Weekly results report · Pixel check, new domain · Carousel, 5 slides · Ad variations, round 2
 Cast: Next.js, React, NestJS, TypeScript, PostgreSQL
 [button] Behind the scenes
   The problem: [TODO(gabriel): the problem this project solved]
@@ -69,6 +70,7 @@ Cast: Next.js, React, NestJS, TypeScript, PostgreSQL
 -- Campaign BI (Group Wave Enterprise) --
 Dashboards built on RedTrack data: monthly and weekly analysis, and each media buyer's performance by the campaigns they launched.
 [still] A weekly performance chart with fictional campaigns and invented media buyers, standing in for the internal dashboards.
+[mockup words] Campaign performance · Monthly · Weekly · W · Revenue · Spend · By media buyer · campaigns
 Cast: RedTrack, n8n, PostgreSQL, [TODO(gabriel): what the dashboards are built with]
 [button] Behind the scenes
   The problem: [TODO(gabriel): the problem this project solved]
@@ -89,6 +91,7 @@ Cast: RedTrack, n8n, PostgreSQL, [TODO(gabriel): what the dashboards are built w
 -- Zibby --
 My own multi-store e-commerce platform, launched in October 2026: a storefront, an admin panel, Stripe payments and Zendrop fulfillment.
 [still] A fictional storefront next to its admin panel.
+[mockup words] New · Home · Kitchen · Cart (2) · Made for every day · Ceramic mug · Desk lamp · Linen tote · Orders · Admin · Sent to Zendrop · Paid · Shipped · Delivered
 Cast: Next.js, NestJS, PostgreSQL, Prisma, Stripe, Zendrop
 [button] Behind the scenes
   The problem: [TODO(gabriel): the problem this project solved]
@@ -111,6 +114,7 @@ Cast: Next.js, NestJS, PostgreSQL, Prisma, Stripe, Zendrop
 -- Hostly (IA Robots Solutions) --
 A system for OrionStar service robots: an admin panel that schedules ad campaigns and music, a backend on a VPS, and a RobotOS app that plays them and talks to people.
 [still] A robot schedule screen with a fictional campaign playlist, standing in for the client system.
+[mockup words] Today · Campaign · Music · Welcome message · Lobby set A · Spring offer · Lunch menu · Lobby set B · Now playing · Campaign, 30 seconds · Up next · Morning light · Open doors · Quiet hour · Second floor · Late check-in
 Cast: RobotOS, [TODO(gabriel): the rest of the Hostly stack]
 [button] Behind the scenes
   The problem: [TODO(gabriel): the problem this project solved]
