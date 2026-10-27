@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test'
 import { expect, skipColdOpen, test } from './fixtures'
-import { useViewMode, viewports } from './helpers'
+import { startInViewMode, viewports } from './helpers'
 
 const titles = [
   'Systems Analyst',
@@ -90,7 +90,7 @@ test.describe('reduced motion', () => {
 test('Quick view lists one milestone per line, with years and no frames', async ({ browser }) => {
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } })
   await skipColdOpen(context)
-  await useViewMode(context, 'quick')
+  await startInViewMode(context, 'quick')
   const page = await context.newPage()
   await page.goto('en/')
   await expect(page.locator('#experience .strip-cell').first()).toBeHidden()

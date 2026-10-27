@@ -519,9 +519,246 @@
   }
 }
 
+/* ---- Act II · Projects ----
+   Phones and tablets stack the parts in order: still (full bleed), title, cast, actions.
+   From 1024 px the grid break (design/COMMIT-SHEET.md §4): the still bleeds off the left edge
+   to column 8, the title sits on the ground in 9–12, and the cast panel overlaps the still's
+   bottom-right corner across columns 8–10. */
+.projects {
+  display: grid;
+  row-gap: clamp(6rem, 14vw, 12rem);
+  padding-bottom: clamp(6rem, 12vw, 12rem);
+}
+
+.project {
+  --cast-overlap: 4rem;
+  row-gap: 1.5rem;
+  align-items: start;
+
+  > * {
+    grid-column: 1 / -1;
+  }
+}
+
+.project-still {
+  margin-inline: calc(-1 * var(--page-margin));
+}
+
+/* The push-in scales this layer inside the frame's crop. */
+.project-still-inner {
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 50%;
+}
+
+.project-cast {
+  /* Set like a credit block: the role on the left, one name per line on the right. */
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: start;
+  column-gap: 1.5rem;
+  justify-self: start;
+  min-width: min(100%, 22rem);
+  padding: 1.25rem 1.5rem;
+  background: var(--color-screen-2);
+}
+
+/* Each cast line rises from behind its own mask, like a credit. */
+.cast-line {
+  overflow: clip;
+
+  > span {
+    display: block;
+  }
+}
+
+.project-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .project {
+    row-gap: 0;
+  }
+
+  .project-still {
+    grid-area: 1 / 1 / 2 / 9;
+    align-self: end;
+    margin-inline: calc(-1 * var(--page-margin)) 0;
+  }
+
+  /* Room under the logline for the cast panel, so the two never meet. */
+  .project-head {
+    grid-area: 1 / 9 / 2 / 13;
+    padding-bottom: calc(var(--cast-overlap) + 2rem);
+  }
+
+  .project-cast {
+    position: relative;
+    grid-area: 2 / 8 / 3 / 11;
+    margin-top: calc(-1 * var(--cast-overlap));
+  }
+
+  .project-actions {
+    grid-area: 3 / 8 / 4 / 13;
+    margin-top: 1.5rem;
+  }
+}
+
+/* ---- Behind the scenes ---- */
+.bts-parts {
+  display: grid;
+  gap: 1.75rem;
+}
+
+.bts-heading {
+  margin-bottom: 0.35rem;
+  font-size: var(--text-small);
+  font-style: italic;
+  color: var(--color-ink-2);
+}
+
+/* No JS: the native <details> opens the parts in place, under the button. */
+.bts-details[open] > summary {
+  margin-bottom: 1.5rem;
+}
+
+.bts-inline {
+  max-width: 62ch;
+}
+
+/* The drawer: a modal <dialog> on the right edge, full height, scrolling on its own. It opens
+   with a clip-path wipe from the right (CSS @starting-style, no JS); reduced motion fades. */
+.bts-drawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  width: min(36rem, 100vw);
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--color-screen-2);
+  color: var(--color-ink);
+  clip-path: inset(0);
+  transition:
+    clip-path var(--dur-ui) var(--ease-out),
+    overlay var(--dur-ui) allow-discrete,
+    display var(--dur-ui) allow-discrete;
+
+  &:not([open]) {
+    clip-path: inset(0 0 0 100%);
+  }
+
+  &::backdrop {
+    background: oklch(0 0 0 / 0.45);
+    transition:
+      opacity var(--dur-ui) var(--ease-out),
+      overlay var(--dur-ui) allow-discrete,
+      display var(--dur-ui) allow-discrete;
+  }
+
+  &:not([open])::backdrop {
+    opacity: 0;
+  }
+}
+
+@starting-style {
+  .bts-drawer[open] {
+    clip-path: inset(0 0 0 100%);
+  }
+
+  .bts-drawer[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+/* The page behind an open drawer stays still. */
+:root:has(.bts-drawer[open]) {
+  overflow: hidden;
+}
+
+.bts-sheet {
+  min-height: 100%;
+  padding: 1.25rem clamp(1.25rem, 4vw, 2.5rem) 3rem;
+}
+
+.bts-sheet-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* Quick view: one column inside the grid, no bleed, no stills, the parts inline. */
+[data-view='quick'] {
+  .projects {
+    row-gap: 3rem;
+    padding-bottom: 2rem;
+  }
+
+  .project {
+    row-gap: 0.75rem;
+
+    > * {
+      grid-area: auto / 1 / auto / -1;
+      margin: 0;
+      padding: 0;
+    }
+  }
+
+  .project-head {
+    padding-bottom: 0;
+  }
+
+  /* The stack reads as a sentence under the logline instead. */
+  .project-cast {
+    display: none;
+  }
+
+  .project-actions {
+    display: block;
+  }
+
+  .bts-inline {
+    margin-top: 0.75rem;
+    padding-left: 1rem;
+    border-left: 1px solid color-mix(in oklch, var(--color-ink) 25%, transparent);
+  }
+
+  .bts-parts {
+    gap: 1rem;
+  }
+
+  .diagram svg {
+    max-width: 22rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .film-grain {
     animation: none;
+  }
+  /* The drawer fades instead of wiping. */
+  .bts-drawer,
+  .bts-drawer:not([open]) {
+    clip-path: none;
+  }
+  .bts-drawer {
+    transition:
+      opacity var(--dur-ui) var(--ease-out),
+      overlay var(--dur-ui) allow-discrete,
+      display var(--dur-ui) allow-discrete;
+  }
+  .bts-drawer:not([open]) {
+    opacity: 0;
   }
   /* No movement: the bars switch state in place and the name neither rises nor grows. */
   .bar,
@@ -556,5 +793,14 @@
   .vignette,
   .bar {
     display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @starting-style {
+    .bts-drawer[open] {
+      clip-path: none;
+      opacity: 0;
+    }
   }
 }

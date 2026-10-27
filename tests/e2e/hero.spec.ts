@@ -1,5 +1,5 @@
 import { expect, skipColdOpen, test } from './fixtures'
-import { factVisibility, ready, useViewMode, viewports } from './helpers'
+import { factVisibility, ready, startInViewMode, viewports } from './helpers'
 
 const facts = ['name', 'role', 'stack', 'remote', 'contact', 'cv']
 
@@ -10,7 +10,7 @@ for (const mode of ['film', 'quick'] as const) {
     test(`5-second test · ${mode} · ${viewport.width}×${viewport.height}`, async ({ browser }) => {
       const context = await browser.newContext({ viewport })
       await skipColdOpen(context)
-      await useViewMode(context, mode)
+      await startInViewMode(context, mode)
       const page = await context.newPage()
       await page.goto('en/')
       await ready(page)

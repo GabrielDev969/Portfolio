@@ -8,6 +8,7 @@ import { Baseline } from '@/components/sections/Baseline'
 import { ColdOpen } from '@/components/sections/ColdOpen'
 import { Experience } from '@/components/sections/Experience'
 import { Hero } from '@/components/sections/Hero'
+import { Projects } from '@/components/sections/Projects'
 import { getContent } from '@/content'
 import { isLocale } from '@/lib/i18n'
 
@@ -25,6 +26,7 @@ export default async function LocalePage({ params }: Props) {
       <main id="main" tabIndex={-1} className="outline-none">
         <Hero locale={locale} content={content} />
         <Experience content={content} />
+        <Projects content={content} />
         <Baseline content={content} />
       </main>
       <CueMark />

@@ -8,7 +8,7 @@ export const viewports = [
   { width: 1440, height: 900 },
 ]
 
-export async function useViewMode(context: BrowserContext, mode: 'film' | 'quick') {
+export async function startInViewMode(context: BrowserContext, mode: 'film' | 'quick') {
   await context.addInitScript((m) => localStorage.setItem('viewMode', m), mode)
 }
 
