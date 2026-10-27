@@ -9,7 +9,7 @@ Read with `STORYBOARD.md` and `COMMIT-SHEET.md`. Every phase ends with lint, typ
 - **Work happens on `rebuild/cinematic`, not `master`.** The live site is today served by GitHub Pages straight from `master`'s root `index.html`. Pushing a Next.js project to `master` would break it before the new one deploys.
 - **At phase 7:**
   1. Merge into `master`.
-  2. Switch **Settings → Pages → Source** to *GitHub Actions*. **Gabriel does this step, and the build tells him exactly when, before the merge.**
+  2. Switch **Settings → Pages → Source** to _GitHub Actions_. **Gabriel does this step, and the build tells him exactly when, before the merge.**
   3. `deploy.yml` then publishes `out/`.
 - **The old site:** `index.html`, `static/js` and `static/icons` are deleted in phase 0.
   - `static/img/bookowl.png` moves to `public/scenes/` as the source for its AVIF/WebP.
@@ -59,14 +59,18 @@ R3F is **not** used. The projector beam is CSS (`clip-path`, a radial gradient a
 ## Content schema (additions)
 
 ```ts
-type Todo = { todo: string }         // todo('what is missing'): marks a gap
+type Todo = { todo: string } // todo('what is missing'): marks a gap
 type Text = string | Todo
 
 type BehindTheScenes = {
   problem: Text
   role: Text
   architecture: {
-    nodes: { id: string; label: string; kind: 'client' | 'service' | 'data' | 'external' | 'device' }[]
+    nodes: {
+      id: string
+      label: string
+      kind: 'client' | 'service' | 'data' | 'external' | 'device'
+    }[]
     edges: { from: string; to: string; label?: string }[]
   }
   decisions: { what: Text; why: Text }[] // 2–3 entries
@@ -86,26 +90,26 @@ type BehindTheScenes = {
 
 Each pin is the newest stable release that is **at least 2 weeks old** (as of 2026-10-27). Newer releases exist (for example Next 16.4.3, Motion 14.7) and can be adopted deliberately later.
 
-| Package | Version | Released |
-|---|---|---|
-| next | 16.3.8 | 2026-09-30 |
-| react / react-dom | 19.3.0 | 2026-09-09 |
-| gsap | 3.15.0 | 2026-04-13 |
-| @gsap/react | 2.1.2 | 2025-01-15 |
-| lenis | 1.3.26 | 2026-08-05 |
-| motion | 14.1.1 | 2026-10-13 |
-| **dev:** typescript | 6.0.3 | 2026-04-16 |
-| tailwindcss / @tailwindcss/postcss | 4.3.3 | 2026-07-16 |
-| eslint | 10.12.0 | 2026-10-02 |
-| eslint-config-next | 16.3.8 | 2026-09-30 |
-| prettier / prettier-plugin-tailwindcss | 3.9.9 / 0.8.1 | 2026-09-23 / 2026-07-15 |
-| @playwright/test | 1.63.0 | 2026-09-04 |
-| @axe-core/playwright | 4.13.0 | 2026-08-11 |
-| @lhci/cli | 0.15.1 | 2025-06-25 |
-| sharp | 0.35.5 | 2026-09-27 |
-| tsx | 4.23.15 | 2026-09-20 |
-| @types/react / @types/react-dom | 19.3.0 | 2026-09-09 |
-| @types/node | 24.19.2 | (matches the local Node 24.22) |
+| Package                                | Version       | Released                       |
+| -------------------------------------- | ------------- | ------------------------------ |
+| next                                   | 16.3.8        | 2026-09-30                     |
+| react / react-dom                      | 19.3.0        | 2026-09-09                     |
+| gsap                                   | 3.15.0        | 2026-04-13                     |
+| @gsap/react                            | 2.1.2         | 2025-01-15                     |
+| lenis                                  | 1.3.26        | 2026-08-05                     |
+| motion                                 | 14.1.1        | 2026-10-13                     |
+| **dev:** typescript                    | 6.0.3         | 2026-04-16                     |
+| tailwindcss / @tailwindcss/postcss     | 4.3.3         | 2026-07-16                     |
+| eslint                                 | 10.12.0       | 2026-10-02                     |
+| eslint-config-next                     | 16.3.8        | 2026-09-30                     |
+| prettier / prettier-plugin-tailwindcss | 3.9.9 / 0.8.1 | 2026-09-23 / 2026-07-15        |
+| @playwright/test                       | 1.63.0        | 2026-09-04                     |
+| @axe-core/playwright                   | 4.13.0        | 2026-08-11                     |
+| @lhci/cli                              | 0.15.1        | 2025-06-25                     |
+| sharp                                  | 0.35.5        | 2026-09-27                     |
+| tsx                                    | 4.23.15       | 2026-09-20                     |
+| @types/react / @types/react-dom        | 19.3.0        | 2026-09-09                     |
+| @types/node                            | 24.19.2       | (matches the local Node 24.22) |
 
 **Notes on the pins:**
 
@@ -114,14 +118,14 @@ Each pin is the newest stable release that is **at least 2 weeks old** (as of 20
 
 ## JS budget (≤ 180 KB gzipped, initial)
 
-| Item | Estimate |
-|---|---|
-| Next + React runtime | ≈ 95 KB |
-| GSAP core, ScrollTrigger and SplitText | ≈ 50 KB |
-| Lenis | ≈ 5 KB |
-| Motion | `LazyMotion` + `m` with `domAnimation` loaded async ≈ 6 KB initial |
-| App code | ≈ 15 KB |
-| **Total** | **≈ 170 KB** |
+| Item                                   | Estimate                                                           |
+| -------------------------------------- | ------------------------------------------------------------------ |
+| Next + React runtime                   | ≈ 95 KB                                                            |
+| GSAP core, ScrollTrigger and SplitText | ≈ 50 KB                                                            |
+| Lenis                                  | ≈ 5 KB                                                             |
+| Motion                                 | `LazyMotion` + `m` with `domAnimation` loaded async ≈ 6 KB initial |
+| App code                               | ≈ 15 KB                                                            |
+| **Total**                              | **≈ 170 KB**                                                       |
 
 This is tight. The budget is enforced in `ci.yml`. If it is exceeded, the first cut is to load SplitText and the Projects timelines through dynamic import after first paint.
 
@@ -129,16 +133,16 @@ A Quick view reader on a return visit downloads the same JS (one bundle) but run
 
 ## Phases
 
-| # | Phase | Ends with |
-|---|---|---|
-| 0 | Setup: pnpm, Next + strict TS + Tailwind v4, ESLint/Prettier, static export (`/Portfolio`, trailing slash, unoptimized images), `content/schema.ts` with the full `BehindTheScenes` shape and `todo()`, the full typed EN content (PT/ES stubs), CI and Pages workflows, README skeleton with badges, old site removed, `pnpm todos` | Lint, typecheck and build green; `out/` served at `/Portfolio/` |
-| 1 | Design system: `@theme` tokens (color, type, grid, motion), contrast check script; FilmGrain, Vignette, Letterbox (with HUD rows), Timecode, ChapterCard, CueMark and FilmFrame; Lenis + GSAP wiring and `useScrollScene`; **view-mode store, head script, the Quick view toggle and the `quick:` variant.** **Hero mockup gate:** static hero at 390 / 768 / 1440 (+ 1366 × 768) in film mode and Quick view, with the **5-second test** passing | Screenshots for approval |
-| 2 | Cold open (≤ 1.5 s, skip, `sessionStorage`, skipped on deep links) and hero with the peak (buttons never covered) | LCP measured with and without the intro; intro, deep-link and 5-second tests |
-| 3 | Experience film strip (desktop pin ≤ 1 viewport; mobile, reduced and Quick view as lists) | Journey frames at 3 widths; pin-budget test |
-| 4 | Projects: 5 projects, 4 mockups, BookOwl still, the six-part behind-the-scenes panel with ArchitectureDiagram. **Gabriel's decisions arrive before this phase** | Journey frames, keyboard pass on the drawer, content tests |
-| 5 | How I work storyboard, Contact credits, post-credits and Rewind | Journey frames |
-| 6 | PT and ES translations (flagged for review), switcher persistence, root redirect, SEO (metadata, hreflang, OG posters, Person JSON-LD, sitemap, robots), a11y, reduced-motion and Quick view/print pass | axe on 3 locales × 2 view modes |
-| 7 | Playwright suite, screenshot journey (3 widths × film / reduced / quick, every frame read), Lighthouse CI, performance pass, `DESIGN.md`, README completed with the `TODO(gabriel)` list, **Pages source switch (Gabriel)**, merge and deploy | The report table from `landing-page-qa` |
+| #   | Phase                                                                                                                                                                                                                                                                                                                                                                                                                                             | Ends with                                                                    |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| 0   | Setup: pnpm, Next + strict TS + Tailwind v4, ESLint/Prettier, static export (`/Portfolio`, trailing slash, unoptimized images), `content/schema.ts` with the full `BehindTheScenes` shape and `todo()`, the full typed EN content (PT/ES stubs), CI and Pages workflows, README skeleton with badges, old site removed, `pnpm todos`                                                                                                              | Lint, typecheck and build green; `out/` served at `/Portfolio/`              |
+| 1   | Design system: `@theme` tokens (color, type, grid, motion), contrast check script; FilmGrain, Vignette, Letterbox (with HUD rows), Timecode, ChapterCard, CueMark and FilmFrame; Lenis + GSAP wiring and `useScrollScene`; **view-mode store, head script, the Quick view toggle and the `quick:` variant.** **Hero mockup gate:** static hero at 390 / 768 / 1440 (+ 1366 × 768) in film mode and Quick view, with the **5-second test** passing | Screenshots for approval                                                     |
+| 2   | Cold open (≤ 1.5 s, skip, `sessionStorage`, skipped on deep links) and hero with the peak (buttons never covered)                                                                                                                                                                                                                                                                                                                                 | LCP measured with and without the intro; intro, deep-link and 5-second tests |
+| 3   | Experience film strip (desktop pin ≤ 1 viewport; mobile, reduced and Quick view as lists)                                                                                                                                                                                                                                                                                                                                                         | Journey frames at 3 widths; pin-budget test                                  |
+| 4   | Projects: 5 projects, 4 mockups, BookOwl still, the six-part behind-the-scenes panel with ArchitectureDiagram. **Gabriel's decisions arrive before this phase**                                                                                                                                                                                                                                                                                   | Journey frames, keyboard pass on the drawer, content tests                   |
+| 5   | How I work storyboard, Contact credits, post-credits and Rewind                                                                                                                                                                                                                                                                                                                                                                                   | Journey frames                                                               |
+| 6   | PT and ES translations (flagged for review), switcher persistence, root redirect, SEO (metadata, hreflang, OG posters, Person JSON-LD, sitemap, robots), a11y, reduced-motion and Quick view/print pass                                                                                                                                                                                                                                           | axe on 3 locales × 2 view modes                                              |
+| 7   | Playwright suite, screenshot journey (3 widths × film / reduced / quick, every frame read), Lighthouse CI, performance pass, `DESIGN.md`, README completed with the `TODO(gabriel)` list, **Pages source switch (Gabriel)**, merge and deploy                                                                                                                                                                                                     | The report table from `landing-page-qa`                                      |
 
 Each section is built in all four versions (film, reduced, Quick view, no-JS) in the phase that introduces it, not patched later.
 

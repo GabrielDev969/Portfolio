@@ -35,13 +35,14 @@ Motion families (see COMMIT-SHEET §5): **A** mask rise · **B** reel (linear sc
 - **Sees:** a black screen with grain. A projector beam enters from the top-right corner as a soft cone cut with `clip-path` and lit by a radial gradient (light, not glow). Then the card "A GABRIEL SANTOS PRODUCTION" in Newsreader small caps, in screen color.
 - **Moves (1.5 s at most, the cap from the brief):**
 
-  | Time | What happens |
-  |---|---|
-  | 0–0.4 s | The beam opacity flickers up in two steps, like a lamp warming |
-  | 0.4–1.2 s | The card is held |
-  | 1.3 s | Hard cut, no fade: the overlay is removed in one frame, revealing the hero with the bars closed |
+  | Time      | What happens                                                                                    |
+  | --------- | ----------------------------------------------------------------------------------------------- |
+  | 0–0.4 s   | The beam opacity flickers up in two steps, like a lamp warming                                  |
+  | 0.4–1.2 s | The card is held                                                                                |
+  | 1.3 s     | Hard cut, no fade: the overlay is removed in one frame, revealing the hero with the bars closed |
 
   A test asserts the overlay is gone by 1.5 s.
+
 - **Skip:** the "Skip intro" button is the first focusable element and visible from frame 0. Esc also skips. The overlay is set in `sessionStorage` (`introSeen`).
 - **When it runs:** an inline `<head>` script sets `html[data-intro]` before first paint only when **all** of these hold:
   - there is JS
@@ -51,6 +52,7 @@ Motion families (see COMMIT-SHEET §5): **A** mask rise · **B** reel (linear sc
   - **the URL has no hash**: a deep link such as `/Portfolio/en/#projects` skips the intro and lands on its target
 
   CSS shows the overlay only under that attribute, so there is no flash.
+
 - **Reduced, Quick view, deep link, No-JS:** never runs.
 - **Risk to measure in phase 2:** the effect on LCP. The hero `h1` is painted underneath at full opacity from the first frame.
 
@@ -97,6 +99,7 @@ The cards for Act II / **Projects** and Act III / **How I work** repeat this com
   - an edge code (like film-stock edge print) showing the frame's year
 
   Frames are about `min(29vw, 440px)` wide.
+
 - **The milestones:**
   1. 2021–2025, Systems Analyst at Fator
   2. 2021–2025, B.Sc. at UNIFACS
@@ -131,6 +134,7 @@ The same device as card 2, with its own cue mark.
   5. **BookOwl:** the real screenshot `static/img/bookowl.png`, converted to AVIF/WebP. It carries a GitHub link.
 
   All mockups are real markup marked `aria-hidden`, and each frame carries a text description.
+
 - **Moves:** family C, a scrubbed timeline per project as it crosses the viewport, with no pin. The still pushes in (`scale 1.12 → 1`) while the cast lines rise one by one like credits. The logline uses family A (a one-shot rise) when the project's top crosses 70%.
 - **Behind the scenes:** the button opens a native `<dialog>` drawer from the right, using Motion `clip-path` at 220 ms. Esc closes it and focus returns to the button. The drawer is `data-lenis-prevent`, so it scrolls natively. It always holds the same six parts, in this order:
   1. **The problem:** what was wrong or missing before.
@@ -141,15 +145,16 @@ The same device as card 2, with its own cue mark.
   6. **Outcome:** what changed after.
 
   Links follow, or the note "Internal system, no public link".
+
 - **Facts already known** (everything else is `TODO(gabriel)`; Gabriel sends the decisions before phase 4):
 
-  | Project | Architecture from the brief | Other known facts |
-  |---|---|---|
-  | Sistema Wave | Next.js/React web → NestJS API → PostgreSQL | — |
-  | Campaign BI | RedTrack data → dashboards. The stack between them is `TODO` | — |
-  | Zibby | Monorepo: storefront and admin (Next.js) → NestJS API → PostgreSQL via Prisma, plus Stripe and Zendrop | Hosted on a VPS; automated tests; own project |
-  | Hostly | Admin panel → backend on a VPS ← RobotOS app on OrionStar robots (scheduled campaigns, music, conversation) | — |
-  | BookOwl | A Python/Django app; the database is `TODO` | Open source |
+  | Project      | Architecture from the brief                                                                                 | Other known facts                             |
+  | ------------ | ----------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+  | Sistema Wave | Next.js/React web → NestJS API → PostgreSQL                                                                 | —                                             |
+  | Campaign BI  | RedTrack data → dashboards. The stack between them is `TODO`                                                | —                                             |
+  | Zibby        | Monorepo: storefront and admin (Next.js) → NestJS API → PostgreSQL via Prisma, plus Stripe and Zendrop      | Hosted on a VPS; automated tests; own project |
+  | Hostly       | Admin panel → backend on a VPS ← RobotOS app on OrionStar robots (scheduled campaigns, music, conversation) | —                                             |
+  | BookOwl      | A Python/Django app; the database is `TODO`                                                                 | Open source                                   |
 
 - **Internal systems** (Sistema Wave, Campaign BI, Hostly) show architecture only: no real names, numbers, screenshots or client data. Their stills stay stylized mockups with fictional data.
 - **Reduced:** no push-in. The still crossfades in, the cast appears all at once, and the drawer opens with opacity only.
@@ -190,6 +195,7 @@ The same device, with its own cue mark.
   - the email address in plain text
   - LinkedIn, GitHub, YouTube and TikTok, as text links with `rel="noopener noreferrer"`
   - "Download CV", which points to `cv/CV_Gabriel_Santos_{PT|EN|ES}.pdf` per locale (`TODO(gabriel)`: the files)
+
 - **Moves:** family B, but **not pinned**. The page scrolls natively, which already reads as a credits roll, and the credit blocks drift upward slightly faster than the scroll (`yPercent`, linear) for the feel of a roll. Nothing is held.
 - **Reduced:** no drift. The black fade is kept (it is a color change).
 - **Quick view:** a plain Contact block on the ground: email, links and CV, with no fade to black and no credits styling.
@@ -227,16 +233,16 @@ The same device, with its own cue mark.
 
 ## Intensity map
 
-| Scene | Intensity |
-|---|---|
-| Cold open | 3 |
-| **Hero** | **5** |
-| Card I | 2 |
-| Experience | 3 |
-| Card II | 2 |
-| Projects | 3 |
-| Card III | 2 |
-| How I work | 2 |
-| Contact | 3 |
-| Post-credits | 2 |
-| Quick view | 1 throughout |
+| Scene        | Intensity    |
+| ------------ | ------------ |
+| Cold open    | 3            |
+| **Hero**     | **5**        |
+| Card I       | 2            |
+| Experience   | 3            |
+| Card II      | 2            |
+| Projects     | 3            |
+| Card III     | 2            |
+| How I work   | 2            |
+| Contact      | 3            |
+| Post-credits | 2            |
+| Quick view   | 1 throughout |

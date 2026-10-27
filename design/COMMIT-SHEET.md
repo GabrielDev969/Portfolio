@@ -37,14 +37,14 @@ The page is the lit screen inside a dark auditorium. The darkness lives where a 
 
 Commitment tier: **restrained.** Three colors plus true black for the masking.
 
-| Token | OKLCH | Role |
-|---|---|---|
-| `--screen` (ground) | `oklch(0.94 0.006 240)` | The projected screen: a cool silver-white, not cream |
+| Token                    | OKLCH                    | Role                                                                                |
+| ------------------------ | ------------------------ | ----------------------------------------------------------------------------------- |
+| `--screen` (ground)      | `oklch(0.94 0.006 240)`  | The projected screen: a cool silver-white, not cream                                |
 | `--screen-2` (tone step) | `oklch(0.895 0.008 240)` | Panels, the behind-the-scenes drawer, mockup chrome. A tone step instead of shadows |
-| `--ink` | `oklch(0.22 0.025 255)` | All running text and display type, in full ink. Silver-halide blue-black |
-| `--ink-2` | `oklch(0.42 0.02 255)` | Metadata only (years, credit roles). 7.1:1 on ground |
-| `--velvet` (accent) | `oklch(0.47 0.17 22)` | Cinema-curtain red |
-| `--house` | `oklch(0 0 0)` | Masking bars, cold open, end credits |
+| `--ink`                  | `oklch(0.22 0.025 255)`  | All running text and display type, in full ink. Silver-halide blue-black            |
+| `--ink-2`                | `oklch(0.42 0.02 255)`   | Metadata only (years, credit roles). 7.1:1 on ground                                |
+| `--velvet` (accent)      | `oklch(0.47 0.17 22)`    | Cinema-curtain red                                                                  |
+| `--house`                | `oklch(0 0 0)`           | Masking bars, cold open, end credits                                                |
 
 - **Background target lightness: 0.94.** It drops to 0 only in the cold open and the end credits.
 - **Accent budget:**
@@ -52,6 +52,7 @@ Commitment tier: **restrained.** Three colors plus true black for the masking.
   2. The **cue mark**, the reel-change dot that flashes in the top-right corner before each chapter card.
 
   Nothing else is red. **Download CV**, the other primary button, is solid ink with screen-colored text. Both buttons share one size and shape, so they read as equals and differ only in hue.
+
 - **Contrast** (computed from the OKLCH values):
   - ink on screen 14.5:1
   - ink on screen-2 12.7:1
@@ -60,15 +61,16 @@ Commitment tier: **restrained.** Three colors plus true black for the masking.
   - screen on house 17.6:1
 
   The hex equivalents are screen `#e8ecef`, screen-2 `#d8dde1`, ink `#131b26`, ink-2 `#464e58` and velvet `#a51d2b`.
+
 - **Velvet never sets text on black.** Velvet on house is only 2.8:1, so in the credits "Write to me" is screen-colored text on a solid velvet plate (6.3:1). The phase 1 token script fails the build if a pairing drops below AA.
 - **Why it is not the category reflex:** a "cinematic" portfolio reflexively goes black and gold. This one is bright because a screen is bright. True black (not a tinted `#0B0B0B`) is argued: masking in a real cinema is unlit black velvet.
 
 ## 3. Type
 
-| Role | Family | Why |
-|---|---|---|
+| Role    | Family                                                                                | Why                                                                                                                                                                                                                 |
+| ------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Display | **Big Shoulders** (variable `wght` 100–900 and `opsz`; latin + latin-ext for ã, ç, ñ) | A tall condensed grotesque with the vertical, billing-block stance of a film poster, without the Bebas/Anton/Oswald reflex. Condensed width means "Gabriel Santos" can be huge and still sit in two lines at 390 px |
-| Text | **Newsreader** (variable `wght` and `opsz`, real italics) | A reading serif with optical sizes. Its small sizes stay sturdy for credits and HUD text, and its italic does the work an eyebrow label would otherwise do ("Act I") |
+| Text    | **Newsreader** (variable `wght` and `opsz`, real italics)                             | A reading serif with optical sizes. Its small sizes stay sturdy for credits and HUD text, and its italic does the work an eyebrow label would otherwise do ("Act I")                                                |
 
 - **Contrast axis:** condensed grotesque against a humanist serif, which contrasts width, structure and stress at once.
 - **Why not Inter:** Inter is the default on everything, and a poster title sequence needs a voice, not a UI face. Not Space Grotesk, Instrument Serif or Playfair, for the same reason.
@@ -91,11 +93,11 @@ Commitment tier: **restrained.** Three colors plus true black for the masking.
 
 ## 5. Motion budget (three scroll families)
 
-| Family | What it is | Easing / distance / direction | Members |
-|---|---|---|---|
-| **A · Mask rise** | One-shot reveal when an element enters | `expo.out`, 1.1 s, lines rise `yPercent 110 → 0` behind a mask, stagger 60 ms; vertical, upward | Hero name, chapter-card headings, project loglines. The masking bars parting (`scaleY`, same ease, 1.2 s, outward) belongs here too |
-| **B · Reel** | Linear 1:1 scroll mapping, nothing eased | `ease: none`, scrub 0.6 | Act I film strip (horizontal, **the page's only pin**), Act III pencil stroke (`stroke-dashoffset`), end-credits drift, timecode |
-| **C · Push-in** | Scrubbed depth as a project crosses the viewport, **without pinning** | `power2.out` inside a scrubbed timeline, scale `1.12 → 1` on the still while the cast block rises `yPercent 100 → 0`, stagger 50 ms | Act II projects only |
+| Family            | What it is                                                            | Easing / distance / direction                                                                                                       | Members                                                                                                                             |
+| ----------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| **A · Mask rise** | One-shot reveal when an element enters                                | `expo.out`, 1.1 s, lines rise `yPercent 110 → 0` behind a mask, stagger 60 ms; vertical, upward                                     | Hero name, chapter-card headings, project loglines. The masking bars parting (`scaleY`, same ease, 1.2 s, outward) belongs here too |
+| **B · Reel**      | Linear 1:1 scroll mapping, nothing eased                              | `ease: none`, scrub 0.6                                                                                                             | Act I film strip (horizontal, **the page's only pin**), Act III pencil stroke (`stroke-dashoffset`), end-credits drift, timecode    |
+| **C · Push-in**   | Scrubbed depth as a project crosses the viewport, **without pinning** | `power2.out` inside a scrubbed timeline, scale `1.12 → 1` on the still while the cast block rises `yPercent 100 → 0`, stagger 50 ms | Act II projects only                                                                                                                |
 
 - **Scroll is never hijacked.**
   - Lenis only smooths the wheel (`lerp 0.12`). Touch stays native (`syncTouch: false`).
@@ -115,25 +117,26 @@ Commitment tier: **restrained.** Three colors plus true black for the masking.
   - a dark-mode toggle
 
   This is roughly the current site.
+
 - **(b) An AI avoiding (a):**
   - a near-black "terminal" page with mono labels, an amber accent and film grain
-  - for a *cinema* brief, black and gold with Playfair italic and Art-Deco "premiere" chrome
+  - for a _cinema_ brief, black and gold with Playfair italic and Art-Deco "premiere" chrome
 - **(c) This page:**
   - a **bright silver screen** framed by true-black masking
   - ink-dark poster type with a reading serif, and one velvet red that behaves like a cue mark
   - darkness used only where a cinema is dark
-  - the cinema devices (masking, timecode, cue marks, chapter cards, credits) do interface work: the HUD lives *inside* the masking bars, the cue mark announces the next section, and the credits are the contact section
+  - the cinema devices (masking, timecode, cue marks, chapter cards, credits) do interface work: the HUD lives _inside_ the masking bars, the cue mark announces the next section, and the credits are the contact section
   - and one button (Quick view) turns the film off for anyone who just wants the facts
 
 ## 7. Tells broken
 
-| Habit not repeated | Replaced by |
-|---|---|
-| Near-black background by default | Ground at L 0.94. Black only as masking, cold open and credits |
-| Amber / acid-green accent | Velvet red, used on the contact action and the cue mark only |
-| Mono "service" labels and a mono timecode | No mono family. Tabular figures in the display face; labels in Newsreader italic, sentence case |
-| Meta strings joined with middle dots ("Salvador · Remote · …") | Real credit blocks: the role on the left, the names on the right, one per line, set the way film credits are set. The hero stack is a plain comma-separated sentence |
-| `WORD — fragment` chapter labels ("ACT I — ORIGIN") | Two lines with no dash and no tracked caps: "Act I" in Newsreader italic, then the plain section name at title size. **Approved:** Act I / Experience · Act II / Projects · Act III / How I work; the end credits are Contact |
+| Habit not repeated                                             | Replaced by                                                                                                                                                                                                                   |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Near-black background by default                               | Ground at L 0.94. Black only as masking, cold open and credits                                                                                                                                                                |
+| Amber / acid-green accent                                      | Velvet red, used on the contact action and the cue mark only                                                                                                                                                                  |
+| Mono "service" labels and a mono timecode                      | No mono family. Tabular figures in the display face; labels in Newsreader italic, sentence case                                                                                                                               |
+| Meta strings joined with middle dots ("Salvador · Remote · …") | Real credit blocks: the role on the left, the names on the right, one per line, set the way film credits are set. The hero stack is a plain comma-separated sentence                                                          |
+| `WORD — fragment` chapter labels ("ACT I — ORIGIN")            | Two lines with no dash and no tracked caps: "Act I" in Newsreader italic, then the plain section name at title size. **Approved:** Act I / Experience · Act II / Projects · Act III / How I work; the end credits are Contact |
 
 ---
 
