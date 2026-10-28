@@ -46,9 +46,15 @@ export function BehindTheScenes({ id, label, title, close, children }: Props) {
   useEffect(() => () => getLenis()?.start(), [mode])
 
   if (!hydrated) {
+    // In Quick view, CSS shows the parts already open and the summary as the plain label the
+    // hydrated Quick view uses, so a returning Quick view reader sees no jump.
     return (
       <details className="bts-details">
-        <summary className={button}>{label}</summary>
+        <summary
+          className={`${button} quick:pointer-events-none quick:block quick:min-h-0 quick:border-0 quick:px-0 quick:text-small quick:font-normal quick:italic`}
+        >
+          {label}
+        </summary>
         <div className="bts-inline">{children}</div>
       </details>
     )

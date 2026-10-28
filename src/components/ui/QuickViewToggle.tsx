@@ -25,7 +25,9 @@ export function QuickViewToggle({ quickView, filmView }: Props) {
       onClick={toggle}
       className="hidden min-h-11 items-center px-1.5 text-small whitespace-nowrap underline-offset-4 hover:underline sm:px-2 js:inline-flex"
     >
-      {quick ? filmView : quickView}
+      {/* CSS picks the label, so it is right before hydration too (the store reads "film" then). */}
+      <span className="quick:hidden">{quickView}</span>
+      <span className="hidden quick:inline">{filmView}</span>
     </button>
   )
 }

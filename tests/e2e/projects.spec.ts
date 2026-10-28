@@ -120,11 +120,51 @@ test('the drawer and Quick view hold the same parts', async ({ browser }) => {
     await page.goto('en/')
     if (mode === 'film') await btsButton(page, 'campaign-bi').click()
     // The parts only: Quick view leaves out the drawer's copy of the links, already on the project.
-    const parts = await page.locator('#campaign-bi .bts-parts > section').allInnerTexts()
+    const sections = page.locator('#campaign-bi .bts-parts > section')
+    // Read them once they are on screen: CI once read them mid-hydration and got empty text.
+    await expect(sections.first()).toBeVisible()
+    const parts = await sections.allInnerTexts()
     await context.close()
     return parts.map((text) => text.replace(/\s+/g, ' ').trim())
   }
   expect(await read('quick')).toEqual(await read('film'))
+})
+
+test('before hydration, Quick view already looks as it will: parts open, nothing moves', async ({
+  browser,
+}) => {
+  const layout = async (hydrate: boolean) => {
+    const context = await browser.newContext({ viewport: { width: 1280, height: 800 } })
+    await skipColdOpen(context)
+    await startInViewMode(context, 'quick')
+    // Without the app's scripts (its CSS still loads) the inline head script runs, but React
+    // never hydrates.
+    if (!hydrate) await context.route('**/_next/static/chunks/*.js', (route) => route.abort())
+    const page = await context.newPage()
+    await page.goto('en/')
+    await page.evaluate(() => document.fonts.ready)
+    const sections = page.locator('#campaign-bi .bts-parts > section')
+    await expect(sections.first()).toBeVisible()
+    if (hydrate) await expect(page.locator('#campaign-bi details')).toHaveCount(0)
+    else await expect(page.locator('#campaign-bi details')).toHaveCount(1)
+    await expect(page.locator('header.bar-top button[aria-pressed]')).toHaveAccessibleName(
+      'Film view',
+    )
+    const result = {
+      parts: (await sections.allInnerTexts()).map((t) => t.replace(/\s+/g, ' ').trim()),
+      bookowl: await page
+        .locator('#bookowl')
+        .evaluate((el) => el.getBoundingClientRect().top + scrollY),
+    }
+    await context.close()
+    return result
+  }
+  const before = await layout(false)
+  const after = await layout(true)
+  expect(before.parts).toEqual(after.parts)
+  expect(before.parts.every((t) => t.length > 0)).toBe(true)
+  // The last project sits where it will be once React has taken over.
+  expect(Math.abs(before.bookowl - after.bookowl)).toBeLessThanOrEqual(4)
 })
 
 test.describe('without JavaScript', () => {

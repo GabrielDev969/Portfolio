@@ -725,10 +725,28 @@
       display: block;
     }
 
-    .bts-inline {
+    .bts-inline,
+    .bts-details {
       margin-top: 0.75rem;
       padding-left: 1rem;
       border-left: 1px solid color-mix(in oklch, var(--color-ink) 25%, transparent);
+    }
+
+    /* Before hydration (or if the app's JS never arrives) the native <details> stands in for
+       the inline block: it takes the rule line, its summary is set as the label (utilities in
+       BehindTheScenes) and the parts show open, so nothing moves when React takes over.
+       Browsers without ::details-content keep the <details> closed. */
+    .bts-details {
+      &::details-content {
+        content-visibility: visible;
+        height: auto;
+      }
+
+      > .bts-inline {
+        margin: 0;
+        padding: 0;
+        border: 0;
+      }
     }
 
     .bts-parts {
