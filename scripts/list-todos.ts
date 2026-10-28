@@ -1,20 +1,26 @@
 /**
  * pnpm todos — every fact Gabriel still has to provide, grouped by where it shows:
  * todo() values in the content, TODO(gabriel) comments in the source, missing
- * public files, and architecture diagrams not yet confirmed.
+ * public files, and architecture diagrams not yet confirmed. A fact missing twice in the
+ * same place (two open decisions) counts twice.
+ *
+ * `pnpm todos --readme` writes the same list into README.md between its todos markers;
+ * tests/unit/readme.test.ts fails when that copy falls behind.
  */
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
 import { join, relative } from 'node:path'
+import { pathToFileURL } from 'node:url'
 import { getContent } from '../src/content'
 import { isTodo } from '../src/content/schema'
 import { locales } from '../src/lib/i18n'
 
 const root = join(import.meta.dirname, '..')
-const groups = new Map<string, string[]>()
+const groups = new Map<string, Map<string, number>>()
 
 function add(group: string, item: string) {
-  const items = groups.get(group) ?? []
-  if (!items.includes(item)) groups.set(group, [...items, item])
+  const items = groups.get(group) ?? new Map<string, number>()
+  items.set(item, (items.get(item) ?? 0) + 1)
+  groups.set(group, items)
 }
 
 function collect(value: unknown, path: string[], out: Map<string, string>) {
@@ -78,9 +84,39 @@ for (const file of sourceFiles(join(root, 'src'))) {
     })
 }
 
-const total = [...groups.values()].reduce((n, items) => n + items.length, 0)
-console.log(`${total} open TODO(gabriel) items\n`)
-for (const [group, items] of groups) {
-  console.log(`${group}`)
-  for (const item of items) console.log(`  - ${item}`)
+const total = [...groups.values()].reduce(
+  (n, items) => n + [...items.values()].reduce((a, b) => a + b, 0),
+  0,
+)
+const line = (item: string, count: number) => (count > 1 ? `${item} (×${count})` : item)
+
+/** The list as Markdown, for the README. */
+export function todosMarkdown() {
+  if (total === 0) return 'Nothing is missing.\n'
+  const out = [`${total} open items.`, '']
+  for (const [group, items] of groups) {
+    out.push(`- **${group}**`)
+    for (const [item, count] of items) out.push(`  - ${line(item, count)}`)
+  }
+  return `${out.join('\n')}\n`
+}
+
+export const readmeMarkers = ['<!-- todos:start -->', '<!-- todos:end -->'] as const
+
+if (import.meta.url === pathToFileURL(process.argv[1]!).href) {
+  if (process.argv.includes('--readme')) {
+    const file = join(root, 'README.md')
+    const readme = readFileSync(file, 'utf8')
+    const [start, end] = readmeMarkers
+    const before = readme.slice(0, readme.indexOf(start) + start.length)
+    const after = readme.slice(readme.indexOf(end))
+    writeFileSync(file, `${before}\n\n${todosMarkdown()}\n${after}`)
+    console.log(`README.md: ${total} open items`)
+  } else {
+    console.log(`${total} open TODO(gabriel) items\n`)
+    for (const [group, items] of groups) {
+      console.log(`${group}`)
+      for (const [item, count] of items) console.log(`  - ${line(item, count)}`)
+    }
+  }
 }

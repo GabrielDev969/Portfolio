@@ -129,8 +129,9 @@ Each pin is the newest stable release that is **at least 2 weeks old** (as of 20
 | Phase 4 | **177.7 KB**         | Act II: the drawer switch and the push-in scene. The drawer animates in CSS, and the mockups and diagrams are server-rendered SVG, so they add HTML, not JS                                                              |
 | Phase 5 | **178.4 KB**         | Act III's pencil, the credits roll and the rewind. The drawings and the credits are server-rendered                                                                                                                      |
 | Phase 6 | **178.7 KB**         | PT and ES (content, so no JS), the print switch to Quick view and the phone monogram. Every locale ships the same bundle                                                                                                 |
+| Phase 7 | **178.8 KB**         | The pre-hydration Quick view label (CSS picks it) and the motion-ready signal for tests                                                                                                                                  |
 
-The margin is 1.3 KB. **Standing rule (from Gabriel):** if a later phase goes over 180 KB, Motion is replaced by CSS transitions (`@starting-style` for the menu and panels) without asking.
+The margin is 1.2 KB. **Standing rule (from Gabriel):** if a later phase goes over 180 KB, Motion is replaced by CSS transitions (`@starting-style` for the menu and panels) without asking.
 
 A Quick view reader on a return visit downloads the same JS (one bundle) but runs none of the motion code.
 
@@ -139,6 +140,7 @@ A Quick view reader on a return visit downloads the same JS (one bundle) but run
 `pnpm measure:vitals` loads the page on a 390 px phone with Slow 4G (150 ms latency, 1.6 Mbps) and a 4× CPU slowdown, five times with the cold open and five without, in each locale (from phase 6; `LOCALE=es` for one). It prints the median and the range of the runs.
 
 - **Gzip, from phase 4.** `pnpm preview` now gzips text the way GitHub Pages does. Before, the HTML arrived uncompressed and competed with the render-blocking CSS for the throttled bandwidth. When Act II grew the HTML from 64 KB to 177 KB raw, some runs reached 3–4 s although the gzipped page is 27 KB. Numbers before phase 4 (1.33 s and 1.94 s in phase 2, 1.52 s in phase 3) come from that uncompressed setup.
+- **Phase 7, per locale** (without / with the cold open): PT 0.66 / 0.66 s, EN 0.66 / 0.66 s, ES 0.65 / 0.66 s; CLS 0.002 or less. Every run now lands between 0.64 and 0.67 s: the slow runs near 1.07 s were the hero waiting on bandwidth shared with the unused `latin-ext` fonts.
 - **Phase 6, per locale** (without / with the cold open): PT 0.71 / 0.71 s, EN 0.70 / 0.71 s, ES 0.71 / 0.71 s; CLS 0.003 or less everywhere. The Spanish hero first measured **CLS 0.234**: its relocation line set in two lines in the fallback font and one in Newsreader, so the swap moved the whole centred hero. Fixed by capping that line at 30ch on phones and top-aligning the hero there (see STORYBOARD §1).
 - **Phase 5:** LCP 0.69 s (range 0.68–1.10 s), 0.70 s with the cold open; CLS 0.002.
 - **Phase 4, same machine, gzip:**
@@ -146,6 +148,22 @@ A Quick view reader on a return visit downloads the same JS (one bundle) but run
   - phase 4 build: LCP 0.70 s (range 0.67–1.04 s)
   - CLS 0.002 in both
 - **About 110 KB of the 177 KB HTML is Next's RSC payload**, which repeats the server tree. It compresses well, but it is the first thing to look at if the page grows again. Next in line are the inline mockups (33 KB raw).
+
+## Lighthouse (phase 7)
+
+`pnpm lighthouse` runs three configs on the gzipped preview, for `/en/`, `/pt/` and `/es/` (`lighthouse/README.md`). Median runs:
+
+| Run                                | Perf  | A11y | Best practices | SEO | LCP         | CLS     | TBT       |
+| ---------------------------------- | ----- | ---- | -------------- | --- | ----------- | ------- | --------- |
+| Mobile, applied throttling (gated) | 97–98 | 100  | 100            | 100 | 1.49–1.50 s | ≤ 0.004 | 94–168 ms |
+| Desktop (gated)                    | 99    | 100  | 100            | 100 | 0.84 s      | 0       | 0 ms      |
+| Mobile, simulated (reported)       | 85    | 100  | 100            | 100 | 4.28 s      | 0       | ≤ 18 ms   |
+
+- **What phase 7 fixed on the way:**
+  - The fonts preloaded six files (about 565 KB), half of them the `latin-ext` subsets the page never used: every letter of PT, EN and ES is in `latin` (a unit test checks the content). Now three files, about 340 KB. Simulated mobile went from 78 to 85.
+  - The site had no favicon, so every page logged a 404 (Best Practices 96 on desktop). It now has the reel mark as `icon.svg` and an Apple touch icon.
+  - `pnpm preview` redirected every path outside `/Portfolio/` to the page, so Lighthouse read HTML as `/robots.txt` (SEO 92). It now answers 404 there, like Pages.
+- **Why the simulated run is not the gate:** Lantern counts every request that starts before the observed LCP (61–127 ms here) as part of it, so the three preloaded fonts are charged to the hero line, although the line paints at once in the fallback font and swaps later. The applied run measures what a throttled phone shows, as `pnpm measure:vitals` does. Without the `opsz` axis the fonts would weigh about 160 KB and the simulated run would reach 91 (LCP still 3.4 s); the axis stays until Gabriel decides, since optical sizes are part of the type choice (COMMIT-SHEET §3).
 
 ## Phases
 

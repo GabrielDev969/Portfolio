@@ -17,7 +17,7 @@ Decided on paper before any markup. Any banned device that survives into the bui
   - "Remote"
   - two primary buttons, **Download CV** and **Contact**
 
-  A Playwright test enforces it.
+  A Playwright test enforces it. Until the CV PDFs are in `public/cv/`, the published page leaves Download CV out (it would be a 404), and the test checks the other five.
 
 ## The concept in one line
 
@@ -67,10 +67,10 @@ Commitment tier: **restrained.** Three colors plus true black for the masking.
 
 ## 3. Type
 
-| Role    | Family                                                                                | Why                                                                                                                                                                                                                 |
-| ------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Display | **Big Shoulders** (variable `wght` 100–900 and `opsz`; latin + latin-ext for ã, ç, ñ) | A tall condensed grotesque with the vertical, billing-block stance of a film poster, without the Bebas/Anton/Oswald reflex. Condensed width means "Gabriel Santos" can be huge and still sit in two lines at 390 px |
-| Text    | **Newsreader** (variable `wght` and `opsz`, real italics)                             | A reading serif with optical sizes. Its small sizes stay sturdy for credits and HUD text, and its italic does the work an eyebrow label would otherwise do ("Act I")                                                |
+| Role    | Family                                                                                                | Why                                                                                                                                                                                                                 |
+| ------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Display | **Big Shoulders** (variable `wght` 100–900 and `opsz`; the latin subset, which already holds ã, ç, ñ) | A tall condensed grotesque with the vertical, billing-block stance of a film poster, without the Bebas/Anton/Oswald reflex. Condensed width means "Gabriel Santos" can be huge and still sit in two lines at 390 px |
+| Text    | **Newsreader** (variable `wght` and `opsz`, real italics)                                             | A reading serif with optical sizes. Its small sizes stay sturdy for credits and HUD text, and its italic does the work an eyebrow label would otherwise do ("Act I")                                                |
 
 - **Contrast axis:** condensed grotesque against a humanist serif, which contrasts width, structure and stress at once.
 - **Why not Inter:** Inter is the default on everything, and a poster title sequence needs a voice, not a UI face. Not Space Grotesk, Instrument Serif or Playfair, for the same reason.
