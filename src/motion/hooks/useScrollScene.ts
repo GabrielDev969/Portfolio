@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, type RefObject } from 'react'
 import { useViewMode } from '@/lib/view-mode'
-import { refreshSoon, useMotion, type MotionRuntime } from '../runtime'
+import { mountSoon, useMotion, type MotionRuntime } from '../runtime'
 
 export type SceneConditions = {
   /** prefers-reduced-motion: no-preference */
@@ -34,18 +34,24 @@ export function useScrollScene(
     const element = scope.current
     if (!runtime || mode === 'quick' || !element) return
     const { gsap } = runtime
-    const context = gsap.context(() => {
-      gsap.matchMedia(element).add(
-        {
-          motion: '(prefers-reduced-motion: no-preference)',
-          reduced: '(prefers-reduced-motion: reduce)',
-          desktop: '(min-width: 768px)',
-        },
-        (media) => setup(media.conditions as SceneConditions, runtime),
-      )
-    }, element)
-    refreshSoon()
-    return () => context.revert()
+    // Mounted in its own task (runtime.ts, mountSoon), so the scenes never block as one.
+    let context: ReturnType<typeof gsap.context> | undefined
+    const cancel = mountSoon(() => {
+      context = gsap.context(() => {
+        gsap.matchMedia(element).add(
+          {
+            motion: '(prefers-reduced-motion: no-preference)',
+            reduced: '(prefers-reduced-motion: reduce)',
+            desktop: '(min-width: 768px)',
+          },
+          (media) => setup(media.conditions as SceneConditions, runtime),
+        )
+      }, element)
+    })
+    return () => {
+      cancel()
+      context?.revert()
+    }
     // `setup` is a fresh closure on every render; the scene re-runs only when these change.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [runtime, mode, scope, ...dependencies])

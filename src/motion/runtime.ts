@@ -26,7 +26,8 @@ let refreshQueued = false
  * were created: a trigger created before the Act I pin, but placed after it on the page, would
  * miss the pin's length (the HUD named each later section about 850 px early). Once the
  * frame's last scene has mounted, put every trigger in page order and measure them again.
- * Then html[data-motion="ready"] says every scene is in place (tests wait for it).
+ * Once no scene is waiting to mount, html[data-motion="ready"] says every scene is in place
+ * (tests wait for it).
  */
 export function refreshSoon() {
   if (refreshQueued) return
@@ -36,8 +37,34 @@ export function refreshSoon() {
     if (!loaded) return
     loaded.ScrollTrigger.sort()
     loaded.ScrollTrigger.refresh()
-    document.documentElement.dataset.motion = 'ready'
+    if (scenes.length === 0) document.documentElement.dataset.motion = 'ready'
   })
+}
+
+type SceneJob = { mount: () => void; cancelled: boolean }
+const scenes: SceneJob[] = []
+
+/**
+ * Scenes mount one per task, in the order they asked, instead of all inside the React commit
+ * that delivers the runtime: on a mid-range phone (Lighthouse, CPU calibrated to a Moto G4)
+ * that commit was one 400 ms task, most of the page's Total Blocking Time. When the last one
+ * has mounted, the triggers are sorted and measured once. Returns a cancel function.
+ */
+export function mountSoon(mount: () => void) {
+  const job: SceneJob = { mount, cancelled: false }
+  if (scenes.length === 0) setTimeout(mountNext, 0)
+  scenes.push(job)
+  delete document.documentElement.dataset.motion
+  return () => {
+    job.cancelled = true
+  }
+}
+
+function mountNext() {
+  const job = scenes.shift()
+  if (job && !job.cancelled) job.mount()
+  if (scenes.length > 0) setTimeout(mountNext, 0)
+  else refreshSoon()
 }
 
 /** Null on the first render (so it never runs during hydration), the runtime once it is fetched. */
