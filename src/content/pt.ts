@@ -20,7 +20,12 @@ const experience: Record<string, Partial<Milestone>> = {
       'Desenvolvi e mantive backends em Node.js e frontends em Angular, com JavaScript e TypeScript. Escrevi e otimizei as consultas SQL dos relatórios, ajustei bancos Firebird e migrei dados de PostgreSQL, MySQL e outros bancos para o Firebird.',
   },
   unifacs: { title: 'Bacharelado em Ciência da Computação' },
-  'group-wave': { title: 'Desenvolvedor Full Stack', place: 'Remoto' },
+  'group-wave': {
+    title: 'Desenvolvedor Full Stack',
+    place: 'Remoto',
+    summary:
+      'Desenhei e construí o Campaign BI do começo ao fim, e atuo em todo o Sistema Wave, a plataforma interna que cerca de 100 pessoas usam para publicar mais de 1.000 campanhas por dia.',
+  },
   'ia-robots': {
     title: 'Consultor e Desenvolvedor de Software (contrato)',
     summary:
@@ -90,7 +95,7 @@ export const pt: SiteContent = {
     {
       ...wave,
       logline:
-        'Uma plataforma interna para publicar campanhas na Meta em massa, editar e melhorar criativos com IA, gerar copies, gerenciar solicitações entre equipes (no estilo do ClickUp) e acompanhar dados de campanhas, financeiro e saúde da empresa em dashboards.',
+        'Uma plataforma interna usada por cerca de 100 pessoas para publicar campanhas na Meta em massa, editar e melhorar criativos com IA, gerar copies, gerenciar solicitações entre equipes (no estilo do ClickUp) e acompanhar dados de campanhas, financeiro e saúde da empresa em dashboards.',
       image: {
         kind: 'mockup',
         mockup: 'wave-board',
@@ -100,7 +105,7 @@ export const pt: SiteContent = {
       technicalDetails: {
         problem:
           'Antes da plataforma, cada campanha era montada à mão no NewsBreak, no Meta Ads e no Taboola.',
-        role: 'Dividimos o trabalho por partes, mas mexi em todas elas, para que cada peça se encaixe no sistema inteiro.',
+        role: 'O time divide o trabalho por áreas, e eu atuo em todas elas, para que cada parte se encaixe no sistema inteiro.',
         architecture: {
           ...wave.technicalDetails.architecture,
           nodes: [
@@ -112,12 +117,12 @@ export const pt: SiteContent = {
         },
         decisions: [
           {
-            what: 'Prometheus, Grafana e logs acompanham o sistema, e alertas vão para o Telegram em caso de erro ou quando uma rota está sobrecarregada.',
-            why: 'Para saber como o sistema está a qualquer momento, e ficar sabendo de erros e rotas sobrecarregadas assim que acontecem.',
-          },
-          {
             what: 'As campanhas sobem pela API da Meta, várias de uma vez.',
             why: 'Antes, cada campanha era montada à mão em cada plataforma de anúncios.',
+          },
+          {
+            what: 'Prometheus, Grafana e logs acompanham o sistema, e alertas vão para o Telegram em caso de erro ou quando uma rota está sobrecarregada.',
+            why: 'Para saber como o sistema está a qualquer momento, e ficar sabendo de erros e rotas sobrecarregadas assim que acontecem.',
           },
         ],
         testing:
@@ -131,7 +136,7 @@ export const pt: SiteContent = {
     {
       ...bi,
       logline:
-        'Um sistema interno para dados de campanhas: workers em NestJS processam os dados do RedTrack a partir de uma fila no RabbitMQ e gravam no PostgreSQL, e um app em Next.js com login Google os lê pela API em NestJS: resultados mensais e semanais, e o desempenho de cada media buyer.',
+        'Um sistema interno de dados de campanhas, usado todos os dias pelos donos, pelo financeiro e pelos líderes de squad: resultados mensais e semanais e o desempenho de cada media buyer, atualizados a cada hora. Workers em NestJS processam os dados do RedTrack a partir de uma fila no RabbitMQ e gravam no PostgreSQL, e um app em Next.js com login Google os lê pela API em NestJS.',
       image: {
         kind: 'mockup',
         mockup: 'campaign-chart',
@@ -159,8 +164,8 @@ export const pt: SiteContent = {
             why: 'Os donos, o financeiro e os líderes de squad analisam os dados todos os dias: o que está dando certo, o que está gastando e como está cada media buyer.',
           },
           {
-            what: 'O n8n leva os dados do RedTrack para uma fila no RabbitMQ, e workers em NestJS os processam até o PostgreSQL.',
-            why: 'São muitos dados para cadastrar, e um erro não pode fazer perder tudo. Com a fila, um registro que falha não afeta os outros.',
+            what: 'O n8n publica os dados do RedTrack numa fila no RabbitMQ, e vários workers em NestJS os processam em paralelo até o PostgreSQL.',
+            why: 'São muitos dados de uma vez. A fila separa a chegada dos dados do processamento: o n8n publica tudo no RabbitMQ, e os workers consomem no ritmo que o banco aguenta. Um registro que falha é tentado de novo sem afetar os outros, e se um worker cai nada se perde, porque a mensagem continua na fila. O RedTrack identifica cada registro, então uma mensagem processada duas vezes não duplica dados.',
           },
           {
             what: 'Um script de alocação pelo método dos maiores restos para conversões e receita.',
@@ -169,7 +174,7 @@ export const pt: SiteContent = {
         ],
         testing: 'As verificações rodam no CI a cada mudança.',
         deploy:
-          'Nada vai para o ar sem passar no CI, então um erro é pego antes de derrubar o sistema, mesmo que por pouco tempo, em vez de ser caçado depois.',
+          'Nada vai para o ar sem passar no CI, então um erro aparece no pipeline, e não depois de derrubar o sistema, mesmo que por pouco tempo.',
         outcome:
           'Os dados do RedTrack agora se atualizam a cada hora durante o dia, e as cargas maiores rodam de madrugada. Os dashboards leem do PostgreSQL com consultas otimizadas, em vez de esperar de 45 minutos a 2 horas por um CSV. O Campaign BI hoje roda dentro do Sistema Wave.',
       },
@@ -314,7 +319,7 @@ export const pt: SiteContent = {
       { label: 'Frontend', items: en.skills.stack[0]!.items },
       {
         label: 'Backend',
-        items: ['Node.js', 'NestJS', 'Express', 'APIs REST', 'Spring Boot', 'Django'],
+        items: ['Node.js', 'NestJS', 'Express', 'RabbitMQ', 'APIs REST', 'Spring Boot', 'Django'],
       },
       { label: 'Dados', items: en.skills.stack[2]!.items },
       { label: 'DevOps e automação', items: en.skills.stack[3]!.items },

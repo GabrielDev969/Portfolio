@@ -82,6 +82,8 @@ export const en: SiteContent = {
       title: 'Full Stack Developer',
       organization: 'Group Wave Enterprise',
       place: 'Remote',
+      summary:
+        'Designed and built Campaign BI end to end, and work across Sistema Wave, the internal platform about 100 people use to publish more than 1,000 campaigns a day.',
     },
     {
       id: 'ia-robots',
@@ -105,7 +107,7 @@ export const en: SiteContent = {
       title: 'Sistema Wave',
       organization: 'Group Wave Enterprise',
       logline:
-        'An internal platform to publish campaigns to Meta in bulk, edit and improve creatives with AI, generate copy, manage requests between teams (ClickUp-style), and follow campaign, finance and company-health data on dashboards.',
+        'An internal platform used by about 100 people to publish campaigns to Meta in bulk, edit and improve creatives with AI, generate copy, manage requests between teams (ClickUp-style), and follow campaign, finance and company-health data on dashboards.',
       stack: [
         'Next.js',
         'React',
@@ -128,7 +130,7 @@ export const en: SiteContent = {
       technicalDetails: {
         problem:
           'Before the platform, every campaign was set up by hand in NewsBreak, Meta Ads and Taboola.',
-        role: 'We split the work by area, but I have worked in every part of it, so each piece fits the whole system.',
+        role: 'The team splits the work by area, and I work across all of it, so each part fits the whole system.',
         architecture: {
           nodes: [
             { id: 'web', label: 'Web app (Next.js, React)', kind: 'client' },
@@ -145,12 +147,12 @@ export const en: SiteContent = {
         },
         decisions: [
           {
-            what: 'Prometheus, Grafana and logs watch the system, and alerts go to Telegram on errors or when a route is under heavy load.',
-            why: 'To know how the system is doing at any moment, and to hear about errors and overloaded routes as soon as they happen.',
-          },
-          {
             what: 'Campaigns publish through the Meta API, many at once.',
             why: 'Before, every campaign was set up by hand on each ad platform.',
+          },
+          {
+            what: 'Prometheus, Grafana and logs watch the system, and alerts go to Telegram on errors or when a route is under heavy load.',
+            why: 'To know how the system is doing at any moment, and to hear about errors and overloaded routes as soon as they happen.',
           },
         ],
         testing:
@@ -166,7 +168,7 @@ export const en: SiteContent = {
       title: 'Campaign BI',
       organization: 'Group Wave Enterprise',
       logline:
-        "An internal system for campaign data: NestJS workers process RedTrack data from a RabbitMQ queue into PostgreSQL, and a Next.js app with Google sign-in reads it through the NestJS API: monthly and weekly results, and each media buyer's performance.",
+        "An internal campaign-data system used every day by the owners, finance and the squad leads: monthly and weekly results and each media buyer's performance, refreshed every hour. NestJS workers process RedTrack data from a RabbitMQ queue into PostgreSQL, and a Next.js app with Google sign-in reads it through the NestJS API.",
       stack: ['Next.js', 'NestJS', 'PostgreSQL', 'RabbitMQ', 'n8n', 'RedTrack'],
       internal: true,
       image: {
@@ -204,8 +206,8 @@ export const en: SiteContent = {
             why: 'The owners, finance and the squad leads review the data every day: what is working, what is spending, and how each media buyer is doing.',
           },
           {
-            what: 'n8n brings RedTrack data into a RabbitMQ queue, and NestJS workers process it into PostgreSQL.',
-            why: 'There is a lot of data to load, and one error must not lose everything. With a queue, a record that fails does not affect the others.',
+            what: 'n8n publishes RedTrack data to a RabbitMQ queue, and several NestJS workers process it in parallel into PostgreSQL.',
+            why: 'There is a lot of data at once. The queue separates bringing the data in from processing it: n8n publishes everything to RabbitMQ, and the workers consume it at the pace the database can take. A record that fails is retried without affecting the others, and if a worker goes down nothing is lost, because the message stays in the queue. RedTrack identifies each record, so a message processed twice never duplicates data.',
           },
           {
             what: 'A largest-remainder allocation script for conversions and revenue.',
@@ -214,7 +216,7 @@ export const en: SiteContent = {
         ],
         testing: 'The checks run in CI on every change.',
         deploy:
-          'Nothing ships until CI passes, so an error is caught before it takes the system down, even briefly, instead of being hunted for afterwards.',
+          'Nothing ships until CI passes, so an error shows up in the pipeline, not after it has taken the system down, even briefly.',
         outcome:
           'RedTrack data now refreshes every hour during the day, and the larger loads run overnight. The dashboards read it from PostgreSQL through optimized queries instead of waiting 45 minutes to 2 hours for a CSV. Campaign BI now runs inside Sistema Wave.',
       },
@@ -379,7 +381,7 @@ export const en: SiteContent = {
       { label: 'Frontend', items: ['Next.js', 'React', 'TypeScript', 'JavaScript', 'Angular'] },
       {
         label: 'Backend',
-        items: ['Node.js', 'NestJS', 'Express', 'REST APIs', 'Spring Boot', 'Django'],
+        items: ['Node.js', 'NestJS', 'Express', 'RabbitMQ', 'REST APIs', 'Spring Boot', 'Django'],
       },
       {
         label: 'Data',

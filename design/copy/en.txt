@@ -34,6 +34,7 @@ From the database to the screen.
   Salvador
 2021–2025 · B.Sc. in Computer Science · UNIFACS
 2025–present · Full Stack Developer · Group Wave Enterprise
+  Designed and built Campaign BI end to end, and work across Sistema Wave, the internal platform about 100 people use to publish more than 1,000 campaigns a day.
   Remote
 2026–present · Consultant & Software Developer (contract) · IA Robots Solutions
   Robot setup and operation for OrionStar service robots, and Hostly development.
@@ -42,27 +43,27 @@ From the database to the screen.
 == Projects ==
 
 -- Sistema Wave (Group Wave Enterprise) --
-An internal platform to publish campaigns to Meta in bulk, edit and improve creatives with AI, generate copy, manage requests between teams (ClickUp-style), and follow campaign, finance and company-health data on dashboards.
+An internal platform used by about 100 people to publish campaigns to Meta in bulk, edit and improve creatives with AI, generate copy, manage requests between teams (ClickUp-style), and follow campaign, finance and company-health data on dashboards.
 [image] A stylized request board with fictional teams and tasks, standing in for the internal system.
 [mockup words] Campaigns · Requests · Reports · Dashboard · All teams · This week · New request · Requested · In progress · Review · Done · Creative · Data · Copy · Media · Mon · Tue · Wed · Thu · Fri · Today · Launch banners, 6 sizes · UTM audit, spring offers · Email sequence, 3 parts · Video cut, 15 seconds · Landing page headline · Offer page, mobile · Weekly results report · Pixel check, new domain · Carousel, 5 slides · Ad variations, round 2
 Stack: Next.js, React, NestJS, TypeScript, PostgreSQL, Meta API, Prometheus, Grafana, Jenkins
 [button] Technical details
   The problem: Before the platform, every campaign was set up by hand in NewsBreak, Meta Ads and Taboola.
-  My role: We split the work by area, but I have worked in every part of it, so each piece fits the whole system.
+  My role: The team splits the work by area, and I work across all of it, so each part fits the whole system.
   Architecture:
     Web app (Next.js, React) → API (NestJS)
     API (NestJS) → PostgreSQL
     API (NestJS) → Meta API
   Key decisions:
-    - Prometheus, Grafana and logs watch the system, and alerts go to Telegram on errors or when a route is under heavy load. To know how the system is doing at any moment, and to hear about errors and overloaded routes as soon as they happen.
     - Campaigns publish through the Meta API, many at once. Before, every campaign was set up by hand on each ad platform.
+    - Prometheus, Grafana and logs watch the system, and alerts go to Telegram on errors or when a route is under heavy load. To know how the system is doing at any moment, and to hear about errors and overloaded routes as soon as they happen.
   Testing and deploy: Security tests that simulate real attacks, and stress tests that look for errors and failures that could open a security hole. Jenkins runs the tests and validations, and a change has to pass them to be approved. It goes to the develop environment first, where we test it, and once everything is approved the tech lead deploys it.
   Outcome: More than 1,000 campaigns published every day through the Meta API, by about 100 people inside the company.
   Internal system, no public link
   [button] Close
 
 -- Campaign BI (Group Wave Enterprise) --
-An internal system for campaign data: NestJS workers process RedTrack data from a RabbitMQ queue into PostgreSQL, and a Next.js app with Google sign-in reads it through the NestJS API: monthly and weekly results, and each media buyer's performance.
+An internal campaign-data system used every day by the owners, finance and the squad leads: monthly and weekly results and each media buyer's performance, refreshed every hour. NestJS workers process RedTrack data from a RabbitMQ queue into PostgreSQL, and a Next.js app with Google sign-in reads it through the NestJS API.
 [image] A weekly performance chart with fictional campaigns and invented media buyers, standing in for the internal system.
 [mockup words] Campaign performance · Monthly · Weekly · W · Revenue · Spend · By media buyer · campaigns
 Stack: Next.js, NestJS, PostgreSQL, RabbitMQ, n8n, RedTrack
@@ -77,9 +78,9 @@ Stack: Next.js, NestJS, PostgreSQL, RabbitMQ, n8n, RedTrack
     NestJS (workers, API) → PostgreSQL
   Key decisions:
     - Monthly and weekly views of RedTrack data, and each media buyer's performance. The owners, finance and the squad leads review the data every day: what is working, what is spending, and how each media buyer is doing.
-    - n8n brings RedTrack data into a RabbitMQ queue, and NestJS workers process it into PostgreSQL. There is a lot of data to load, and one error must not lose everything. With a queue, a record that fails does not affect the others.
+    - n8n publishes RedTrack data to a RabbitMQ queue, and several NestJS workers process it in parallel into PostgreSQL. There is a lot of data at once. The queue separates bringing the data in from processing it: n8n publishes everything to RabbitMQ, and the workers consume it at the pace the database can take. A record that fails is retried without affecting the others, and if a worker goes down nothing is lost, because the message stays in the queue. RedTrack identifies each record, so a message processed twice never duplicates data.
     - A largest-remainder allocation script for conversions and revenue. The metrics were inflated. The script corrected them, and the results were reconciled against the reference spreadsheets.
-  Testing and deploy: The checks run in CI on every change. Nothing ships until CI passes, so an error is caught before it takes the system down, even briefly, instead of being hunted for afterwards.
+  Testing and deploy: The checks run in CI on every change. Nothing ships until CI passes, so an error shows up in the pipeline, not after it has taken the system down, even briefly.
   Outcome: RedTrack data now refreshes every hour during the day, and the larger loads run overnight. The dashboards read it from PostgreSQL through optimized queries instead of waiting 45 minutes to 2 hours for a CSV. Campaign BI now runs inside Sistema Wave.
   Internal system, no public link
   [button] Close
@@ -166,7 +167,7 @@ LinkedIn · GitHub · YouTube · TikTok
 
 Stack
 Frontend: Next.js, React, TypeScript, JavaScript, Angular
-Backend: Node.js, NestJS, Express, REST APIs, Spring Boot, Django
+Backend: Node.js, NestJS, Express, RabbitMQ, REST APIs, Spring Boot, Django
 Data: PostgreSQL, Prisma, MySQL, MongoDB, Redis, Firebird, RedTrack
 DevOps & automation: Docker, AWS, Git, n8n, Jenkins, Prometheus, Grafana
 Architecture: Clean Architecture, SOLID, TDD
