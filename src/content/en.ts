@@ -92,7 +92,7 @@ export const en: SiteContent = {
       title: 'Consultant & Software Developer (contract)',
       organization: 'IA Robots Solutions',
       summary:
-        'Setup and operation of OrionStar service robots, and development of Hostly, which streams ads to the robots and to big screens.',
+        'Setup and operation of OrionStar service robots, and development of Hostly, which streams ads to the robots and to LED screens.',
     },
     {
       id: 'unipds',
@@ -233,6 +233,7 @@ export const en: SiteContent = {
         'PostgreSQL',
         'Prisma',
         'Stripe',
+        'Resend',
         'Microsoft Clarity',
         'Meta Pixel',
       ],
@@ -257,7 +258,7 @@ export const en: SiteContent = {
             { id: 'api', label: 'API (NestJS, modular monolith)', kind: 'service' },
             { id: 'db', label: 'PostgreSQL (Prisma)', kind: 'data' },
             { id: 'stripe', label: 'Stripe (payments provider)', kind: 'external' },
-            { id: 'email', label: 'E-mail provider', kind: 'external' },
+            { id: 'email', label: 'Resend (e-mail provider)', kind: 'external' },
           ],
           edges: [
             { from: 'storefront', to: 'api' },
@@ -275,17 +276,18 @@ export const en: SiteContent = {
             why: todo('why a modular monolith in one monorepo'),
           },
           {
-            what: 'Microsoft Clarity and the Meta Pixel in the storefront.',
-            why: 'Clarity records sessions and builds heatmaps, so I can see where customers click, how far they scroll and where they give up. The Meta Pixel reports visits, add-to-carts and purchases back to Meta, so the ads can be measured and optimized.',
+            what: 'Microsoft Clarity in the storefront, and a Meta Pixel set per store.',
+            why: 'Clarity records sessions and builds heatmaps, so I can see where customers click, how far they scroll and where they give up. Each store adds its own Meta Pixel, which reports visits, add-to-carts and purchases back to Meta, so its ads can be measured and optimized.',
           },
           {
-            what: 'Every integration is a provider: Stripe for payments and the e-mail service are the first, and other APIs plug in the same way.',
+            what: 'Every integration is a provider: Stripe for payments and Resend for e-mail are the first, and other APIs plug in the same way.',
             why: 'So each store can be created and customized however it needs, with the services it chooses.',
           },
         ],
         testing:
           'Automated tests across the monorepo; each phase passed them before its diff review.',
-        deploy: 'Deployed to a VPS, with encryption and emergency backups.',
+        deploy:
+          'Deployed to a VPS, with emergency backups. Customer data and API keys are encrypted, so even after a break-in they can only be read with the decryption key.',
         outcome: [
           'Launched in October 2026.',
           todo('one number, if you want it: orders, products or uptime'),
@@ -297,7 +299,7 @@ export const en: SiteContent = {
       title: 'Hostly',
       organization: 'IA Robots Solutions',
       logline:
-        'A system for OrionStar service robots and registered big screens: an admin panel that schedules ad campaigns and music, a backend on a VPS, and a RobotOS app that plays them and talks to people. The ads stream to the robot and to the screens, at events too.',
+        'A system for OrionStar service robots and registered LED screens: an admin panel that schedules ad campaigns and music, a backend on a VPS, and a RobotOS app that plays them and talks to people. The ads stream to the robot and to the screens, at events too.',
       stack: ['RobotOS', todo('the rest of the Hostly stack')],
       internal: true,
       image: {
@@ -316,7 +318,7 @@ export const en: SiteContent = {
             { id: 'app', label: 'Robot app', kind: 'client' },
             { id: 'backend', label: 'Backend (VPS)', kind: 'service' },
             { id: 'robot', label: 'RobotOS on OrionStar LuckiBot Plus', kind: 'device' },
-            { id: 'screen', label: 'Registered big screen', kind: 'device' },
+            { id: 'screen', label: 'Registered LED screen', kind: 'device' },
           ],
           edges: [
             { from: 'admin', to: 'backend', label: 'campaigns, music' },
@@ -342,7 +344,7 @@ export const en: SiteContent = {
         testing: missing.testing(),
         deploy: 'The backend is hosted on a VPS.',
         outcome:
-          'In use: it connects to the robot and to registered big screens and streams ads to both, at events too.',
+          'In use: it connects to the robot and to registered LED screens and streams ads to both, at events too.',
       },
     },
     {

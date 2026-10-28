@@ -37,7 +37,7 @@ From the database to the screen.
   Designed and built Campaign BI end to end, and work across Sistema Wave, the internal platform about 100 people use to publish more than 500 campaigns a day.
   Remote
 2025–present · Consultant & Software Developer (contract) · IA Robots Solutions
-  Setup and operation of OrionStar service robots, and development of Hostly, which streams ads to the robots and to big screens.
+  Setup and operation of OrionStar service robots, and development of Hostly, which streams ads to the robots and to LED screens.
 2026–2027 · Postgraduate degree in Software Engineering for Applied AI · UNIPDS
 
 == Projects ==
@@ -89,7 +89,7 @@ Stack: Next.js, NestJS, PostgreSQL, RabbitMQ, n8n, RedTrack
 My own multi-store e-commerce platform, launched in October 2026: a storefront, an admin panel with product registration and sales dashboards that show how each product is selling, and Stripe payments. Every integration is a provider, so each store can be created and customized with the APIs it needs.
 [image] A fictional storefront next to its admin panel.
 [mockup words] New · Home · Kitchen · Cart (2) · Made for every day · Ceramic mug · Desk lamp · Linen tote · Orders · Admin · Preparing · Paid · Shipped · Delivered
-Stack: Next.js, NestJS, PostgreSQL, Prisma, Stripe, Microsoft Clarity, Meta Pixel
+Stack: Next.js, NestJS, PostgreSQL, Prisma, Stripe, Resend, Microsoft Clarity, Meta Pixel
 [button] Technical details
   The problem: [TODO(gabriel): the problem this project solved]
   My role: My own product. I built it in phases with AI coding agents, and every phase went plan → review → implement → tests → diff review → merge.
@@ -98,19 +98,19 @@ Stack: Next.js, NestJS, PostgreSQL, Prisma, Stripe, Microsoft Clarity, Meta Pixe
     Admin panel (Next.js) → API (NestJS, modular monolith)
     API (NestJS, modular monolith) → PostgreSQL (Prisma)
     API (NestJS, modular monolith) → Stripe (payments provider)
-    API (NestJS, modular monolith) → E-mail provider
+    API (NestJS, modular monolith) → Resend (e-mail provider)
     Storefront (Next.js) → Microsoft Clarity and Meta Pixel
   Key decisions:
     - A pnpm monorepo with the NestJS API and the Next.js storefront and admin, organized as a modular monolith. [TODO(gabriel): why a modular monolith in one monorepo]
-    - Microsoft Clarity and the Meta Pixel in the storefront. Clarity records sessions and builds heatmaps, so I can see where customers click, how far they scroll and where they give up. The Meta Pixel reports visits, add-to-carts and purchases back to Meta, so the ads can be measured and optimized.
-    - Every integration is a provider: Stripe for payments and the e-mail service are the first, and other APIs plug in the same way. So each store can be created and customized however it needs, with the services it chooses.
-  Testing and deploy: Automated tests across the monorepo; each phase passed them before its diff review. Deployed to a VPS, with encryption and emergency backups.
+    - Microsoft Clarity in the storefront, and a Meta Pixel set per store. Clarity records sessions and builds heatmaps, so I can see where customers click, how far they scroll and where they give up. Each store adds its own Meta Pixel, which reports visits, add-to-carts and purchases back to Meta, so its ads can be measured and optimized.
+    - Every integration is a provider: Stripe for payments and Resend for e-mail are the first, and other APIs plug in the same way. So each store can be created and customized however it needs, with the services it chooses.
+  Testing and deploy: Automated tests across the monorepo; each phase passed them before its diff review. Deployed to a VPS, with emergency backups. Customer data and API keys are encrypted, so even after a break-in they can only be read with the decryption key.
   Outcome: Launched in October 2026. [TODO(gabriel): one number, if you want it: orders, products or uptime]
   Links: [TODO(gabriel): a public link for Zibby, if there is one]
   [button] Close
 
 -- Hostly (IA Robots Solutions) --
-A system for OrionStar service robots and registered big screens: an admin panel that schedules ad campaigns and music, a backend on a VPS, and a RobotOS app that plays them and talks to people. The ads stream to the robot and to the screens, at events too.
+A system for OrionStar service robots and registered LED screens: an admin panel that schedules ad campaigns and music, a backend on a VPS, and a RobotOS app that plays them and talks to people. The ads stream to the robot and to the screens, at events too.
 [image] A robot schedule screen with a fictional campaign playlist, standing in for the real system.
 [mockup words] Today · Campaign · Music · Welcome message · Lobby set A · Spring offer · Lunch menu · Lobby set B · Now playing · Campaign, 30 seconds · Up next · Morning light · Open doors · Quiet hour · Second floor · Late check-in
 Stack: RobotOS, [TODO(gabriel): the rest of the Hostly stack]
@@ -121,13 +121,13 @@ Stack: RobotOS, [TODO(gabriel): the rest of the Hostly stack]
     Admin panel → Backend (VPS) (campaigns, music)
     Robot app → Backend (VPS)
     Robot app → RobotOS on OrionStar LuckiBot Plus (abstraction layer)
-    Backend (VPS) → Registered big screen (ads)
+    Backend (VPS) → Registered LED screen (ads)
   Key decisions:
     - The robot app reaches RobotOS (OrionStar LuckiBot Plus) through an abstraction layer, so it can move to AgentOS later.
     - A backend on a VPS, and an admin panel to schedule ad campaigns and music. [TODO(gabriel): why this split]
     - Designed to become a multi-company SaaS later. [TODO(gabriel): what that changed in the design today]
   Testing and deploy: [TODO(gabriel): how it is tested] The backend is hosted on a VPS.
-  Outcome: In use: it connects to the robot and to registered big screens and streams ads to both, at events too.
+  Outcome: In use: it connects to the robot and to registered LED screens and streams ads to both, at events too.
   Internal system, no public link
   [button] Close
 

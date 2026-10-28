@@ -30,7 +30,7 @@ const experience: Record<string, Partial<Milestone>> = {
   'ia-robots': {
     title: 'Consultor y Desarrollador de Software (contrato)',
     summary:
-      'Configuración y operación de robots de servicio OrionStar, y desarrollo de Hostly, que transmite anuncios en los robots y en pantallas gigantes.',
+      'Configuración y operación de robots de servicio OrionStar, y desarrollo de Hostly, que transmite anuncios en los robots y en pantallas LED.',
   },
   unipds: { title: 'Posgrado en Ingeniería de Software con IA Aplicada' },
 }
@@ -205,7 +205,7 @@ export const es: SiteContent = {
             { id: 'api', label: 'API (NestJS, monolito modular)', kind: 'service' },
             { id: 'db', label: 'PostgreSQL (Prisma)', kind: 'data' },
             { id: 'stripe', label: 'Stripe (provider de pagos)', kind: 'external' },
-            { id: 'email', label: 'Provider de e-mail', kind: 'external' },
+            { id: 'email', label: 'Resend (provider de e-mail)', kind: 'external' },
           ],
         },
         decisions: [
@@ -214,17 +214,18 @@ export const es: SiteContent = {
             why: todo('why a modular monolith in one monorepo'),
           },
           {
-            what: 'Microsoft Clarity y el Píxel de Meta en la tienda.',
-            why: 'Clarity graba las sesiones y genera mapas de calor, así que se puede ver dónde hacen clic los clientes, hasta dónde bajan en la página y dónde abandonan. El Píxel de Meta envía visitas, productos agregados al carrito y compras de vuelta a Meta, para medir y optimizar los anuncios.',
+            what: 'Microsoft Clarity en la tienda, y el Píxel de Meta configurado por tienda.',
+            why: 'Clarity graba las sesiones y genera mapas de calor, así que se puede ver dónde hacen clic los clientes, hasta dónde bajan en la página y dónde abandonan. Cada tienda agrega su propio Píxel de Meta, que envía visitas, productos agregados al carrito y compras de vuelta a Meta, para medir y optimizar sus anuncios.',
           },
           {
-            what: 'Cada integración es un provider: Stripe para pagos y el servicio de e-mail son los primeros, y otras APIs se conectan de la misma forma.',
+            what: 'Cada integración es un provider: Stripe para pagos y Resend para e-mail son los primeros, y otras APIs se conectan de la misma forma.',
             why: 'Para que cada tienda pueda crearse y personalizarse como necesite, con los servicios que elija.',
           },
         ],
         testing:
           'Pruebas automatizadas en todo el monorepo; cada fase las pasó antes de la revisión del diff.',
-        deploy: 'Desplegado en un VPS, con cifrado y copias de seguridad de emergencia.',
+        deploy:
+          'Desplegado en un VPS, con copias de seguridad de emergencia. Los datos de los clientes y las claves de API están cifrados: incluso ante una intrusión, solo pueden leerse con la clave de descifrado.',
         outcome: [
           'Lanzada en octubre de 2026.',
           todo('one number, if you want it: orders, products or uptime'),
@@ -234,7 +235,7 @@ export const es: SiteContent = {
     {
       ...hostly,
       logline:
-        'Un sistema para robots de servicio OrionStar y pantallas gigantes registradas: un panel de administración que programa campañas publicitarias y música, un backend en un VPS y una app en RobotOS que las reproduce y conversa con las personas. Los anuncios se transmiten en el robot y en las pantallas, también en eventos.',
+        'Un sistema para robots de servicio OrionStar y pantallas LED registradas: un panel de administración que programa campañas publicitarias y música, un backend en un VPS y una app en RobotOS que las reproduce y conversa con las personas. Los anuncios se transmiten en el robot y en las pantallas, también en eventos.',
       image: {
         kind: 'mockup',
         mockup: 'hostly-schedule',
@@ -251,7 +252,7 @@ export const es: SiteContent = {
             { id: 'app', label: 'App del robot', kind: 'client' },
             { id: 'backend', label: 'Backend (VPS)', kind: 'service' },
             { id: 'robot', label: 'RobotOS en OrionStar LuckiBot Plus', kind: 'device' },
-            { id: 'screen', label: 'Pantalla gigante registrada', kind: 'device' },
+            { id: 'screen', label: 'Pantalla LED registrada', kind: 'device' },
           ],
           edges: [
             { from: 'admin', to: 'backend', label: 'campañas, música' },
@@ -276,7 +277,7 @@ export const es: SiteContent = {
         testing: missing.testing(),
         deploy: 'El backend está alojado en un VPS.',
         outcome:
-          'En uso: se conecta al robot y a las pantallas gigantes registradas y transmite anuncios en ambos, también en eventos.',
+          'En uso: se conecta al robot y a las pantallas LED registradas y transmite anuncios en ambos, también en eventos.',
       },
     },
     {
