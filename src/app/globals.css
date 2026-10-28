@@ -737,12 +737,17 @@
        BehindTheScenes) and the parts show open, so nothing moves when React takes over.
        Browsers without ::details-content keep the <details> closed. */
     .bts-details {
+      /* The same box as .bts-inline (62ch, rule line and indent included), so a line wraps
+         at the same word before and after hydration. */
+      max-width: 62ch;
+
       &::details-content {
         content-visibility: visible;
         height: auto;
       }
 
       > .bts-inline {
+        max-width: none;
         margin: 0;
         padding: 0;
         border: 0;
