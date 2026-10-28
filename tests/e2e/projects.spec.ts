@@ -25,9 +25,42 @@ test('all five projects are there, in order', async ({ page }) => {
 })
 
 test('the production build shows no TODO placeholder anywhere', async ({ page }) => {
-  await page.goto('en/')
-  expect(await page.content()).not.toContain('TODO(gabriel)')
+  for (const locale of ['pt', 'en', 'es']) {
+    await page.goto(`${locale}/`)
+    expect(await page.content(), locale).not.toContain('TODO(gabriel)')
+  }
 })
+
+// A fact still missing is left out with its label: no "The problem" over nothing, no empty
+// decision, in the drawer or inline in Quick view, in any language.
+for (const mode of ['film', 'quick'] as const) {
+  test(`no behind-the-scenes label is left without its content · ${mode}`, async ({
+    context,
+    page,
+  }) => {
+    await startInViewMode(context, mode)
+    for (const locale of ['pt', 'en', 'es']) {
+      await page.goto(`${locale}/`)
+      const empty = await page.locator('.bts-parts').evaluateAll((all) =>
+        all.flatMap((parts) => {
+          const project = parts.closest('article')?.id
+          const sections = [...parts.querySelectorAll(':scope > section')]
+          const bare = sections
+            .filter((s) => {
+              const heading = s.querySelector('h4')?.textContent ?? ''
+              return (s.textContent ?? '').replace(heading, '').trim() === ''
+            })
+            .map((s) => `${project}: "${s.querySelector('h4')?.textContent}" has no content`)
+          const items = [...parts.querySelectorAll('li, p')]
+            .filter((el) => (el.textContent ?? '').trim() === '')
+            .map((el) => `${project}: an empty <${el.tagName.toLowerCase()}>`)
+          return [...bare, ...items]
+        }),
+      )
+      expect(empty, locale).toEqual([])
+    }
+  })
+}
 
 test.describe('the behind-the-scenes drawer', () => {
   test('opens from the keyboard, keeps focus inside, and Esc returns focus', async ({ page }) => {

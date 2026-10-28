@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react'
 import type { CreditBlock, SiteContent } from '@/content/schema'
+import { canLinkTo } from '@/lib/public-files'
 import { asset } from '@/lib/site'
 import { ChapterCard } from '../cinema/ChapterCard'
 import { CreditsRoll } from './CreditsRoll'
@@ -79,13 +80,15 @@ export function Contact({ content }: Props) {
                   </li>
                 ))}
               </ul>
-              <a
-                href={asset(contact.cv.href)}
-                download
-                className="inline-flex min-h-11 items-center underline underline-offset-4"
-              >
-                {contact.cv.label}
-              </a>
+              {canLinkTo(contact.cv.href) ? (
+                <a
+                  href={asset(contact.cv.href)}
+                  download
+                  className="inline-flex min-h-11 items-center underline underline-offset-4"
+                >
+                  {contact.cv.label}
+                </a>
+              ) : null}
             </div>
           </div>
         </div>

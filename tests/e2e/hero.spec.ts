@@ -1,7 +1,13 @@
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
 import { expect, skipColdOpen, test } from './fixtures'
 import { factVisibility, ready, startInViewMode, viewports } from './helpers'
 
-const facts = ['name', 'role', 'stack', 'remote', 'contact', 'cv']
+// Download CV joins the facts once its PDF is in public/cv/; until then the build leaves it out.
+const cv = existsSync(
+  join(import.meta.dirname, '..', '..', 'public', 'cv', 'CV_Gabriel_Santos_EN.pdf'),
+)
+const facts = ['name', 'role', 'stack', 'remote', 'contact', ...(cv ? ['cv'] : [])]
 
 // The 5-second test (design/COMMIT-SHEET.md, Brief): the first screen, without scrolling,
 // shows name, role, core stack, "Remote", Contact and Download CV, inside the viewport and uncovered.

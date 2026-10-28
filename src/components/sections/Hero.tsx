@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
 import type { SiteContent } from '@/content/schema'
 import { languageTags, type Locale } from '@/lib/i18n'
+import { canLinkTo } from '@/lib/public-files'
 import { asset } from '@/lib/site'
 import { Button } from '../ui/Button'
 
@@ -59,9 +60,12 @@ export function Hero({ locale, content }: Props) {
           <Button variant="velvet" href="#contact" data-fact="contact">
             {ui.contact}
           </Button>
-          <Button variant="ink" href={asset(contact.cv.href)} download data-fact="cv">
-            {ui.downloadCv}
-          </Button>
+          {/* Until the PDF is in public/cv/, the published page leaves the button out. */}
+          {canLinkTo(contact.cv.href) ? (
+            <Button variant="ink" href={asset(contact.cv.href)} download data-fact="cv">
+              {ui.downloadCv}
+            </Button>
+          ) : null}
         </div>
       </div>
 

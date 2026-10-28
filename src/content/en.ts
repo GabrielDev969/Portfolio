@@ -130,7 +130,7 @@ export const en: SiteContent = {
             { from: 'web', to: 'api' },
             { from: 'api', to: 'db' },
           ],
-          confirmed: false,
+          confirmed: true,
         },
         decisions: [missing.decision(), missing.decision()],
         testing: missing.testing(),
@@ -168,7 +168,7 @@ export const en: SiteContent = {
             { from: 'n8n', to: 'db' },
             { from: 'db', to: 'dashboards' },
           ],
-          confirmed: false,
+          confirmed: true,
         },
         decisions: [
           {
@@ -221,7 +221,7 @@ export const en: SiteContent = {
             { from: 'api', to: 'stripe' },
             { from: 'api', to: 'zendrop' },
           ],
-          confirmed: false,
+          confirmed: true,
         },
         decisions: [
           {
@@ -273,7 +273,7 @@ export const en: SiteContent = {
             { from: 'app', to: 'backend' },
             { from: 'app', to: 'robot', label: 'abstraction layer' },
           ],
-          confirmed: false,
+          confirmed: true,
         },
         decisions: [
           {
@@ -318,7 +318,7 @@ export const en: SiteContent = {
             { id: 'db', label: todo('the BookOwl database'), kind: 'data' },
           ],
           edges: [{ from: 'app', to: 'db' }],
-          confirmed: false,
+          confirmed: true,
         },
         decisions: [
           { what: 'Python and Django.', why: todo('why Python and Django') },

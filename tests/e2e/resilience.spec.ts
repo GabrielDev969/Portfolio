@@ -76,3 +76,14 @@ test('printing gives Quick view on paper and returns to the film', async ({ page
   await expect(page.locator('html')).toHaveAttribute('data-view', 'film')
   expect(await page.evaluate(() => localStorage.getItem('viewMode'))).toBeNull()
 })
+
+test('every download points to a file that exists', async ({ page, request }) => {
+  for (const locale of ['pt', 'en', 'es']) {
+    await page.goto(`${locale}/`)
+    for (const href of await page
+      .locator('a[download]')
+      .evaluateAll((as) => as.map((a) => a.getAttribute('href')!))) {
+      expect((await request.get(href)).status(), href).toBe(200)
+    }
+  }
+})
