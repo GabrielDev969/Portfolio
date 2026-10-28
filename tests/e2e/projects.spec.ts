@@ -227,3 +227,38 @@ test('the projects never widen the page', async ({ browser }) => {
     await context.close()
   }
 })
+
+// An arrow runs from the bottom of one box to the top of another, and never across a third.
+test('no architecture arrow crosses a box', async ({ browser }) => {
+  // Quick view lays every diagram out inline; in the full view they wait in closed drawers.
+  const context = await browser.newContext()
+  await startInViewMode(context, 'quick')
+  const page = await context.newPage()
+  await page.goto('en/')
+  const crossings = await page.evaluate(() => {
+    const out: string[] = []
+    for (const svg of document.querySelectorAll<SVGSVGElement>('.diagram svg')) {
+      const boxes = [...svg.querySelectorAll<SVGRectElement>('g > rect:not(.fill-screen-2)')].map(
+        (r) => r.getBBox(),
+      )
+      for (const line of svg.querySelectorAll<SVGLineElement>('g > line.stroke-ink[marker-end]')) {
+        const [x1, y1, x2, y2] = ['x1', 'y1', 'x2', 'y2'].map((a) => +line.getAttribute(a)!)
+        // Sample the inner part of the arrow; its ends touch their own boxes.
+        for (let t = 0.1; t <= 0.9; t += 0.05) {
+          const x = x1! + (x2! - x1!) * t
+          const y = y1! + (y2! - y1!) * t
+          const hit = boxes.some(
+            (b) => x > b.x && x < b.x + b.width && y > b.y && y < b.y + b.height,
+          )
+          if (hit) {
+            out.push(`${svg.closest('article')?.id}: ${x1},${y1} → ${x2},${y2}`)
+            break
+          }
+        }
+      }
+    }
+    return out
+  })
+  expect(crossings).toEqual([])
+  await context.close()
+})

@@ -206,7 +206,7 @@ Gabriel's direction after phase 7: "Sou desenvolvedor, não diretor." Keep the p
 | Lighthouse desktop                           | 99                | **100**                    |
 | Lighthouse mobile, simulated (PageSpeed)     | 84–85, LCP 4.28 s | 86–89, LCP 3.76–4.22 s     |
 | Stylesheet (`globals.css`, source lines)     | 1,082             | 660                        |
-| Tests                                        | 44 unit, 112 e2e  | 40 unit, 102 e2e           |
+| Tests                                        | 44 unit, 112 e2e  | 40 unit, 103 e2e           |
 
 The mobile TBT moved between 87 and 185 ms from run to run on this Mac (load average 3.5–5), as it did before; Accessibility, Best Practices and SEO stay at 100 everywhere.
 
