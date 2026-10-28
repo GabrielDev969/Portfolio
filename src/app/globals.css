@@ -30,14 +30,9 @@
   --text-title: min(30vw, 22svh, 13rem);
   --text-title--line-height: 0.86;
   --text-title--letter-spacing: -0.03em;
-  /* Chapter titles: same role as the title. .chapter-title shrinks it further when the longest
-     word would spill out of its column ("Experiencia" is wider than "Experience"). */
-  --text-chapter: min(22vw, 22svh, 13rem);
-  --text-chapter--line-height: 0.86;
-  --text-chapter--letter-spacing: -0.03em;
-  --text-scene: clamp(2.75rem, 6vw, 5rem);
-  --text-scene--line-height: 0.95;
-  --text-scene--letter-spacing: -0.02em;
+  --text-heading: clamp(2.75rem, 6vw, 5rem);
+  --text-heading--line-height: 0.95;
+  --text-heading--letter-spacing: -0.02em;
   --text-body: 1.1875rem;
   --text-body--line-height: 1.55;
   --text-small: 0.875rem;
@@ -132,208 +127,135 @@
   }
 }
 
-/* ---- Act I · Experience: a 35 mm strip ----
-   The default is a vertical strip (phones, reduced motion, no JS). ExperienceStrip sets
-   data-strip="on" when it pins the reel, and only then is the strip laid out sideways. */
-.strip {
-  padding-bottom: clamp(5rem, 12vw, 12rem);
+/* ---- Section titles: plain words on a hairline that spans the grid ---- */
+.section-heading {
+  padding-top: clamp(5rem, 10vw, 9rem);
+  padding-bottom: clamp(2rem, 4vw, 3.5rem);
 }
 
-.strip-pin {
-  padding-inline: var(--page-margin);
+/* Heading size, unless the longest word (--chars, set by SectionHeading) would overflow the
+   page: "EXPERIÊNCIA" is wider than "PROJECTS". 0.44 em is the widest letter average. */
+.section-title {
+  padding-top: 1.25rem;
+  border-top: 1px solid color-mix(in oklch, var(--color-ink) 15%, transparent);
+  font-size: min(
+    var(--text-heading),
+    calc((100vw - 2 * var(--page-margin)) / (var(--chars) * 0.44))
+  );
+  line-height: var(--text-heading--line-height);
+  letter-spacing: var(--text-heading--letter-spacing);
 }
 
-.strip-track {
-  display: flex;
-  flex-direction: column;
-  gap: 3rem;
-  max-width: 64rem;
-  margin-inline: auto;
-}
-
-.strip-item {
+/* ---- Experience: a dated timeline ----
+   A vertical list on a hairline below 1024 px; from 1024 px the five entries sit side by side
+   on a horizontal hairline. A dot marks each entry where it meets the line. */
+.timeline {
   display: grid;
-  gap: 1rem;
+  gap: 2.5rem;
+  padding-left: 1.5rem;
+  border-left: 1px solid color-mix(in oklch, var(--color-ink) 25%, transparent);
 }
 
-@media (min-width: 768px) {
-  .strip-item {
-    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
-    column-gap: var(--grid-gap);
-    align-items: center;
-  }
-}
-
-.strip-cell {
+.timeline-item {
   position: relative;
-  padding: 0.75rem 1.75rem;
-  background: var(--color-house);
-  color: var(--color-screen);
+  display: grid;
+  align-content: start;
+  gap: 0.5rem;
 }
 
-/* Sprocket holes: the ground showing through the film base, down both edges. */
-.strip-cell::before,
-.strip-cell::after {
+.timeline-item::before {
   content: '';
   position: absolute;
-  inset-block: 0;
-  width: 0.5rem;
-  background: repeating-linear-gradient(
-    to bottom,
-    transparent 0 0.4rem,
-    var(--color-screen) 0.4rem 0.8rem,
-    transparent 0.8rem 1.25rem
-  );
+  top: 0.55rem;
+  left: calc(-1.5rem - 4.5px);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-ink);
 }
 
-.strip-cell::before {
-  left: 0.6rem;
+.timeline-years {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: var(--text-heading--line-height);
 }
 
-.strip-cell::after {
-  right: 0.6rem;
+.timeline-start {
+  font-size: var(--text-heading);
+  letter-spacing: var(--text-heading--letter-spacing);
 }
 
-.strip-frame {
-  position: relative;
-  display: flex;
-  align-items: flex-end;
-  aspect-ratio: 2.39 / 1;
-  overflow: hidden;
-  padding: clamp(0.75rem, 1.4vw, 1.25rem);
-  background: var(--color-screen);
-  color: var(--color-ink);
+.timeline-end {
+  display: block;
+  font-size: var(--text-body);
 }
 
-/* The protagonist's still: the same muted treatment as every frame on the site. */
-.strip-still {
-  position: absolute;
-  inset-block: 0;
-  right: 0;
-  width: 42%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 20%;
-  filter: saturate(0.7) contrast(1.05);
+.timeline-summary {
+  max-width: 40ch;
 }
 
-/* Edge print: the frame's year, like the code printed along the film stock. */
-.strip-edge {
-  margin-top: 0.35rem;
-  font-size: var(--text-small);
-  letter-spacing: 0.2em;
-}
-
-/* Years are drawn in the frame; the caption carries them for screen readers and Quick view. */
-.strip-years {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-[data-strip='on'] {
-  /* The pinned frame already leaves space below the reel; more would open a blank stretch. */
-  padding-bottom: 0;
-
-  .strip-pin {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    height: calc(100svh - var(--top-bar));
-    padding-inline: 0;
-    overflow-x: clip;
+@media (min-width: 1024px) {
+  .timeline {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--grid-gap);
+    padding-top: 2rem;
+    padding-left: 0;
+    border-top: 1px solid color-mix(in oklch, var(--color-ink) 25%, transparent);
+    border-left: 0;
   }
 
-  .strip-track {
-    flex-direction: row;
-    gap: 0;
-    width: max-content;
-    max-width: none;
-    margin-inline: 0;
-    padding-inline: var(--page-margin);
-  }
-
-  /* min(28vw, 420px) keeps the reel's overflow, and so the pin, within one screen height. */
-  .strip-item {
-    display: flex;
-    flex-direction: column;
-    /* The vertical layout centres items; the reel needs the cell at the item's full width. */
-    align-items: stretch;
-    width: calc(min(28vw, 420px) + 2vw);
-  }
-
-  .strip-cell {
-    padding: 1.9rem 1vw;
-  }
-
-  .strip-cell::before,
-  .strip-cell::after {
-    inset-inline: 0;
-    inset-block: 0.7rem auto;
-    width: auto;
-    height: 0.5rem;
-    background: repeating-linear-gradient(
-      to right,
-      transparent 0 0.4rem,
-      var(--color-screen) 0.4rem 0.8rem,
-      transparent 0.8rem 1.25rem
-    );
-  }
-
-  .strip-cell::after {
-    inset-block: auto 0.7rem;
-  }
-
-  .strip-caption {
-    padding: 1.5rem 1vw 0;
+  .timeline-item::before {
+    top: calc(-2rem - 4.5px);
+    left: 0;
   }
 }
 
-/* Quick view: a dated list, one milestone per line. */
+/* Quick view: a dated list, one entry per line. */
 [data-view='quick'] {
-  .strip {
-    padding-bottom: 2rem;
-  }
-
-  .strip-cell {
-    display: none;
-  }
-
-  .strip-track {
-    gap: 0.75rem;
-    max-width: 62ch;
-    margin-inline: 0;
-  }
-
-  .strip-item {
+  .timeline {
     display: block;
+    max-width: 62ch;
+    padding: 0;
+    border: 0;
   }
 
-  .strip-caption > * {
+  .timeline-item {
+    display: block;
+    margin-bottom: 0.75rem;
+
+    &::before {
+      display: none;
+    }
+  }
+
+  .timeline-years,
+  .timeline-body,
+  .timeline-body > * {
     display: inline;
   }
 
-  .strip-years {
-    position: static;
-    width: auto;
-    height: auto;
+  .timeline-years {
     margin-right: 0.5em;
-    clip-path: none;
-    font-weight: 700;
+    font-family: var(--font-text);
+    line-height: inherit;
   }
 
-  .strip-caption h3::after {
+  .timeline-start,
+  .timeline-end {
+    display: inline;
+    font-size: inherit;
+    letter-spacing: normal;
+  }
+
+  .timeline-body h3::after {
     content: ', ';
   }
 
-  .strip-caption h3 + p::after {
+  .timeline-body h3 + p::after {
     content: '. ';
   }
 
-  .strip-summary::after {
+  .timeline-summary::after {
     content: ' ';
   }
 }
@@ -582,30 +504,32 @@
     }
   }
 
-  /* ---- Act III · How I work: a storyboard sheet ----
-   Six panels in workflow order: one column on phones, two from 768 px, three from 1024 px. */
-  .board {
+  /* ---- How I work: six numbered steps ----
+   One column on phones, two from 768 px, three from 1024 px. */
+  .steps {
     display: grid;
     gap: clamp(2rem, 4vw, 3rem) var(--grid-gap);
   }
 
   @media (min-width: 768px) {
-    .board {
+    .steps {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
   @media (min-width: 1024px) {
-    .board {
+    .steps {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 
-  /* Pencil on paper: ink strokes with round ends. The pencil pass sets the dashes from JS. */
-  .board-drawing {
+  /* Ink line drawings on the tone step. StepsDraw sets the dashes from JS. */
+  .step-drawing {
     display: block;
     width: 100%;
     height: auto;
+    padding: clamp(0.75rem, 2vw, 1.5rem);
+    background: var(--color-screen-2);
     fill: none;
     stroke: var(--color-ink);
     stroke-width: 2;
@@ -613,221 +537,82 @@
     stroke-linejoin: round;
   }
 
-  .board-frame {
-    stroke-width: 1.5;
-  }
-
-  .board-caption {
+  .step-caption {
     margin-top: 0.75rem;
-    font-style: italic;
   }
 
-  /* The panel number, as pencilled on a real board. */
-  .board-number {
+  .step-number {
     margin-right: 0.6em;
     font-family: var(--font-display);
-    font-style: normal;
     font-weight: 700;
     color: var(--color-ink-2);
   }
 
   /* Quick view: the numbered list, without drawings. */
   [data-view='quick'] {
-    .board {
+    .steps {
       display: block;
     }
 
-    .board-drawing {
+    .step-drawing {
       display: none;
     }
 
-    .board-caption {
+    .step-caption {
       margin-top: 0.25rem;
-      font-style: normal;
     }
   }
 
-  /* ---- End credits / Contact ----
-   The ground fades to black as the section arrives: --fade runs 0 → 1, scrubbed. Without JS
-   it stays at 1, so the credits are simply light on black. */
-  .credits {
-    --fade: 1;
-    /* Mixed in OKLab, which has no hue: in OKLCH, black's hue of 0 would tint the fade pink. */
-    background: color-mix(
-      in oklab,
-      var(--color-house) calc(var(--fade) * 100%),
-      var(--color-screen)
-    );
-    color: color-mix(in oklab, var(--color-screen) calc(var(--fade) * 100%), var(--color-ink));
+  /* ---- Contact ----
+   The photo over the stack by area; each area is its label on the left and the tools on the
+   right, stacked on phones. */
+  .contact-about {
+    display: grid;
+    gap: 1.5rem;
+    align-content: start;
+  }
 
-    :focus-visible {
-      outline-color: var(--color-screen);
+  .contact-photo {
+    width: 8rem;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    object-position: 50% 20%;
+  }
+
+  .skill-list {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .skill-group dt {
+    font-size: var(--text-small);
+    font-style: italic;
+    color: var(--color-ink-2);
+  }
+
+  @media (min-width: 640px) {
+    .skill-group {
+      display: grid;
+      grid-template-columns: 9rem minmax(0, 1fr);
+      column-gap: 1rem;
     }
-  }
 
-  .credits-roll {
-    text-align: center;
-  }
-
-  /* Film credits: the role on the left of a central gutter, the names on the right. */
-  .credit-list {
-    display: grid;
-    gap: 2rem;
-    margin-block: 0 4rem;
-  }
-
-  .credit {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    column-gap: 1.5rem;
-    text-align: left;
-
-    dt {
-      grid-row: 1 / span 20;
-      font-size: var(--text-small);
-      font-style: italic;
+    .skill-group dt {
       line-height: var(--text-body--line-height);
-      text-align: right;
-    }
-
-    dd {
-      grid-column: 2;
     }
   }
 
-  .credits-heading {
-    margin-bottom: 2rem;
-    font-family: var(--font-display);
-    font-size: var(--text-scene);
-    font-weight: 700;
-    line-height: var(--text-scene--line-height);
-    text-transform: uppercase;
-  }
-
-  .credits-end {
-    display: grid;
-    justify-items: center;
-    gap: 0.75rem;
-    margin-top: clamp(4rem, 10vw, 8rem);
-  }
-
-  /* The one action, at title size: screen on a solid velvet plate (6.3:1; velvet text on black
-   would be 2.8:1). */
-  /* Chapter size, unless the longest word (--chars, set by ChapterCard) would overflow its
-     column: "EXPERIENCIA" is wider than "EXPERIENCE". 0.44 em is the widest letter average. */
-  .chapter-title {
-    font-size: min(var(--text-chapter), calc(100cqi / (var(--chars) * 0.44)));
-    line-height: var(--text-chapter--line-height);
-    letter-spacing: var(--text-chapter--letter-spacing);
-  }
-
-  .write-to-me {
-    display: inline-block;
-    margin-block: 1.5rem 1rem;
-    padding: 0.12em 0.25em 0.04em;
-    border-radius: 2px;
-    background: var(--color-velvet);
-    color: var(--color-screen);
-    font-family: var(--font-display);
-    /* One line at any width and in any language: the plate shrinks to fit its label
-       (--chars, set by Contact) where the title size would overflow. Big Shoulders caps
-       run at most 0.44 em a letter; the padding adds 0.5 em. */
-    font-size: min(
-      var(--text-title),
-      calc((100vw - 2 * var(--page-margin)) / (var(--chars) * 0.44 + 0.5))
-    );
-    font-weight: 800;
-    line-height: var(--text-title--line-height);
-    letter-spacing: var(--text-title--letter-spacing);
-    text-transform: uppercase;
-    transition: opacity var(--dur-ui) var(--ease-out);
-
-    &:hover {
-      opacity: 0.88;
+  @media (min-width: 1024px) {
+    .contact-photo {
+      width: 10rem;
     }
   }
 
-  /* A deliberate rest of black, then one card; the bottom bar is closed by now. */
-  .post-credits {
-    display: grid;
-    padding: 60svh var(--page-margin) 4rem;
-    text-align: center;
-  }
-
-  .post-credits-card {
-    min-height: calc(100svh - 8rem);
-    display: grid;
-    place-content: center;
-    justify-items: center;
-  }
-
-  /* Quick view: a plain contact block on the ground. */
+  /* Quick view: no photo, the stack as plain lines. */
   [data-view='quick'] {
-    .credits {
-      --fade: 0;
-      padding-bottom: 4rem;
-    }
-
-    .credits-roll,
-    .credit {
-      text-align: left;
-    }
-
-    .credit-list {
-      gap: 0.25rem;
-      margin-bottom: 1.5rem;
-    }
-
-    /* The crew credits belong to the film; Quick view starts at the facts, with the cast. */
-    .credit-list.crew {
-      display: none;
-    }
-
-    .credit {
+    .contact-about {
       display: block;
-
-      dt {
-        display: inline;
-        font-size: inherit;
-        font-weight: 600;
-
-        &::after {
-          content: ': ';
-        }
-      }
-
-      dd {
-        display: inline;
-
-        &:not(:last-child)::after {
-          content: ', ';
-        }
-      }
-    }
-
-    .credits-heading {
-      margin-bottom: 0.5rem;
-      font-family: var(--font-text);
-      font-size: var(--text-body);
-      font-weight: 600;
-      line-height: var(--text-body--line-height);
-      text-transform: none;
-    }
-
-    .credits-end {
-      justify-items: start;
-      margin-top: 1.5rem;
-    }
-
-    .write-to-me {
-      margin: 0;
-      padding: 0.6rem 1.5rem;
-      font-family: var(--font-text);
-      font-size: var(--text-body);
-      font-weight: 600;
-      line-height: var(--text-body--line-height);
-      letter-spacing: normal;
-      text-transform: none;
     }
   }
 }
@@ -862,11 +647,6 @@
   .top-bar,
   a[href='#main'] {
     display: none !important;
-  }
-
-  .write-to-me {
-    border: 1px solid;
-    color: var(--color-ink);
   }
 }
 

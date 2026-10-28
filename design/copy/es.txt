@@ -28,7 +28,7 @@ Disponible para trasladarme a Santiago, Chile.
 De la base de datos a la pantalla.
 [link] Ver proyectos
 
-== Acto I · Experiencia ==
+== Experiencia ==
 
 2021–2025 · Analista de Sistemas · Fator Sistemas & Consultorias
   Desarrollé y mantuve sistemas con JavaScript, TypeScript, Node.js, Angular, SQL y Firebird.
@@ -40,11 +40,11 @@ De la base de datos a la pantalla.
   Configuración y operación de robots de servicio OrionStar, y desarrollo de Hostly.
 2026–2027 · Posgrado en Ingeniería de Software con IA Aplicada · UNIPDS
 
-== Acto II · Proyectos ==
+== Proyectos ==
 
 -- Sistema Wave (Group Wave Enterprise) --
 Una plataforma interna para publicar campañas, gestionar solicitudes entre equipos (al estilo de ClickUp), generar informes y seguir los resultados en un dashboard.
-[still] Un tablero de solicitudes estilizado, con equipos y tareas ficticios, en lugar del sistema interno.
+[image] Un tablero de solicitudes estilizado, con equipos y tareas ficticios, en lugar del sistema interno.
 [mockup words] Campañas · Solicitudes · Informes · Dashboard · Todos los equipos · Esta semana · Nueva solicitud · Solicitadas · En curso · En revisión · Listas · Creativo · Datos · Redacción · Medios · Lun · Mar · Mié · Jue · Vie · Hoy · Listo · Banners, 6 tamaños · Auditoría de UTM · Secuencia de 3 correos · Corte de video, 15 s · Título de la landing · Oferta, versión móvil · Informe semanal · Píxel del nuevo dominio · Carrusel, 5 imágenes · Anuncios, 2.ª ronda
 Stack: Next.js, React, NestJS, TypeScript, PostgreSQL
 [button] Detalles técnicos
@@ -63,7 +63,7 @@ Stack: Next.js, React, NestJS, TypeScript, PostgreSQL
 
 -- Campaign BI (Group Wave Enterprise) --
 Un sistema interno para datos de campañas: workers en NestJS procesan los datos de RedTrack desde una cola en RabbitMQ y los guardan en PostgreSQL, y una app en Next.js con inicio de sesión de Google los consulta a través de la API en NestJS: resultados mensuales y semanales, y el rendimiento de cada media buyer.
-[still] Un gráfico de rendimiento semanal con campañas ficticias y media buyers inventados, en lugar del sistema interno.
+[image] Un gráfico de rendimiento semanal con campañas ficticias y media buyers inventados, en lugar del sistema interno.
 [mockup words] Rendimiento de campañas · Mensual · Semanal · S · Ingresos · Inversión · Por media buyer · campañas
 Stack: Next.js, NestJS, PostgreSQL, RabbitMQ, n8n, RedTrack
 [button] Detalles técnicos
@@ -86,7 +86,7 @@ Stack: Next.js, NestJS, PostgreSQL, RabbitMQ, n8n, RedTrack
 
 -- Zibby --
 Mi propia plataforma de e-commerce multitienda, lanzada en octubre de 2026: tienda online, panel de administración, pagos con Stripe y fulfillment con Zendrop.
-[still] Una tienda ficticia junto a su panel de administración.
+[image] Una tienda ficticia junto a su panel de administración.
 [mockup words] Novedades · Hogar · Cocina · Carrito (2) · Para cada día · Taza de cerámica · Lámpara de mesa · Bolso de lino · Pedidos · Admin · Enviado a Zendrop · Pagado · Despachado · Entregado
 Stack: Next.js, NestJS, PostgreSQL, Prisma, Stripe, Zendrop
 [button] Detalles técnicos
@@ -109,7 +109,7 @@ Stack: Next.js, NestJS, PostgreSQL, Prisma, Stripe, Zendrop
 
 -- Hostly (IA Robots Solutions) --
 Un sistema para robots de servicio OrionStar: un panel de administración que programa campañas publicitarias y música, un backend en un VPS y una app en RobotOS que las reproduce y conversa con las personas.
-[still] Una pantalla de programación del robot con una playlist de campañas ficticia, en lugar del sistema real.
+[image] Una pantalla de programación del robot con una playlist de campañas ficticia, en lugar del sistema real.
 [mockup words] Hoy · Campaña · Música · Bienvenida · Lobby, lista A · Oferta semanal · Menú de almuerzo · Lobby, lista B · Reproduciendo · Campaña, 30 segundos · A continuación · Luz de mañana · Puertas abiertas · Hora tranquila · Segundo piso · Check-in tardío
 Stack: RobotOS, [TODO(gabriel): the rest of the Hostly stack]
 [button] Detalles técnicos
@@ -130,7 +130,7 @@ Stack: RobotOS, [TODO(gabriel): the rest of the Hostly stack]
 
 -- BookOwl --
 Un sistema open source de gestión de bibliotecas en Python y Django, hecho para la biblioteca real de una iglesia.
-[still alt] La pantalla de inicio de BookOwl: el logo del búho sobre un mensaje de bienvenida.
+[image alt] La pantalla de inicio de BookOwl: el logo del búho sobre un mensaje de bienvenida.
 Stack: Python, Django
 [button] Detalles técnicos
   El problema: [TODO(gabriel): the problem this project solved]
@@ -145,7 +145,7 @@ Stack: Python, Django
   [link] Código en GitHub
   [button] Cerrar
 
-== Acto III · Cómo trabajo ==
+== Cómo trabajo ==
 
 1. Planifico
 2. Reviso el plan
@@ -157,9 +157,13 @@ La IA acelera. El criterio es mío.
 
 == Contacto ==
 
-Dirección: Gabriel Santos
-Guion: Gabriel Santos
-Fotografía: Gabriel Santos
+Vivo en Salvador, Brasil, y trabajo en remoto.
+Disponible para trasladarme a Santiago, Chile.
+Disponible · Santiago, Chile
+[link] Escríbeme
+gabriel.dev969@gmail.com
+LinkedIn · GitHub · YouTube · TikTok
+[link] Descargar CV
 
 Stack
 Frontend: Next.js, React, TypeScript, JavaScript, Angular
@@ -169,15 +173,4 @@ DevOps y automatización: Docker, AWS, Git, n8n
 Arquitectura: Clean Architecture, SOLID, TDD
 Idiomas: Portugués (nativo), Español (estudiando), Inglés (estudiando)
 
-Vivo en Salvador, Brasil, y trabajo en remoto.
-Disponible para trasladarme a Santiago, Chile.
-Disponible · Santiago, Chile
-[link] Escríbeme
-gabriel.dev969@gmail.com
-LinkedIn · GitHub · YouTube · TikTok
-[link] Descargar CV
-
-== Post-credits ==
-
-Gabriel Santos volverá en tu próximo proyecto.
-[button] Rebobinar la cinta
+[link] Volver arriba

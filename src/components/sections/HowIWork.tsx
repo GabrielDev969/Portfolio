@@ -1,43 +1,36 @@
 import type { SiteContent } from '@/content/schema'
-import { ChapterCard } from '../cinema/ChapterCard'
-import { StoryboardDraw } from './StoryboardDraw'
-import { StoryboardPanel } from './StoryboardPanel'
+import { SectionHeading } from '../ui/SectionHeading'
+import { StepDrawing } from './StepDrawing'
+import { StepsDraw } from './StepsDraw'
 
 type Props = { content: SiteContent }
 
 /**
- * Act III · How I work (design/STORYBOARD.md §7): the workflow as a storyboard sheet, six
- * panels in order, each a line drawing with a pencilled caption, then the one line that sums
- * it up. The drawings are complete in the markup; StoryboardDraw pencils them in as the sheet
- * scrolls past. Quick view keeps the numbered list and the closing line.
+ * How I work (design/STORYBOARD.md §4): the workflow as six numbered steps, each with a small
+ * line drawing, then the one line that sums it up. The drawings are complete in the markup;
+ * StepsDraw traces them once as they arrive. Quick view keeps the numbered list and the line.
  */
 export function HowIWork({ content }: Props) {
-  const { chapters, workflow } = content
+  const { sections, workflow } = content
 
   return (
-    <section
-      id="how-i-work"
-      data-section
-      data-act={chapters.howIWork.act}
-      data-act-title={chapters.howIWork.title}
-      aria-labelledby="how-i-work-title"
-    >
-      <ChapterCard id="how-i-work-title" {...chapters.howIWork} />
-      <div className="page-grid pb-[clamp(6rem,12vw,12rem)] quick:pb-8">
-        <StoryboardDraw>
-          <ol className="board">
+    <section id="how-i-work" data-section aria-labelledby="how-i-work-title">
+      <SectionHeading id="how-i-work-title" title={sections.howIWork.title} />
+      <div className="page-grid pb-[clamp(5rem,10vw,9rem)] quick:pb-8">
+        <StepsDraw>
+          <ol className="steps">
             {workflow.steps.map((step, i) => (
-              <li key={step} className="board-panel">
-                <StoryboardPanel index={i} />
-                <p className="board-caption">
-                  <span className="board-number">{i + 1}</span>
+              <li key={step} className="step">
+                <StepDrawing index={i} />
+                <p className="step-caption">
+                  <span className="step-number">{i + 1}</span>
                   {step}
                 </p>
               </li>
             ))}
           </ol>
-        </StoryboardDraw>
-        <p className="col-span-12 mt-[clamp(3rem,7vw,6rem)] font-text text-scene text-balance italic md:col-span-10 md:col-start-2 quick:col-start-1 quick:mt-6 quick:text-body quick:font-semibold quick:not-italic">
+        </StepsDraw>
+        <p className="col-span-12 mt-[clamp(3rem,7vw,6rem)] font-text text-heading text-balance italic md:col-span-10 quick:mt-6 quick:text-body quick:font-semibold quick:not-italic">
           {workflow.closing}
         </p>
       </div>

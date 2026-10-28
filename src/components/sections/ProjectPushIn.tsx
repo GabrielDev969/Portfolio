@@ -33,11 +33,7 @@ export function ProjectPushIn({ children }: { children: ReactNode }) {
           scrollTrigger: { trigger: root, start: 'top bottom', end: 'center center', scrub },
         })
         .fromTo(still, { scale: 1.12 }, { scale: 1, ease: ease.push, duration: 1 }, 0)
-        .from(
-          cast,
-          { yPercent: 100, ease: ease.push, duration: 0.4, stagger: stagger.credits },
-          0.35,
-        )
+        .from(cast, { yPercent: 100, ease: ease.push, duration: 0.4, stagger: stagger.items }, 0.35)
 
       const split = SplitText.create(root.querySelector('.project-logline'), {
         type: 'lines',

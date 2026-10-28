@@ -85,7 +85,8 @@ export type Project = {
   behindTheScenes: BehindTheScenes
 }
 
-export type CreditBlock = { role: string; names: string[] }
+/** A labelled list: a stack area and its tools, or the languages Gabriel speaks. */
+export type Group = { label: string; items: string[] }
 
 export type SiteContent = {
   locale: Locale
@@ -119,7 +120,9 @@ export type SiteContent = {
     technicalDetails: string
     close: string
     internalNoLink: string
-    rewind: string
+    backToTop: string
+    /** The heading over the stack, in a project and in the contact section. */
+    stack: string
     sectionsNav: string
     languageNav: string
     bts: {
@@ -132,16 +135,16 @@ export type SiteContent = {
       links: string
     }
   }
-  chapters: {
-    experience: { act: string; title: string }
-    projects: { act: string; title: string }
-    howIWork: { act: string; title: string }
+  sections: {
+    experience: { title: string }
+    projects: { title: string }
+    howIWork: { title: string }
     contact: { title: string }
   }
   experience: Milestone[]
   projects: Project[]
   workflow: { steps: string[]; closing: string }
-  credits: { crew: CreditBlock[]; cast: CreditBlock[]; castLabel: string; languages: CreditBlock }
+  skills: { stack: Group[]; languages: Group }
   contact: {
     cta: string
     email: string
@@ -150,5 +153,4 @@ export type SiteContent = {
     cv: { href: string; label: string }
     basedIn: string
   }
-  postCredits: { line: string; rewind: string }
 }

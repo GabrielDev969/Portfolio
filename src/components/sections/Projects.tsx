@@ -1,12 +1,12 @@
 import type { Project, SiteContent } from '@/content/schema'
 import type { Locale } from '@/lib/i18n'
 import { resolveText } from '@/lib/text'
-import { ChapterCard } from '../cinema/ChapterCard'
 import { FilmFrame } from '../cinema/FilmFrame'
 import { Still } from '../cinema/Still'
 import { mockups } from '../mockups'
 import { BehindTheScenes } from '../ui/BehindTheScenes'
 import { BehindTheScenesParts, ProjectLinks } from '../ui/BehindTheScenesParts'
+import { SectionHeading } from '../ui/SectionHeading'
 import { ProjectPushIn } from './ProjectPushIn'
 
 type Props = { content: SiteContent }
@@ -46,17 +46,11 @@ function ProjectStill({ project, locale }: { project: Project; locale: Locale })
  * Behind the scenes opens the six-part panel. Quick view keeps the facts and drops the stills.
  */
 export function Projects({ content }: Props) {
-  const { chapters, projects, ui, credits } = content
+  const { sections, projects, ui } = content
 
   return (
-    <section
-      id="projects"
-      data-section
-      data-act={chapters.projects.act}
-      data-act-title={chapters.projects.title}
-      aria-labelledby="projects-title"
-    >
-      <ChapterCard id="projects-title" {...chapters.projects} />
+    <section id="projects" data-section aria-labelledby="projects-title">
+      <SectionHeading id="projects-title" title={sections.projects.title} />
       <div className="projects">
         {projects.map((project) => {
           const stack = project.stack.map(resolveText).filter((s): s is string => s !== null)
@@ -77,7 +71,7 @@ export function Projects({ content }: Props) {
                   ) : null}
                   <h3
                     id={`${project.id}-title`}
-                    className="font-display text-scene font-bold uppercase quick:font-text quick:text-body quick:font-semibold quick:normal-case"
+                    className="font-display text-heading font-bold uppercase quick:font-text quick:text-body quick:font-semibold quick:normal-case"
                   >
                     {project.title}
                   </h3>
@@ -86,7 +80,7 @@ export function Projects({ content }: Props) {
                 </header>
 
                 <div className="project-cast quick:hidden">
-                  <p className="text-small text-ink-2 italic">{credits.castLabel}</p>
+                  <p className="text-small text-ink-2 italic">{ui.stack}</p>
                   <ul className="text-small font-medium">
                     {stack.map((name) => (
                       <li key={name} className="cast-line">

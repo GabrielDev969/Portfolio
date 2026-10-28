@@ -107,7 +107,7 @@ export function BehindTheScenes({ id, label, title, close, children }: Props) {
               <p id={`${id}-bts-label`} className="text-small italic">
                 {label}
               </p>
-              <p id={`${id}-bts-title`} className="font-display text-scene font-bold uppercase">
+              <p id={`${id}-bts-title`} className="font-display text-heading font-bold uppercase">
                 {title}
               </p>
             </div>

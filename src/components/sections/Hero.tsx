@@ -31,7 +31,7 @@ export function Hero({ locale, content }: Props) {
       <h1
         id="hero-name"
         data-fact="name"
-        className="hero-name col-span-12 w-fit justify-self-start font-display text-title font-extrabold uppercase lg:col-span-7 quick:col-span-12 quick:text-scene"
+        className="hero-name col-span-12 w-fit justify-self-start font-display text-title font-extrabold uppercase lg:col-span-7 quick:col-span-12 quick:text-heading"
       >
         {person.name.split(' ').map((word, i) => (
           <span key={word} className="rise-line">
@@ -70,7 +70,7 @@ export function Hero({ locale, content }: Props) {
 
       {/* On wide screens the line sits beside the name, on its last baseline. On tablets it sits
           beside the facts, so the stack stays on the first screen when standing up. */}
-      <p className="col-span-12 self-end font-text text-scene text-balance italic md:col-span-5 md:col-start-8 md:row-start-2 lg:col-span-5 lg:col-start-8 lg:row-start-1 lg:pb-[0.1em] quick:col-span-12 quick:col-start-1 quick:row-start-auto quick:pb-0 quick:text-body">
+      <p className="col-span-12 self-end font-text text-heading text-balance italic md:col-span-5 md:col-start-8 md:row-start-2 lg:col-span-5 lg:col-start-8 lg:row-start-1 lg:pb-[0.1em] quick:col-span-12 quick:col-start-1 quick:row-start-auto quick:pb-0 quick:text-body">
         {person.heroLine}
       </p>
 

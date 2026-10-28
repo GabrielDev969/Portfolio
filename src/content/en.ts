@@ -37,7 +37,8 @@ export const en: SiteContent = {
     technicalDetails: 'Technical details',
     close: 'Close',
     internalNoLink: 'Internal system, no public link',
-    rewind: 'Rewind the reel',
+    backToTop: 'Back to top',
+    stack: 'Stack',
     sectionsNav: 'Sections',
     languageNav: 'Choose a language',
     bts: {
@@ -50,10 +51,10 @@ export const en: SiteContent = {
       links: 'Links',
     },
   },
-  chapters: {
-    experience: { act: 'Act I', title: 'Experience' },
-    projects: { act: 'Act II', title: 'Projects' },
-    howIWork: { act: 'Act III', title: 'How I work' },
+  sections: {
+    experience: { title: 'Experience' },
+    projects: { title: 'Projects' },
+    howIWork: { title: 'How I work' },
     contact: { title: 'Contact' },
   },
   experience: [
@@ -345,29 +346,23 @@ export const en: SiteContent = {
     ],
     closing: 'AI speeds things up. The judgment is mine.',
   },
-  credits: {
-    crew: [
-      { role: 'Directed by', names: ['Gabriel Santos'] },
-      { role: 'Written by', names: ['Gabriel Santos'] },
-      { role: 'Shot by', names: ['Gabriel Santos'] },
-    ],
-    castLabel: 'Stack',
-    cast: [
-      { role: 'Frontend', names: ['Next.js', 'React', 'TypeScript', 'JavaScript', 'Angular'] },
+  skills: {
+    stack: [
+      { label: 'Frontend', items: ['Next.js', 'React', 'TypeScript', 'JavaScript', 'Angular'] },
       {
-        role: 'Backend',
-        names: ['Node.js', 'NestJS', 'Express', 'REST APIs', 'Spring Boot', 'Django'],
+        label: 'Backend',
+        items: ['Node.js', 'NestJS', 'Express', 'REST APIs', 'Spring Boot', 'Django'],
       },
       {
-        role: 'Data',
-        names: ['PostgreSQL', 'Prisma', 'MySQL', 'MongoDB', 'Redis', 'Firebird', 'RedTrack'],
+        label: 'Data',
+        items: ['PostgreSQL', 'Prisma', 'MySQL', 'MongoDB', 'Redis', 'Firebird', 'RedTrack'],
       },
-      { role: 'DevOps & automation', names: ['Docker', 'AWS', 'Git', 'n8n'] },
-      { role: 'Architecture', names: ['Clean Architecture', 'SOLID', 'TDD'] },
+      { label: 'DevOps & automation', items: ['Docker', 'AWS', 'Git', 'n8n'] },
+      { label: 'Architecture', items: ['Clean Architecture', 'SOLID', 'TDD'] },
     ],
     languages: {
-      role: 'Languages',
-      names: ['Portuguese (native)', 'Spanish (studying)', 'English (studying)'],
+      label: 'Languages',
+      items: ['Portuguese (native)', 'Spanish (studying)', 'English (studying)'],
     },
   },
   contact: {
@@ -384,9 +379,5 @@ export const en: SiteContent = {
       label: 'Download CV',
     },
     basedIn: 'Based in Salvador, Brazil, working remotely.',
-  },
-  postCredits: {
-    line: 'Gabriel Santos will return in your next project.',
-    rewind: 'Rewind the reel',
   },
 }

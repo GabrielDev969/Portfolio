@@ -37,7 +37,7 @@ export async function factVisibility(page: Page) {
 
 /**
  * Wait until the page has settled: fonts loaded, and in the full view every scene mounted and
- * measured (html[data-motion="ready"]) and no chapter card still rising (data-revealing).
+ * measured (html[data-motion="ready"]) and no section title still rising (data-revealing).
  */
 export async function settled(page: Page) {
   await page.evaluate(() => document.fonts.ready)

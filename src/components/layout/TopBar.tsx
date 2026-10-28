@@ -11,12 +11,12 @@ type Props = { locale: Locale; content: SiteContent }
  * language. Before it in the tab order comes "Skip to content", visible only on focus.
  */
 export function TopBar({ locale, content }: Props) {
-  const { person, ui, chapters } = content
+  const { person, ui, sections: titles } = content
   const sections = [
-    { href: '#experience', label: chapters.experience.title },
-    { href: '#projects', label: chapters.projects.title },
-    { href: '#how-i-work', label: chapters.howIWork.title },
-    { href: '#contact', label: chapters.contact.title },
+    { href: '#experience', label: titles.experience.title },
+    { href: '#projects', label: titles.projects.title },
+    { href: '#how-i-work', label: titles.howIWork.title },
+    { href: '#contact', label: titles.contact.title },
   ]
 
   return (

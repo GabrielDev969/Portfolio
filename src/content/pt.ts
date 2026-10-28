@@ -65,7 +65,8 @@ export const pt: SiteContent = {
     technicalDetails: 'Detalhes técnicos',
     close: 'Fechar',
     internalNoLink: 'Sistema interno, sem link público',
-    rewind: 'Rebobinar o filme',
+    backToTop: 'Voltar ao topo',
+    stack: 'Stack',
     sectionsNav: 'Seções',
     languageNav: 'Escolha o idioma',
     bts: {
@@ -78,10 +79,10 @@ export const pt: SiteContent = {
       links: 'Links',
     },
   },
-  chapters: {
-    experience: { act: 'Ato I', title: 'Experiência' },
-    projects: { act: 'Ato II', title: 'Projetos' },
-    howIWork: { act: 'Ato III', title: 'Como trabalho' },
+  sections: {
+    experience: { title: 'Experiência' },
+    projects: { title: 'Projetos' },
+    howIWork: { title: 'Como trabalho' },
     contact: { title: 'Contato' },
   },
   experience: en.experience.map((m) => ({ ...m, ...experience[m.id] })),
@@ -291,26 +292,20 @@ export const pt: SiteContent = {
     ],
     closing: 'A IA acelera. O critério é meu.',
   },
-  credits: {
-    crew: [
-      { role: 'Direção', names: ['Gabriel Santos'] },
-      { role: 'Roteiro', names: ['Gabriel Santos'] },
-      { role: 'Fotografia', names: ['Gabriel Santos'] },
-    ],
-    castLabel: 'Stack',
-    cast: [
-      { role: 'Frontend', names: en.credits.cast[0]!.names },
+  skills: {
+    stack: [
+      { label: 'Frontend', items: en.skills.stack[0]!.items },
       {
-        role: 'Backend',
-        names: ['Node.js', 'NestJS', 'Express', 'APIs REST', 'Spring Boot', 'Django'],
+        label: 'Backend',
+        items: ['Node.js', 'NestJS', 'Express', 'APIs REST', 'Spring Boot', 'Django'],
       },
-      { role: 'Dados', names: en.credits.cast[2]!.names },
-      { role: 'DevOps e automação', names: en.credits.cast[3]!.names },
-      { role: 'Arquitetura', names: en.credits.cast[4]!.names },
+      { label: 'Dados', items: en.skills.stack[2]!.items },
+      { label: 'DevOps e automação', items: en.skills.stack[3]!.items },
+      { label: 'Arquitetura', items: en.skills.stack[4]!.items },
     ],
     languages: {
-      role: 'Idiomas',
-      names: ['Português (nativo)', 'Espanhol (estudando)', 'Inglês (estudando)'],
+      label: 'Idiomas',
+      items: ['Português (nativo)', 'Espanhol (estudando)', 'Inglês (estudando)'],
     },
   },
   contact: {
@@ -322,9 +317,5 @@ export const pt: SiteContent = {
       label: 'Baixar CV',
     },
     basedIn: 'Moro em Salvador, Bahia, e trabalho remoto.',
-  },
-  postCredits: {
-    line: 'Gabriel Santos voltará no seu próximo projeto.',
-    rewind: 'Rebobinar o filme',
   },
 }

@@ -14,10 +14,11 @@ export const dur = {
   ui: 0.22,
   fade: 0.3,
   reveal: 1.1,
-  rewind: 1.6,
+  /** One workflow drawing, all its strokes. */
+  draw: 0.9,
 } as const
 
-export const stagger = { lines: 0.06, credits: 0.05 } as const
+export const stagger = { lines: 0.06, items: 0.05 } as const
 
 export const scrub = 0.6
 
