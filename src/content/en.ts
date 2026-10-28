@@ -226,8 +226,16 @@ export const en: SiteContent = {
       id: 'zibby',
       title: 'Zibby',
       logline:
-        'My own multi-store e-commerce platform, launched in October 2026: a storefront, an admin panel, Stripe payments and Zendrop fulfillment. Every integration is a provider, so each store can be created and customized with the APIs it needs.',
-      stack: ['Next.js', 'NestJS', 'PostgreSQL', 'Prisma', 'Stripe', 'Zendrop'],
+        'My own multi-store e-commerce platform, launched in October 2026: a storefront, an admin panel with product registration and sales dashboards that show how each product is selling, and Stripe payments. Every integration is a provider, so each store can be created and customized with the APIs it needs.',
+      stack: [
+        'Next.js',
+        'NestJS',
+        'PostgreSQL',
+        'Prisma',
+        'Stripe',
+        'Microsoft Clarity',
+        'Meta Pixel',
+      ],
       internal: false,
       image: {
         kind: 'mockup',
@@ -244,18 +252,20 @@ export const en: SiteContent = {
         architecture: {
           nodes: [
             { id: 'storefront', label: 'Storefront (Next.js)', kind: 'client' },
+            { id: 'tracking', label: 'Microsoft Clarity and Meta Pixel', kind: 'external' },
             { id: 'admin', label: 'Admin panel (Next.js)', kind: 'client' },
             { id: 'api', label: 'API (NestJS, modular monolith)', kind: 'service' },
             { id: 'db', label: 'PostgreSQL (Prisma)', kind: 'data' },
             { id: 'stripe', label: 'Stripe (payments provider)', kind: 'external' },
-            { id: 'zendrop', label: 'Zendrop (fulfillment provider)', kind: 'external' },
+            { id: 'email', label: 'E-mail provider', kind: 'external' },
           ],
           edges: [
             { from: 'storefront', to: 'api' },
             { from: 'admin', to: 'api' },
             { from: 'api', to: 'db' },
             { from: 'api', to: 'stripe' },
-            { from: 'api', to: 'zendrop' },
+            { from: 'api', to: 'email' },
+            { from: 'storefront', to: 'tracking' },
           ],
           confirmed: true,
         },
@@ -264,9 +274,12 @@ export const en: SiteContent = {
             what: 'A pnpm monorepo with the NestJS API and the Next.js storefront and admin, organized as a modular monolith.',
             why: todo('why a modular monolith in one monorepo'),
           },
-          { what: 'PostgreSQL with Prisma.', why: todo('why PostgreSQL and Prisma') },
           {
-            what: 'Every integration is a provider: Stripe for payments and Zendrop for fulfillment are the first, and other APIs plug in the same way.',
+            what: 'Microsoft Clarity and the Meta Pixel in the storefront.',
+            why: 'Clarity records sessions and builds heatmaps, so I can see where customers click, how far they scroll and where they give up. The Meta Pixel reports visits, add-to-carts and purchases back to Meta, so the ads can be measured and optimized.',
+          },
+          {
+            what: 'Every integration is a provider: Stripe for payments and the e-mail service are the first, and other APIs plug in the same way.',
             why: 'So each store can be created and customized however it needs, with the services it chooses.',
           },
         ],

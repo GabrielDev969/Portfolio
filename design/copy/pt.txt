@@ -86,10 +86,10 @@ Stack: Next.js, NestJS, PostgreSQL, RabbitMQ, n8n, RedTrack
   [button] Fechar
 
 -- Zibby --
-Minha própria plataforma de e-commerce multiloja, lançada em outubro de 2026: vitrine, painel administrativo, pagamentos com Stripe e fulfillment pela Zendrop. Cada integração é um provider, então cada loja pode ser criada e personalizada com as APIs de que precisa.
+Minha própria plataforma de e-commerce multiloja, lançada em outubro de 2026: vitrine, painel administrativo com cadastro de produtos e dashboards de vendas que mostram como cada produto está saindo, e pagamentos com Stripe. Cada integração é um provider, então cada loja pode ser criada e personalizada com as APIs de que precisa.
 [image] Uma vitrine fictícia ao lado do seu painel administrativo.
-[mockup words] Novidades · Casa · Cozinha · Carrinho (2) · Para o dia a dia · Caneca de cerâmica · Luminária de mesa · Bolsa de linho · Pedidos · Admin · Enviado à Zendrop · Pago · Despachado · Entregue
-Stack: Next.js, NestJS, PostgreSQL, Prisma, Stripe, Zendrop
+[mockup words] Novidades · Casa · Cozinha · Carrinho (2) · Para o dia a dia · Caneca de cerâmica · Luminária de mesa · Bolsa de linho · Pedidos · Admin · Em separação · Pago · Despachado · Entregue
+Stack: Next.js, NestJS, PostgreSQL, Prisma, Stripe, Microsoft Clarity, Meta Pixel
 [button] Detalhes técnicos
   O problema: [TODO(gabriel): the problem this project solved]
   Meu papel: Produto próprio. Construí em fases com agentes de IA para programar, e cada fase seguiu plano → revisão → implementação → testes → revisão do diff → merge.
@@ -98,11 +98,12 @@ Stack: Next.js, NestJS, PostgreSQL, Prisma, Stripe, Zendrop
     Painel administrativo (Next.js) → API (NestJS, monólito modular)
     API (NestJS, monólito modular) → PostgreSQL (Prisma)
     API (NestJS, monólito modular) → Stripe (provider de pagamentos)
-    API (NestJS, monólito modular) → Zendrop (provider de fulfillment)
+    API (NestJS, monólito modular) → Provider de e-mail
+    Vitrine (Next.js) → Microsoft Clarity, Pixel da Meta
   Decisões principais:
     - Um monorepo pnpm com a API em NestJS e a vitrine e o painel em Next.js, organizado como monólito modular. [TODO(gabriel): why a modular monolith in one monorepo]
-    - PostgreSQL com Prisma. [TODO(gabriel): why PostgreSQL and Prisma]
-    - Cada integração é um provider: Stripe para pagamentos e Zendrop para fulfillment são os primeiros, e outras APIs se conectam do mesmo jeito. Para que cada loja possa ser criada e personalizada como precisar, com os serviços que escolher.
+    - Microsoft Clarity e o Pixel da Meta na vitrine. O Clarity grava as sessões e gera mapas de calor, então dá para ver onde os clientes clicam, até onde rolam a página e onde desistem. O Pixel da Meta envia visitas, adições ao carrinho e compras de volta para a Meta, para medir e otimizar os anúncios.
+    - Cada integração é um provider: Stripe para pagamentos e o serviço de e-mail são os primeiros, e outras APIs se conectam do mesmo jeito. Para que cada loja possa ser criada e personalizada como precisar, com os serviços que escolher.
   Testes e deploy: Testes automatizados em todo o monorepo; cada fase passou por eles antes da revisão do diff. Deploy em uma VPS, com criptografia e backups de emergência.
   Resultado: Lançada em outubro de 2026. [TODO(gabriel): one number, if you want it: orders, products or uptime]
   Links: [TODO(gabriel): a public link for Zibby, if there is one]

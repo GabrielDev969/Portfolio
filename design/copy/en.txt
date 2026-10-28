@@ -86,10 +86,10 @@ Stack: Next.js, NestJS, PostgreSQL, RabbitMQ, n8n, RedTrack
   [button] Close
 
 -- Zibby --
-My own multi-store e-commerce platform, launched in October 2026: a storefront, an admin panel, Stripe payments and Zendrop fulfillment. Every integration is a provider, so each store can be created and customized with the APIs it needs.
+My own multi-store e-commerce platform, launched in October 2026: a storefront, an admin panel with product registration and sales dashboards that show how each product is selling, and Stripe payments. Every integration is a provider, so each store can be created and customized with the APIs it needs.
 [image] A fictional storefront next to its admin panel.
-[mockup words] New · Home · Kitchen · Cart (2) · Made for every day · Ceramic mug · Desk lamp · Linen tote · Orders · Admin · Sent to Zendrop · Paid · Shipped · Delivered
-Stack: Next.js, NestJS, PostgreSQL, Prisma, Stripe, Zendrop
+[mockup words] New · Home · Kitchen · Cart (2) · Made for every day · Ceramic mug · Desk lamp · Linen tote · Orders · Admin · Preparing · Paid · Shipped · Delivered
+Stack: Next.js, NestJS, PostgreSQL, Prisma, Stripe, Microsoft Clarity, Meta Pixel
 [button] Technical details
   The problem: [TODO(gabriel): the problem this project solved]
   My role: My own product. I built it in phases with AI coding agents, and every phase went plan → review → implement → tests → diff review → merge.
@@ -98,11 +98,12 @@ Stack: Next.js, NestJS, PostgreSQL, Prisma, Stripe, Zendrop
     Admin panel (Next.js) → API (NestJS, modular monolith)
     API (NestJS, modular monolith) → PostgreSQL (Prisma)
     API (NestJS, modular monolith) → Stripe (payments provider)
-    API (NestJS, modular monolith) → Zendrop (fulfillment provider)
+    API (NestJS, modular monolith) → E-mail provider
+    Storefront (Next.js) → Microsoft Clarity and Meta Pixel
   Key decisions:
     - A pnpm monorepo with the NestJS API and the Next.js storefront and admin, organized as a modular monolith. [TODO(gabriel): why a modular monolith in one monorepo]
-    - PostgreSQL with Prisma. [TODO(gabriel): why PostgreSQL and Prisma]
-    - Every integration is a provider: Stripe for payments and Zendrop for fulfillment are the first, and other APIs plug in the same way. So each store can be created and customized however it needs, with the services it chooses.
+    - Microsoft Clarity and the Meta Pixel in the storefront. Clarity records sessions and builds heatmaps, so I can see where customers click, how far they scroll and where they give up. The Meta Pixel reports visits, add-to-carts and purchases back to Meta, so the ads can be measured and optimized.
+    - Every integration is a provider: Stripe for payments and the e-mail service are the first, and other APIs plug in the same way. So each store can be created and customized however it needs, with the services it chooses.
   Testing and deploy: Automated tests across the monorepo; each phase passed them before its diff review. Deployed to a VPS, with encryption and emergency backups.
   Outcome: Launched in October 2026. [TODO(gabriel): one number, if you want it: orders, products or uptime]
   Links: [TODO(gabriel): a public link for Zibby, if there is one]

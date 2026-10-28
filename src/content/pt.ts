@@ -182,7 +182,7 @@ export const pt: SiteContent = {
     {
       ...zibby,
       logline:
-        'Minha própria plataforma de e-commerce multiloja, lançada em outubro de 2026: vitrine, painel administrativo, pagamentos com Stripe e fulfillment pela Zendrop. Cada integração é um provider, então cada loja pode ser criada e personalizada com as APIs de que precisa.',
+        'Minha própria plataforma de e-commerce multiloja, lançada em outubro de 2026: vitrine, painel administrativo com cadastro de produtos e dashboards de vendas que mostram como cada produto está saindo, e pagamentos com Stripe. Cada integração é um provider, então cada loja pode ser criada e personalizada com as APIs de que precisa.',
       image: {
         kind: 'mockup',
         mockup: 'zibby-store',
@@ -198,11 +198,12 @@ export const pt: SiteContent = {
           ...zibby.technicalDetails.architecture,
           nodes: [
             { id: 'storefront', label: 'Vitrine (Next.js)', kind: 'client' },
+            { id: 'tracking', label: 'Microsoft Clarity, Pixel da Meta', kind: 'external' },
             { id: 'admin', label: 'Painel administrativo (Next.js)', kind: 'client' },
             { id: 'api', label: 'API (NestJS, monólito modular)', kind: 'service' },
             { id: 'db', label: 'PostgreSQL (Prisma)', kind: 'data' },
             { id: 'stripe', label: 'Stripe (provider de pagamentos)', kind: 'external' },
-            { id: 'zendrop', label: 'Zendrop (provider de fulfillment)', kind: 'external' },
+            { id: 'email', label: 'Provider de e-mail', kind: 'external' },
           ],
         },
         decisions: [
@@ -210,9 +211,12 @@ export const pt: SiteContent = {
             what: 'Um monorepo pnpm com a API em NestJS e a vitrine e o painel em Next.js, organizado como monólito modular.',
             why: todo('why a modular monolith in one monorepo'),
           },
-          { what: 'PostgreSQL com Prisma.', why: todo('why PostgreSQL and Prisma') },
           {
-            what: 'Cada integração é um provider: Stripe para pagamentos e Zendrop para fulfillment são os primeiros, e outras APIs se conectam do mesmo jeito.',
+            what: 'Microsoft Clarity e o Pixel da Meta na vitrine.',
+            why: 'O Clarity grava as sessões e gera mapas de calor, então dá para ver onde os clientes clicam, até onde rolam a página e onde desistem. O Pixel da Meta envia visitas, adições ao carrinho e compras de volta para a Meta, para medir e otimizar os anúncios.',
+          },
+          {
+            what: 'Cada integração é um provider: Stripe para pagamentos e o serviço de e-mail são os primeiros, e outras APIs se conectam do mesmo jeito.',
             why: 'Para que cada loja possa ser criada e personalizada como precisar, com os serviços que escolher.',
           },
         ],

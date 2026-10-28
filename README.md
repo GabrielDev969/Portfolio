@@ -96,13 +96,12 @@ Everything below is a `todo()` in the content or a missing file. None of it show
 
 <!-- todos:start -->
 
-19 open items.
+18 open items.
 
 - **Project: Zibby**
   - a public link for Zibby, if there is one
   - the problem this project solved
   - why a modular monolith in one monorepo
-  - why PostgreSQL and Prisma
   - one number, if you want it: orders, products or uptime
 - **Project: Hostly**
   - the rest of the Hostly stack

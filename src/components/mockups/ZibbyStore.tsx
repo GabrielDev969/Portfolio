@@ -7,7 +7,7 @@ import { MockupFrame } from './MockupFrame'
 const prices = ['$24', '$58', '$32']
 
 const orders = [
-  { id: '#1048', total: '$56.00', status: 'sent' },
+  { id: '#1048', total: '$56.00', status: 'preparing' },
   { id: '#1047', total: '$24.00', status: 'paid' },
   { id: '#1046', total: '$90.00', status: 'shipped' },
   { id: '#1045', total: '$32.00', status: 'shipped' },

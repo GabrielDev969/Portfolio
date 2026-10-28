@@ -184,7 +184,7 @@ export const es: SiteContent = {
     {
       ...zibby,
       logline:
-        'Mi propia plataforma de e-commerce multitienda, lanzada en octubre de 2026: tienda online, panel de administración, pagos con Stripe y fulfillment con Zendrop. Cada integración es un provider, así que cada tienda puede crearse y personalizarse con las APIs que necesite.',
+        'Mi propia plataforma de e-commerce multitienda, lanzada en octubre de 2026: tienda online, panel de administración con registro de productos y dashboards de ventas que muestran cómo se vende cada producto, y pagos con Stripe. Cada integración es un provider, así que cada tienda puede crearse y personalizarse con las APIs que necesite.',
       image: {
         kind: 'mockup',
         mockup: 'zibby-store',
@@ -200,11 +200,12 @@ export const es: SiteContent = {
           ...zibby.technicalDetails.architecture,
           nodes: [
             { id: 'storefront', label: 'Tienda (Next.js)', kind: 'client' },
+            { id: 'tracking', label: 'Microsoft Clarity, Píxel de Meta', kind: 'external' },
             { id: 'admin', label: 'Panel de administración (Next.js)', kind: 'client' },
             { id: 'api', label: 'API (NestJS, monolito modular)', kind: 'service' },
             { id: 'db', label: 'PostgreSQL (Prisma)', kind: 'data' },
             { id: 'stripe', label: 'Stripe (provider de pagos)', kind: 'external' },
-            { id: 'zendrop', label: 'Zendrop (provider de fulfillment)', kind: 'external' },
+            { id: 'email', label: 'Provider de e-mail', kind: 'external' },
           ],
         },
         decisions: [
@@ -212,9 +213,12 @@ export const es: SiteContent = {
             what: 'Un monorepo pnpm con la API en NestJS y la tienda y el panel en Next.js, organizado como monolito modular.',
             why: todo('why a modular monolith in one monorepo'),
           },
-          { what: 'PostgreSQL con Prisma.', why: todo('why PostgreSQL and Prisma') },
           {
-            what: 'Cada integración es un provider: Stripe para pagos y Zendrop para fulfillment son los primeros, y otras APIs se conectan de la misma forma.',
+            what: 'Microsoft Clarity y el Píxel de Meta en la tienda.',
+            why: 'Clarity graba las sesiones y genera mapas de calor, así que se puede ver dónde hacen clic los clientes, hasta dónde bajan en la página y dónde abandonan. El Píxel de Meta envía visitas, productos agregados al carrito y compras de vuelta a Meta, para medir y optimizar los anuncios.',
+          },
+          {
+            what: 'Cada integración es un provider: Stripe para pagos y el servicio de e-mail son los primeros, y otras APIs se conectan de la misma forma.',
             why: 'Para que cada tienda pueda crearse y personalizarse como necesite, con los servicios que elija.',
           },
         ],
