@@ -37,7 +37,7 @@ export type MockupCopy = {
     products: [string, string, string]
     orders: string
     admin: string
-    status: { sent: string; paid: string; shipped: string; delivered: string }
+    status: { preparing: string; paid: string; shipped: string; delivered: string }
   }
   hostly: {
     today: string
@@ -103,7 +103,7 @@ export const mockupCopy: Record<Locale, MockupCopy> = {
       orders: 'Orders',
       admin: 'Admin',
       status: {
-        sent: 'Sent to Zendrop',
+        preparing: 'Preparing',
         paid: 'Paid',
         shipped: 'Shipped',
         delivered: 'Delivered',
@@ -168,7 +168,7 @@ export const mockupCopy: Record<Locale, MockupCopy> = {
       orders: 'Pedidos',
       admin: 'Admin',
       status: {
-        sent: 'Enviado à Zendrop',
+        preparing: 'Em separação',
         paid: 'Pago',
         shipped: 'Despachado',
         delivered: 'Entregue',
@@ -239,7 +239,7 @@ export const mockupCopy: Record<Locale, MockupCopy> = {
       orders: 'Pedidos',
       admin: 'Admin',
       status: {
-        sent: 'Enviado a Zendrop',
+        preparing: 'En preparación',
         paid: 'Pagado',
         shipped: 'Despachado',
         delivered: 'Entregado',

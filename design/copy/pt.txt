@@ -36,8 +36,8 @@ Do banco de dados à tela.
 2025–atual · Desenvolvedor Full Stack · Group Wave Enterprise
   Desenhei e construí o Campaign BI do começo ao fim, e atuo em todo o Sistema Wave, a plataforma interna que cerca de 100 pessoas usam para publicar mais de 500 campanhas por dia.
   Remoto
-2026–atual · Consultor e Desenvolvedor de Software (contrato) · IA Robots Solutions
-  Configuração e operação de robôs de atendimento OrionStar, e desenvolvimento do Hostly.
+2025–atual · Consultor e Desenvolvedor de Software (contrato) · IA Robots Solutions
+  Configuração e operação de robôs de atendimento OrionStar, e desenvolvimento do Hostly, que transmite anúncios nos robôs e em telões de LED.
 2026–2027 · Pós-graduação em Engenharia de Software com IA Aplicada · UNIPDS
 
 == Projetos ==
@@ -86,10 +86,10 @@ Stack: Next.js, NestJS, PostgreSQL, RabbitMQ, n8n, RedTrack
   [button] Fechar
 
 -- Zibby --
-Minha própria plataforma de e-commerce multiloja, lançada em outubro de 2026: vitrine, painel administrativo, pagamentos com Stripe e fulfillment pela Zendrop.
+Minha própria plataforma de e-commerce multiloja, lançada em outubro de 2026: vitrine, painel administrativo com cadastro de produtos e dashboards de vendas que mostram como cada produto está saindo, e pagamentos com Stripe. Cada integração é um provider, então cada loja pode ser criada e personalizada com as APIs de que precisa.
 [image] Uma vitrine fictícia ao lado do seu painel administrativo.
-[mockup words] Novidades · Casa · Cozinha · Carrinho (2) · Para o dia a dia · Caneca de cerâmica · Luminária de mesa · Bolsa de linho · Pedidos · Admin · Enviado à Zendrop · Pago · Despachado · Entregue
-Stack: Next.js, NestJS, PostgreSQL, Prisma, Stripe, Zendrop
+[mockup words] Novidades · Casa · Cozinha · Carrinho (2) · Para o dia a dia · Caneca de cerâmica · Luminária de mesa · Bolsa de linho · Pedidos · Admin · Em separação · Pago · Despachado · Entregue
+Stack: Next.js, NestJS, PostgreSQL, Prisma, Stripe, Resend, Microsoft Clarity, Meta Pixel
 [button] Detalhes técnicos
   O problema: [TODO(gabriel): the problem this project solved]
   Meu papel: Produto próprio. Construí em fases com agentes de IA para programar, e cada fase seguiu plano → revisão → implementação → testes → revisão do diff → merge.
@@ -97,19 +97,20 @@ Stack: Next.js, NestJS, PostgreSQL, Prisma, Stripe, Zendrop
     Vitrine (Next.js) → API (NestJS, monólito modular)
     Painel administrativo (Next.js) → API (NestJS, monólito modular)
     API (NestJS, monólito modular) → PostgreSQL (Prisma)
-    API (NestJS, monólito modular) → Stripe (pagamentos)
-    API (NestJS, monólito modular) → Zendrop (fulfillment)
+    API (NestJS, monólito modular) → Stripe (provider de pagamentos)
+    API (NestJS, monólito modular) → Resend (provider de e-mail)
+    Vitrine (Next.js) → Microsoft Clarity, Pixel da Meta
   Decisões principais:
     - Um monorepo pnpm com a API em NestJS e a vitrine e o painel em Next.js, organizado como monólito modular. [TODO(gabriel): why a modular monolith in one monorepo]
-    - PostgreSQL com Prisma. [TODO(gabriel): why PostgreSQL and Prisma]
-    - Stripe para pagamentos e Zendrop para fulfillment. [TODO(gabriel): why Stripe and Zendrop]
-  Testes e deploy: Testes automatizados em todo o monorepo; cada fase passou por eles antes da revisão do diff. Deploy em uma VPS.
+    - Microsoft Clarity na vitrine, e o Pixel da Meta configurado por loja. O Clarity grava as sessões e gera mapas de calor, então dá para ver onde os clientes clicam, até onde rolam a página e onde desistem. Cada loja coloca o próprio Pixel da Meta, que envia visitas, adições ao carrinho e compras de volta para a Meta, para medir e otimizar os anúncios dela.
+    - Cada integração é um provider: Stripe para pagamentos e o Resend para e-mail são os primeiros, e outras APIs se conectam do mesmo jeito. Para que cada loja possa ser criada e personalizada como precisar, com os serviços que escolher.
+  Testes e deploy: Testes automatizados em todo o monorepo; cada fase passou por eles antes da revisão do diff. Deploy em uma VPS, com backups de emergência. Os dados dos clientes e as chaves de API ficam criptografados: mesmo numa invasão, só podem ser lidos com a chave de descriptografia.
   Resultado: Lançada em outubro de 2026. [TODO(gabriel): one number, if you want it: orders, products or uptime]
   Links: [TODO(gabriel): a public link for Zibby, if there is one]
   [button] Fechar
 
 -- Hostly (IA Robots Solutions) --
-Um sistema para robôs de atendimento OrionStar: um painel administrativo que agenda campanhas de anúncios e músicas, um backend em uma VPS e um app no RobotOS que reproduz tudo e conversa com as pessoas.
+Um sistema para robôs de atendimento OrionStar e telões de LED cadastrados: um painel administrativo que agenda campanhas de anúncios e músicas, um backend em uma VPS e um app no RobotOS que reproduz tudo e conversa com as pessoas. Os anúncios são transmitidos no robô e nos telões, inclusive em eventos.
 [image] Uma tela de agenda do robô com uma playlist de campanhas fictícia, no lugar do sistema real.
 [mockup words] Hoje · Campanha · Música · Boas-vindas · Lobby, trilha A · Oferta semanal · Menu do almoço · Lobby, trilha B · Tocando agora · Campanha, 30 segundos · A seguir · Luz da manhã · Portas abertas · Hora calma · Segundo andar · Check-in tardio
 Stack: RobotOS, [TODO(gabriel): the rest of the Hostly stack]
@@ -120,12 +121,13 @@ Stack: RobotOS, [TODO(gabriel): the rest of the Hostly stack]
     Painel administrativo → Backend (VPS) (campanhas, músicas)
     App do robô → Backend (VPS)
     App do robô → RobotOS no OrionStar LuckiBot Plus (camada de abstração)
+    Backend (VPS) → Telão de LED cadastrado (anúncios)
   Decisões principais:
     - O app do robô acessa o RobotOS (OrionStar LuckiBot Plus) por uma camada de abstração, para poder migrar para o AgentOS depois.
     - Um backend em uma VPS e um painel administrativo para agendar campanhas de anúncios e músicas. [TODO(gabriel): why this split]
     - Pensado para virar um SaaS para várias empresas no futuro. [TODO(gabriel): what that changed in the design today]
   Testes e deploy: [TODO(gabriel): how it is tested] O backend fica hospedado em uma VPS.
-  Resultado: [TODO(gabriel): the outcome, ideally with a number]
+  Resultado: Em uso: conecta ao robô e aos telões de LED cadastrados e transmite anúncios nos dois, inclusive em eventos.
   Sistema interno, sem link público
   [button] Fechar
 

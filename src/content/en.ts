@@ -87,11 +87,12 @@ export const en: SiteContent = {
     },
     {
       id: 'ia-robots',
-      start: 2026,
+      start: 2025,
       end: 'present',
       title: 'Consultant & Software Developer (contract)',
       organization: 'IA Robots Solutions',
-      summary: 'Robot setup and operation for OrionStar service robots, and Hostly development.',
+      summary:
+        'Setup and operation of OrionStar service robots, and development of Hostly, which streams ads to the robots and to LED screens.',
     },
     {
       id: 'unipds',
@@ -225,8 +226,17 @@ export const en: SiteContent = {
       id: 'zibby',
       title: 'Zibby',
       logline:
-        'My own multi-store e-commerce platform, launched in October 2026: a storefront, an admin panel, Stripe payments and Zendrop fulfillment.',
-      stack: ['Next.js', 'NestJS', 'PostgreSQL', 'Prisma', 'Stripe', 'Zendrop'],
+        'My own multi-store e-commerce platform, launched in October 2026: a storefront, an admin panel with product registration and sales dashboards that show how each product is selling, and Stripe payments. Every integration is a provider, so each store can be created and customized with the APIs it needs.',
+      stack: [
+        'Next.js',
+        'NestJS',
+        'PostgreSQL',
+        'Prisma',
+        'Stripe',
+        'Resend',
+        'Microsoft Clarity',
+        'Meta Pixel',
+      ],
       internal: false,
       image: {
         kind: 'mockup',
@@ -243,18 +253,20 @@ export const en: SiteContent = {
         architecture: {
           nodes: [
             { id: 'storefront', label: 'Storefront (Next.js)', kind: 'client' },
+            { id: 'tracking', label: 'Microsoft Clarity and Meta Pixel', kind: 'external' },
             { id: 'admin', label: 'Admin panel (Next.js)', kind: 'client' },
             { id: 'api', label: 'API (NestJS, modular monolith)', kind: 'service' },
             { id: 'db', label: 'PostgreSQL (Prisma)', kind: 'data' },
-            { id: 'stripe', label: 'Stripe (payments)', kind: 'external' },
-            { id: 'zendrop', label: 'Zendrop (fulfillment)', kind: 'external' },
+            { id: 'stripe', label: 'Stripe (payments provider)', kind: 'external' },
+            { id: 'email', label: 'Resend (e-mail provider)', kind: 'external' },
           ],
           edges: [
             { from: 'storefront', to: 'api' },
             { from: 'admin', to: 'api' },
             { from: 'api', to: 'db' },
             { from: 'api', to: 'stripe' },
-            { from: 'api', to: 'zendrop' },
+            { from: 'api', to: 'email' },
+            { from: 'storefront', to: 'tracking' },
           ],
           confirmed: true,
         },
@@ -263,15 +275,19 @@ export const en: SiteContent = {
             what: 'A pnpm monorepo with the NestJS API and the Next.js storefront and admin, organized as a modular monolith.',
             why: todo('why a modular monolith in one monorepo'),
           },
-          { what: 'PostgreSQL with Prisma.', why: todo('why PostgreSQL and Prisma') },
           {
-            what: 'Stripe for payments and Zendrop for fulfillment.',
-            why: todo('why Stripe and Zendrop'),
+            what: 'Microsoft Clarity in the storefront, and a Meta Pixel set per store.',
+            why: 'Clarity records sessions and builds heatmaps, so I can see where customers click, how far they scroll and where they give up. Each store adds its own Meta Pixel, which reports visits, add-to-carts and purchases back to Meta, so its ads can be measured and optimized.',
+          },
+          {
+            what: 'Every integration is a provider: Stripe for payments and Resend for e-mail are the first, and other APIs plug in the same way.',
+            why: 'So each store can be created and customized however it needs, with the services it chooses.',
           },
         ],
         testing:
           'Automated tests across the monorepo; each phase passed them before its diff review.',
-        deploy: 'Deployed to a VPS.',
+        deploy:
+          'Deployed to a VPS, with emergency backups. Customer data and API keys are encrypted, so even after a break-in they can only be read with the decryption key.',
         outcome: [
           'Launched in October 2026.',
           todo('one number, if you want it: orders, products or uptime'),
@@ -283,7 +299,7 @@ export const en: SiteContent = {
       title: 'Hostly',
       organization: 'IA Robots Solutions',
       logline:
-        'A system for OrionStar service robots: an admin panel that schedules ad campaigns and music, a backend on a VPS, and a RobotOS app that plays them and talks to people.',
+        'A system for OrionStar service robots and registered LED screens: an admin panel that schedules ad campaigns and music, a backend on a VPS, and a RobotOS app that plays them and talks to people. The ads stream to the robot and to the screens, at events too.',
       stack: ['RobotOS', todo('the rest of the Hostly stack')],
       internal: true,
       image: {
@@ -302,11 +318,13 @@ export const en: SiteContent = {
             { id: 'app', label: 'Robot app', kind: 'client' },
             { id: 'backend', label: 'Backend (VPS)', kind: 'service' },
             { id: 'robot', label: 'RobotOS on OrionStar LuckiBot Plus', kind: 'device' },
+            { id: 'screen', label: 'Registered LED screen', kind: 'device' },
           ],
           edges: [
             { from: 'admin', to: 'backend', label: 'campaigns, music' },
             { from: 'app', to: 'backend' },
             { from: 'app', to: 'robot', label: 'abstraction layer' },
+            { from: 'backend', to: 'screen', label: 'ads' },
           ],
           confirmed: true,
         },
@@ -325,7 +343,8 @@ export const en: SiteContent = {
         ],
         testing: missing.testing(),
         deploy: 'The backend is hosted on a VPS.',
-        outcome: missing.outcome(),
+        outcome:
+          'In use: it connects to the robot and to registered LED screens and streams ads to both, at events too.',
       },
     },
     {
