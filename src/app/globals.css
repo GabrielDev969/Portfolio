@@ -145,6 +145,11 @@
   letter-spacing: var(--text-heading--letter-spacing);
 }
 
+[data-view='quick'] .section-heading {
+  padding-top: 3rem;
+  padding-bottom: 1rem;
+}
+
 /* ---- Experience: a dated timeline ----
    A vertical list on a hairline below 1024 px; from 1024 px the five entries sit side by side
    on a horizontal hairline. A dot marks each entry where it meets the line. */

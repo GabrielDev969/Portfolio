@@ -6,7 +6,8 @@ type Props = { id: string; title: string }
 /**
  * A section's title, in plain words, at heading size on a hairline that spans the grid. It
  * rises from behind its mask once as it arrives (HeadingReveal); in Quick view, with reduced
- * motion and without JS it is simply there.
+ * motion and without JS it is simply there. Quick view keeps the same title, with less room
+ * above it.
  */
 export function SectionHeading({ id, title }: Props) {
   // The longest word sets the ceiling: a title may wrap between words, never inside one.
@@ -16,7 +17,7 @@ export function SectionHeading({ id, title }: Props) {
       <header data-section-heading className="section-heading page-grid">
         <h2
           id={id}
-          className="section-title col-span-12 font-display font-bold uppercase quick:font-text quick:text-body quick:font-semibold quick:normal-case"
+          className="section-title col-span-12 font-display font-bold uppercase"
           style={{ '--chars': chars } as CSSProperties}
         >
           <span className="rise-line">
