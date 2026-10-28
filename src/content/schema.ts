@@ -111,19 +111,19 @@ export type SiteContent = {
     /** For date ranges that are still open: "2025–present". */
     present: string
     quickView: string
-    filmView: string
-    chapters: string
+    fullView: string
+    sections: string
     language: string
     contact: string
     downloadCv: string
-    watchTrailer: string
-    behindTheScenes: string
+    seeProjects: string
+    technicalDetails: string
     close: string
     internalNoLink: string
     rewind: string
     /** HUD label while the hero is on screen. */
     openingTitles: string
-    chaptersNav: string
+    sectionsNav: string
     languageNav: string
     bts: {
       problem: string

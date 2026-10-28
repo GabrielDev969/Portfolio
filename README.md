@@ -96,7 +96,7 @@ Everything below is a `todo()` in the content or a missing file. None of it show
 
 <!-- todos:start -->
 
-38 open items.
+37 open items.
 
 - **Project: Sistema Wave**
   - the problem this project solved
@@ -107,11 +107,10 @@ Everything below is a `todo()` in the content or a missing file. None of it show
   - how it is deployed
   - the outcome, ideally with a number
 - **Project: Campaign BI**
-  - what the dashboards are built with
   - the problem this project solved
   - what you owned in this project
   - why these views
-  - why n8n and PostgreSQL
+  - why a queue between n8n and the workers
   - how it is tested
   - how it is deployed
   - the outcome, ideally with a number

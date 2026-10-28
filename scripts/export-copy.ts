@@ -62,13 +62,13 @@ export function renderCopy(locale: Locale): string {
   line(
     `[link] ${ui.skipToContent}`,
     person.name,
-    `[menu] ${ui.chapters} (${ui.chaptersNav}): ${[
+    `[menu] ${ui.sections} (${ui.sectionsNav}): ${[
       chapters.experience.title,
       chapters.projects.title,
       chapters.howIWork.title,
       chapters.contact.title,
     ].join(' · ')}`,
-    `[button] ${ui.quickView} / ${ui.filmView}`,
+    `[button] ${ui.quickView} / ${ui.fullView}`,
     `[nav] ${ui.languageNav}: PT · EN · ES`,
     `[timecode label] ${ui.openingTitles}`,
     person.availability,
@@ -86,7 +86,7 @@ export function renderCopy(locale: Locale): string {
     `[button] ${ui.contact}`,
     `[button] ${ui.downloadCv}`,
     person.heroLine,
-    `[link] ${ui.watchTrailer}`,
+    `[link] ${ui.seeProjects}`,
   )
 
   section(`${chapters.experience.act} · ${chapters.experience.title}`)
@@ -106,7 +106,7 @@ export function renderCopy(locale: Locale): string {
       line(`[mockup words] ${drawn.join(' · ')}`)
     }
     line(`${c.credits.castLabel}: ${p.stack.map(text).join(', ')}`)
-    line(`[button] ${ui.behindTheScenes}`)
+    line(`[button] ${ui.technicalDetails}`)
     line(`  ${ui.bts.problem}: ${prose(bts.problem)}`)
     line(`  ${ui.bts.role}: ${prose(bts.role)}`)
     line(`  ${ui.bts.architecture}:`)

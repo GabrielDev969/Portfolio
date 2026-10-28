@@ -17,8 +17,8 @@ Una producción de Gabriel Santos
 
 [link] Saltar al contenido
 Gabriel Santos
-[menu] Capítulos (Secciones): Experiencia · Proyectos · Cómo trabajo · Contacto
-[button] Vista rápida / Vista de película
+[menu] Secciones (Secciones): Experiencia · Proyectos · Cómo trabajo · Contacto
+[button] Vista rápida / Vista completa
 [nav] Elige un idioma: PT · EN · ES
 [timecode label] Créditos iniciales
 Disponible · Santiago, Chile
@@ -33,7 +33,7 @@ Disponible para trasladarme a Santiago, Chile.
 [button] Contacto
 [button] Descargar CV
 De la base de datos a la pantalla.
-[link] Ver el tráiler
+[link] Ver proyectos
 
 == Acto I · Experiencia ==
 
@@ -53,8 +53,8 @@ De la base de datos a la pantalla.
 Una plataforma interna para publicar campañas, gestionar solicitudes entre equipos (al estilo de ClickUp), generar informes y seguir los resultados en un dashboard.
 [still] Un tablero de solicitudes estilizado, con equipos y tareas ficticios, en lugar del sistema interno.
 [mockup words] Campañas · Solicitudes · Informes · Dashboard · Todos los equipos · Esta semana · Nueva solicitud · Solicitadas · En curso · En revisión · Listas · Creativo · Datos · Redacción · Medios · Lun · Mar · Mié · Jue · Vie · Hoy · Listo · Banners, 6 tamaños · Auditoría de UTM · Secuencia de 3 correos · Corte de video, 15 s · Título de la landing · Oferta, versión móvil · Informe semanal · Píxel del nuevo dominio · Carrusel, 5 imágenes · Anuncios, 2.ª ronda
-Reparto: Next.js, React, NestJS, TypeScript, PostgreSQL
-[button] Detrás de cámaras
+Stack: Next.js, React, NestJS, TypeScript, PostgreSQL
+[button] Detalles técnicos
   El problema: [TODO(gabriel): the problem this project solved]
   Mi rol: [TODO(gabriel): what you owned in this project]
   Arquitectura:
@@ -69,20 +69,22 @@ Reparto: Next.js, React, NestJS, TypeScript, PostgreSQL
   [button] Cerrar
 
 -- Campaign BI (Group Wave Enterprise) --
-Dashboards con los datos de RedTrack: análisis mensual y semanal, y el rendimiento de cada media buyer según las campañas que lanzó.
-[still] Un gráfico de rendimiento semanal con campañas ficticias y media buyers inventados, en lugar de los dashboards internos.
+Un sistema interno para datos de campañas: workers en NestJS procesan los datos de RedTrack desde una cola en RabbitMQ y los guardan en PostgreSQL, y una app en Next.js con inicio de sesión de Google los consulta a través de la API en NestJS: resultados mensuales y semanales, y el rendimiento de cada media buyer.
+[still] Un gráfico de rendimiento semanal con campañas ficticias y media buyers inventados, en lugar del sistema interno.
 [mockup words] Rendimiento de campañas · Mensual · Semanal · S · Ingresos · Inversión · Por media buyer · campañas
-Reparto: RedTrack, n8n, PostgreSQL, [TODO(gabriel): what the dashboards are built with]
-[button] Detrás de cámaras
+Stack: Next.js, NestJS, PostgreSQL, RabbitMQ, n8n, RedTrack
+[button] Detalles técnicos
   El problema: [TODO(gabriel): the problem this project solved]
   Mi rol: [TODO(gabriel): what you owned in this project]
   Arquitectura:
-    RedTrack → Pipelines de n8n
-    Pipelines de n8n → PostgreSQL
-    PostgreSQL → Dashboards
+    RedTrack → n8n
+    n8n → RabbitMQ
+    RabbitMQ → NestJS (workers y API)
+    App Next.js (inicio de sesión de Google) → NestJS (workers y API)
+    NestJS (workers y API) → PostgreSQL
   Decisiones clave:
-    - Dashboards con los datos de RedTrack, con vistas mensuales y semanales y el rendimiento de cada media buyer. [TODO(gabriel): why these views]
-    - Pipelines de n8n alimentan PostgreSQL. [TODO(gabriel): why n8n and PostgreSQL]
+    - Vistas mensuales y semanales de los datos de RedTrack, y el rendimiento de cada media buyer. [TODO(gabriel): why these views]
+    - n8n lleva los datos de RedTrack a una cola en RabbitMQ, y workers en NestJS los procesan hasta PostgreSQL. [TODO(gabriel): why a queue between n8n and the workers]
     - Un script de asignación por el método de los restos mayores para conversiones e ingresos. Las métricas estaban infladas. El script corrigió los números, y los resultados se conciliaron con las planillas de referencia.
   Pruebas y despliegue: [TODO(gabriel): how it is tested] [TODO(gabriel): how it is deployed]
   Resultado: [TODO(gabriel): the outcome, ideally with a number]
@@ -93,8 +95,8 @@ Reparto: RedTrack, n8n, PostgreSQL, [TODO(gabriel): what the dashboards are buil
 Mi propia plataforma de e-commerce multitienda, lanzada en octubre de 2026: tienda online, panel de administración, pagos con Stripe y fulfillment con Zendrop.
 [still] Una tienda ficticia junto a su panel de administración.
 [mockup words] Novedades · Hogar · Cocina · Carrito (2) · Para cada día · Taza de cerámica · Lámpara de mesa · Bolso de lino · Pedidos · Admin · Enviado a Zendrop · Pagado · Despachado · Entregado
-Reparto: Next.js, NestJS, PostgreSQL, Prisma, Stripe, Zendrop
-[button] Detrás de cámaras
+Stack: Next.js, NestJS, PostgreSQL, Prisma, Stripe, Zendrop
+[button] Detalles técnicos
   El problema: [TODO(gabriel): the problem this project solved]
   Mi rol: Producto propio. Lo construí por fases con agentes de IA para programar, y cada fase siguió plan → revisión → implementación → pruebas → revisión del diff → merge.
   Arquitectura:
@@ -116,8 +118,8 @@ Reparto: Next.js, NestJS, PostgreSQL, Prisma, Stripe, Zendrop
 Un sistema para robots de servicio OrionStar: un panel de administración que programa campañas publicitarias y música, un backend en un VPS y una app en RobotOS que las reproduce y conversa con las personas.
 [still] Una pantalla de programación del robot con una playlist de campañas ficticia, en lugar del sistema real.
 [mockup words] Hoy · Campaña · Música · Bienvenida · Lobby, lista A · Oferta semanal · Menú de almuerzo · Lobby, lista B · Reproduciendo · Campaña, 30 segundos · A continuación · Luz de mañana · Puertas abiertas · Hora tranquila · Segundo piso · Check-in tardío
-Reparto: RobotOS, [TODO(gabriel): the rest of the Hostly stack]
-[button] Detrás de cámaras
+Stack: RobotOS, [TODO(gabriel): the rest of the Hostly stack]
+[button] Detalles técnicos
   El problema: [TODO(gabriel): the problem this project solved]
   Mi rol: [TODO(gabriel): what you owned in this project]
   Arquitectura:
@@ -136,8 +138,8 @@ Reparto: RobotOS, [TODO(gabriel): the rest of the Hostly stack]
 -- BookOwl --
 Un sistema open source de gestión de bibliotecas en Python y Django, hecho para la biblioteca real de una iglesia.
 [still alt] La pantalla de inicio de BookOwl: el logo del búho sobre un mensaje de bienvenida.
-Reparto: Python, Django
-[button] Detrás de cámaras
+Stack: Python, Django
+[button] Detalles técnicos
   El problema: [TODO(gabriel): the problem this project solved]
   Mi rol: [TODO(gabriel): what you owned in this project]
   Arquitectura:
@@ -166,7 +168,7 @@ Dirección: Gabriel Santos
 Guion: Gabriel Santos
 Fotografía: Gabriel Santos
 
-Reparto
+Stack
 Frontend: Next.js, React, TypeScript, JavaScript, Angular
 Backend: Node.js, NestJS, Express, APIs REST, Spring Boot, Django
 Datos: PostgreSQL, Prisma, MySQL, MongoDB, Redis, Firebird, RedTrack

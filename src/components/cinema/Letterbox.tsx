@@ -45,8 +45,8 @@ export function Letterbox({ locale, content }: Props) {
             <span className="max-sm:sr-only">{person.name}</span>
           </a>
           <div className="flex items-center sm:gap-3">
-            <ChapterNav label={ui.chapters} navLabel={ui.chaptersNav} chapters={sections} />
-            <QuickViewToggle quickView={ui.quickView} filmView={ui.filmView} />
+            <ChapterNav label={ui.sections} navLabel={ui.sectionsNav} chapters={sections} />
+            <QuickViewToggle quickView={ui.quickView} fullView={ui.fullView} />
             <LanguageSwitcher current={locale} label={ui.languageNav} />
           </div>
         </div>

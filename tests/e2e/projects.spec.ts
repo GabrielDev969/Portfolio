@@ -13,7 +13,7 @@ const partOrder = [
 ]
 
 const btsButton = (page: Page, id: string) =>
-  page.locator(`#${id}`).getByRole('button', { name: 'Behind the scenes' })
+  page.locator(`#${id}`).getByRole('button', { name: 'Technical details' })
 
 /** The part headings of one project's behind the scenes, as a reader sees them. */
 const partHeadings = (page: Page, id: string) =>
@@ -69,7 +69,7 @@ test.describe('the behind-the-scenes drawer', () => {
     await button.focus()
     await page.keyboard.press('Enter')
 
-    const drawer = page.getByRole('dialog', { name: /Behind the scenes\s+Zibby/ })
+    const drawer = page.getByRole('dialog', { name: /Technical details\s+Zibby/ })
     await expect(drawer).toBeVisible()
     await expect(drawer.getByRole('button', { name: 'Close' })).toBeFocused()
     // The page behind a modal is inert: Tab moves through the drawer and, past its end, out to
@@ -140,7 +140,7 @@ test('Quick view shows every project’s behind the scenes inline, with no still
     await expect(parts.getByRole('heading', { name: 'Architecture' })).toBeVisible()
   }
   await expect(page.locator('#projects .project-still').filter({ visible: true })).toHaveCount(0)
-  await expect(page.getByRole('button', { name: 'Behind the scenes' })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Technical details' })).toHaveCount(0)
   await context.close()
 })
 
@@ -181,7 +181,7 @@ test('before hydration, Quick view already looks as it will: parts open, nothing
     if (hydrate) await expect(page.locator('#campaign-bi details')).toHaveCount(0)
     else await expect(page.locator('#campaign-bi details')).toHaveCount(1)
     await expect(page.locator('header.bar-top button[aria-pressed]')).toHaveAccessibleName(
-      'Film view',
+      'Full view',
     )
     const result = {
       parts: (await sections.allInnerTexts()).map((t) => t.replace(/\s+/g, ' ').trim()),

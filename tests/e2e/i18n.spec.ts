@@ -38,7 +38,7 @@ for (const locale of locales) {
   test(`axe passes with a behind-the-scenes drawer open · ${locale}`, async ({ page }) => {
     const { ui } = getContent(locale)
     await page.goto(`${locale}/`)
-    await page.locator('#zibby').getByRole('button', { name: ui.behindTheScenes }).click()
+    await page.locator('#zibby').getByRole('button', { name: ui.technicalDetails }).click()
     await expect(page.getByRole('dialog')).toBeVisible()
     const { violations } = await new AxeBuilder({ page }).include('dialog[open]').analyze()
     const blocking = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical')

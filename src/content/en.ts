@@ -29,18 +29,18 @@ export const en: SiteContent = {
     skipToContent: 'Skip to content',
     present: 'present',
     quickView: 'Quick view',
-    filmView: 'Film view',
-    chapters: 'Chapters',
+    fullView: 'Full view',
+    sections: 'Sections',
     language: 'Language',
     contact: 'Contact',
     downloadCv: 'Download CV',
-    watchTrailer: 'Watch the trailer',
-    behindTheScenes: 'Behind the scenes',
+    seeProjects: 'See projects',
+    technicalDetails: 'Technical details',
     close: 'Close',
     internalNoLink: 'Internal system, no public link',
     rewind: 'Rewind the reel',
     openingTitles: 'Opening titles',
-    chaptersNav: 'Sections',
+    sectionsNav: 'Sections',
     languageNav: 'Choose a language',
     bts: {
       problem: 'The problem',
@@ -143,14 +143,14 @@ export const en: SiteContent = {
       title: 'Campaign BI',
       organization: 'Group Wave Enterprise',
       logline:
-        "Dashboards built on RedTrack data: monthly and weekly analysis, and each media buyer's performance by the campaigns they launched.",
-      stack: ['RedTrack', 'n8n', 'PostgreSQL', todo('what the dashboards are built with')],
+        "An internal system for campaign data: NestJS workers process RedTrack data from a RabbitMQ queue into PostgreSQL, and a Next.js app with Google sign-in reads it through the NestJS API: monthly and weekly results, and each media buyer's performance.",
+      stack: ['Next.js', 'NestJS', 'PostgreSQL', 'RabbitMQ', 'n8n', 'RedTrack'],
       internal: true,
       still: {
         kind: 'mockup',
         mockup: 'campaign-chart',
         description:
-          'A weekly performance chart with fictional campaigns and invented media buyers, standing in for the internal dashboards.',
+          'A weekly performance chart with fictional campaigns and invented media buyers, standing in for the internal system.',
       },
       links: { kind: 'internal' },
       behindTheScenes: {
@@ -159,23 +159,30 @@ export const en: SiteContent = {
         architecture: {
           nodes: [
             { id: 'redtrack', label: 'RedTrack', kind: 'external' },
-            { id: 'n8n', label: 'n8n pipelines', kind: 'service' },
+            { id: 'n8n', label: 'n8n', kind: 'service' },
+            { id: 'queue', label: 'RabbitMQ', kind: 'service' },
+            { id: 'web', label: 'Next.js app (Google sign-in)', kind: 'client' },
+            { id: 'api', label: 'NestJS (workers, API)', kind: 'service' },
             { id: 'db', label: 'PostgreSQL', kind: 'data' },
-            { id: 'dashboards', label: 'Dashboards', kind: 'client' },
           ],
           edges: [
             { from: 'redtrack', to: 'n8n' },
-            { from: 'n8n', to: 'db' },
-            { from: 'db', to: 'dashboards' },
+            { from: 'n8n', to: 'queue' },
+            { from: 'queue', to: 'api' },
+            { from: 'web', to: 'api' },
+            { from: 'api', to: 'db' },
           ],
           confirmed: true,
         },
         decisions: [
           {
-            what: "Dashboards on RedTrack data, with monthly and weekly views and each media buyer's performance.",
+            what: "Monthly and weekly views of RedTrack data, and each media buyer's performance.",
             why: todo('why these views'),
           },
-          { what: 'n8n pipelines feed PostgreSQL.', why: todo('why n8n and PostgreSQL') },
+          {
+            what: 'n8n brings RedTrack data into a RabbitMQ queue, and NestJS workers process it into PostgreSQL.',
+            why: todo('why a queue between n8n and the workers'),
+          },
           {
             what: 'A largest-remainder allocation script for conversions and revenue.',
             why: 'The metrics were inflated. The script corrected them, and the results were reconciled against the reference spreadsheets.',
@@ -347,7 +354,7 @@ export const en: SiteContent = {
       { role: 'Written by', names: ['Gabriel Santos'] },
       { role: 'Shot by', names: ['Gabriel Santos'] },
     ],
-    castLabel: 'Cast',
+    castLabel: 'Stack',
     cast: [
       { role: 'Frontend', names: ['Next.js', 'React', 'TypeScript', 'JavaScript', 'Angular'] },
       {

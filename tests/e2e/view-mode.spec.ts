@@ -8,7 +8,7 @@ test('Quick view switches in place, is remembered, and switches back', async ({ 
   await expect(html).toHaveAttribute('data-view', 'film')
   await toggle.click()
   await expect(html).toHaveAttribute('data-view', 'quick')
-  await expect(page.getByRole('button', { name: 'Film view' })).toHaveAttribute(
+  await expect(page.getByRole('button', { name: 'Full view' })).toHaveAttribute(
     'aria-pressed',
     'true',
   )
@@ -18,7 +18,7 @@ test('Quick view switches in place, is remembered, and switches back', async ({ 
   await page.reload()
   await expect(html).toHaveAttribute('data-view', 'quick')
 
-  await page.getByRole('button', { name: 'Film view' }).click()
+  await page.getByRole('button', { name: 'Full view' }).click()
   await expect(html).toHaveAttribute('data-view', 'film')
   await page.reload()
   await expect(html).toHaveAttribute('data-view', 'film')

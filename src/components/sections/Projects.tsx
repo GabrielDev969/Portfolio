@@ -99,7 +99,7 @@ export function Projects({ content }: Props) {
                 <div className="project-actions">
                   <BehindTheScenes
                     id={project.id}
-                    label={ui.behindTheScenes}
+                    label={ui.technicalDetails}
                     title={project.title}
                     close={ui.close}
                   >

@@ -2,10 +2,10 @@
 import { currentSection, setViewMode, useViewMode } from '@/lib/view-mode'
 import { peekMotion } from '@/motion/runtime'
 
-type Props = { quickView: string; filmView: string }
+type Props = { quickView: string; fullView: string }
 
-/** Film view ↔ Quick view, switched in place, keeping the reader's section on screen. */
-export function QuickViewToggle({ quickView, filmView }: Props) {
+/** Full view ↔ Quick view, switched in place, keeping the reader's section on screen. */
+export function QuickViewToggle({ quickView, fullView }: Props) {
   const mode = useViewMode()
   const quick = mode === 'quick'
 
@@ -27,7 +27,7 @@ export function QuickViewToggle({ quickView, filmView }: Props) {
     >
       {/* CSS picks the label, so it is right before hydration too (the store reads "film" then). */}
       <span className="quick:hidden">{quickView}</span>
-      <span className="hidden quick:inline">{filmView}</span>
+      <span className="hidden quick:inline">{fullView}</span>
     </button>
   )
 }

@@ -57,18 +57,18 @@ export const pt: SiteContent = {
     skipToContent: 'Pular para o conteúdo',
     present: 'atual',
     quickView: 'Visão rápida',
-    filmView: 'Visão de filme',
-    chapters: 'Capítulos',
+    fullView: 'Visão completa',
+    sections: 'Seções',
     language: 'Idioma',
     contact: 'Contato',
     downloadCv: 'Baixar CV',
-    watchTrailer: 'Ver o trailer',
-    behindTheScenes: 'Bastidores',
+    seeProjects: 'Ver projetos',
+    technicalDetails: 'Detalhes técnicos',
     close: 'Fechar',
     internalNoLink: 'Sistema interno, sem link público',
     rewind: 'Rebobinar o filme',
     openingTitles: 'Créditos de abertura',
-    chaptersNav: 'Seções',
+    sectionsNav: 'Seções',
     languageNav: 'Escolha o idioma',
     bts: {
       problem: 'O problema',
@@ -83,7 +83,7 @@ export const pt: SiteContent = {
   chapters: {
     experience: { act: 'Ato I', title: 'Experiência' },
     projects: { act: 'Ato II', title: 'Projetos' },
-    howIWork: { act: 'Ato III', title: 'Como eu trabalho' },
+    howIWork: { act: 'Ato III', title: 'Como trabalho' },
     contact: { title: 'Contato' },
   },
   production: 'Uma produção de Gabriel Santos',
@@ -119,12 +119,12 @@ export const pt: SiteContent = {
     {
       ...bi,
       logline:
-        'Dashboards sobre os dados do RedTrack: análises mensais e semanais, e o desempenho de cada media buyer nas campanhas que subiu.',
+        'Um sistema interno para dados de campanhas: workers em NestJS processam os dados do RedTrack a partir de uma fila no RabbitMQ e gravam no PostgreSQL, e um app em Next.js com login Google os lê pela API em NestJS: resultados mensais e semanais, e o desempenho de cada media buyer.',
       still: {
         kind: 'mockup',
         mockup: 'campaign-chart',
         description:
-          'Um gráfico de desempenho semanal com campanhas fictícias e media buyers inventados, no lugar dos dashboards internos.',
+          'Um gráfico de desempenho semanal com campanhas fictícias e media buyers inventados, no lugar do sistema interno.',
       },
       behindTheScenes: {
         problem: missing.problem(),
@@ -133,17 +133,22 @@ export const pt: SiteContent = {
           ...bi.behindTheScenes.architecture,
           nodes: [
             { id: 'redtrack', label: 'RedTrack', kind: 'external' },
-            { id: 'n8n', label: 'Pipelines no n8n', kind: 'service' },
+            { id: 'n8n', label: 'n8n', kind: 'service' },
+            { id: 'queue', label: 'RabbitMQ', kind: 'service' },
+            { id: 'web', label: 'App Next.js (login Google)', kind: 'client' },
+            { id: 'api', label: 'NestJS (workers e API)', kind: 'service' },
             { id: 'db', label: 'PostgreSQL', kind: 'data' },
-            { id: 'dashboards', label: 'Dashboards', kind: 'client' },
           ],
         },
         decisions: [
           {
-            what: 'Dashboards sobre os dados do RedTrack, com visões mensais e semanais e o desempenho de cada media buyer.',
+            what: 'Visões mensais e semanais dos dados do RedTrack, e o desempenho de cada media buyer.',
             why: todo('why these views'),
           },
-          { what: 'Pipelines no n8n alimentam o PostgreSQL.', why: todo('why n8n and PostgreSQL') },
+          {
+            what: 'O n8n leva os dados do RedTrack para uma fila no RabbitMQ, e workers em NestJS os processam até o PostgreSQL.',
+            why: todo('why a queue between n8n and the workers'),
+          },
           {
             what: 'Um script de alocação pelo método dos maiores restos para conversões e receita.',
             why: 'As métricas estavam infladas. O script corrigiu os números, e os resultados foram conferidos com as planilhas de referência.',
@@ -295,7 +300,7 @@ export const pt: SiteContent = {
       { role: 'Roteiro', names: ['Gabriel Santos'] },
       { role: 'Fotografia', names: ['Gabriel Santos'] },
     ],
-    castLabel: 'Elenco',
+    castLabel: 'Stack',
     cast: [
       { role: 'Frontend', names: en.credits.cast[0]!.names },
       {

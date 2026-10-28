@@ -15,7 +15,7 @@ type Props = { locale: Locale; content: SiteContent }
  * rewraps, only what is below that line moves, not the name.
  */
 export function Hero({ locale, content }: Props) {
-  const { person, ui, contact, chapters } = content
+  const { person, ui, contact } = content
   const stack = new Intl.ListFormat(languageTags[locale], { type: 'conjunction' }).format(
     person.coreStack,
   )
@@ -76,25 +76,19 @@ export function Hero({ locale, content }: Props) {
       </p>
 
       <a
-        href="#experience"
+        href="#projects"
         className="col-span-12 inline-flex min-h-11 items-center gap-2 justify-self-start text-small underline-offset-4 hover:underline lg:col-span-5 lg:col-start-8 lg:self-end quick:hidden"
-        aria-label={`${ui.watchTrailer}: ${chapters.experience.title}`}
       >
         <svg aria-hidden="true" viewBox="0 0 20 20" className="size-5" fill="none">
-          <circle cx="10" cy="10" r="8.5" stroke="currentColor" strokeWidth="1.5" />
-          <circle cx="10" cy="10" r="1.5" fill="currentColor" />
-          {[0, 72, 144, 216, 288].map((angle) => (
-            <circle
-              key={angle}
-              cx={10 + 4.6 * Math.cos(((angle - 90) * Math.PI) / 180)}
-              cy={10 + 4.6 * Math.sin(((angle - 90) * Math.PI) / 180)}
-              r="1.6"
-              stroke="currentColor"
-              strokeWidth="1.2"
-            />
-          ))}
+          <path
+            d="M10 3v13M4.5 10.5 10 16l5.5-5.5"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </svg>
-        {ui.watchTrailer}
+        {ui.seeProjects}
       </a>
     </section>
   )
