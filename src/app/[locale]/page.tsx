@@ -1,11 +1,6 @@
 import { notFound } from 'next/navigation'
 import { PersonJsonLd } from '@/components/PersonJsonLd'
-import { BarsState } from '@/components/cinema/BarsState'
-import { CueMark } from '@/components/cinema/CueMark'
-import { FilmGrain } from '@/components/cinema/FilmGrain'
-import { Letterbox } from '@/components/cinema/Letterbox'
-import { Vignette } from '@/components/cinema/Vignette'
-import { ColdOpen } from '@/components/sections/ColdOpen'
+import { TopBar } from '@/components/layout/TopBar'
 import { Contact } from '@/components/sections/Contact'
 import { Experience } from '@/components/sections/Experience'
 import { Hero } from '@/components/sections/Hero'
@@ -24,8 +19,7 @@ export default async function LocalePage({ params }: Props) {
   return (
     <>
       <PersonJsonLd locale={locale} content={content} />
-      <ColdOpen production={content.production} skip={content.ui.skipIntro} />
-      <Letterbox locale={locale} content={content} />
+      <TopBar locale={locale} content={content} />
       <main id="main" tabIndex={-1} className="outline-none">
         <Hero locale={locale} content={content} />
         <Experience content={content} />
@@ -33,10 +27,6 @@ export default async function LocalePage({ params }: Props) {
         <HowIWork content={content} />
         <Contact content={content} />
       </main>
-      <CueMark />
-      <Vignette />
-      <FilmGrain />
-      <BarsState />
     </>
   )
 }

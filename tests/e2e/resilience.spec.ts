@@ -50,7 +50,7 @@ test('the first Tab reaches "Skip to content", which moves focus to the main con
   await expect(page.locator('main')).toBeFocused()
 })
 
-test('printing gives Quick view on paper and returns to the film', async ({ page }) => {
+test('printing gives Quick view on paper and returns to the full page', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 })
   await page.goto('en/')
   // Let every scene run first, as for a reader who prints from the end credits.
@@ -67,13 +67,13 @@ test('printing gives Quick view on paper and returns to the film', async ({ page
       await heading.evaluate((el) => el.querySelector('span span')?.getAttribute('style') ?? ''),
     ).not.toMatch(/translate/)
   }
-  await expect(page.locator('.cold-open, .bar').first()).toBeHidden()
+  await expect(page.locator('header.top-bar')).toBeHidden()
   const contact = page.locator('[data-fact="contact"]')
   expect(await contact.evaluate((el) => getComputedStyle(el).borderTopWidth)).toBe('1px')
 
   await page.emulateMedia({ media: 'screen' })
   await page.evaluate(() => dispatchEvent(new Event('afterprint')))
-  await expect(page.locator('html')).toHaveAttribute('data-view', 'film')
+  await expect(page.locator('html')).toHaveAttribute('data-view', 'full')
   expect(await page.evaluate(() => localStorage.getItem('viewMode'))).toBeNull()
 })
 

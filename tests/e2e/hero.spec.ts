@@ -1,15 +1,14 @@
-import { expect, skipColdOpen, test } from './fixtures'
+import { expect, test } from './fixtures'
 import { factVisibility, ready, startInViewMode, viewports } from './helpers'
 
 const facts = ['name', 'role', 'stack', 'remote', 'contact', 'cv']
 
 // The 5-second test (design/COMMIT-SHEET.md, Brief): the first screen, without scrolling,
 // shows name, role, core stack, "Remote", Contact and Download CV, inside the viewport and uncovered.
-for (const mode of ['film', 'quick'] as const) {
+for (const mode of ['full', 'quick'] as const) {
   for (const viewport of viewports) {
     test(`5-second test · ${mode} · ${viewport.width}×${viewport.height}`, async ({ browser }) => {
       const context = await browser.newContext({ viewport })
-      await skipColdOpen(context)
       await startInViewMode(context, mode)
       const page = await context.newPage()
       await page.goto('en/')
@@ -20,19 +19,14 @@ for (const mode of ['film', 'quick'] as const) {
       for (const f of before)
         expect(f, `${f.fact} before scrolling`).toMatchObject({ inViewport: true, uncovered: true })
 
-      if (mode === 'film') {
-        // The peak must never hide a fact: check while the bars and the name are still moving,
-        // and again once they have settled.
-        await page.evaluate(() => window.scrollTo(0, 2))
-        await expect(page.locator('html')).toHaveAttribute('data-bars', 'open')
-        for (const [moment, wait] of [
-          ['mid-peak', 400],
-          ['after the peak', 1000],
-        ] as const) {
-          await page.waitForTimeout(wait)
-          for (const f of await factVisibility(page)) {
-            expect(f, `${f.fact} ${moment}`).toMatchObject({ inViewport: true, uncovered: true })
-          }
+      if (mode === 'full') {
+        // The name's entrance never hides a fact: check again once it has settled.
+        await page.waitForTimeout(1300)
+        for (const f of await factVisibility(page)) {
+          expect(f, `${f.fact} after the entrance`).toMatchObject({
+            inViewport: true,
+            uncovered: true,
+          })
         }
       }
       await context.close()
@@ -40,19 +34,27 @@ for (const mode of ['film', 'quick'] as const) {
   }
 }
 
-test('the bars close at the top and open on the first scroll', async ({ page }) => {
+test('the page opens on the hero, with nothing over it', async ({ page }) => {
   await page.goto('en/')
-  const html = page.locator('html')
-  await expect(html).toHaveAttribute('data-bars', 'closed')
-  await page.evaluate(() => window.scrollTo(0, 200))
-  await expect(html).toHaveAttribute('data-bars', 'open')
-  await page.evaluate(() => window.scrollTo(0, 0))
-  await expect(html).toHaveAttribute('data-bars', 'closed')
+  // No intro screen, no overlay: the name is the first thing hit at the centre of the screen.
+  const hit = await page.evaluate(() => {
+    const el = document.elementFromPoint(innerWidth / 2, innerHeight / 2)
+    return el?.closest('#top') !== null
+  })
+  expect(hit).toBe(true)
+  await expect(page.locator('html')).not.toHaveAttribute('data-intro', /.*/)
 })
 
-test('a deep link opens with the bars already open', async ({ page }) => {
+test('the top bar stays in place and above the content while scrolling', async ({ page }) => {
   await page.goto('en/#projects')
-  await expect(page.locator('html')).toHaveAttribute('data-bars', 'open')
+  const bar = page.locator('header.top-bar')
+  await expect(bar).toBeInViewport()
+  expect(await bar.evaluate((el) => el.getBoundingClientRect().top)).toBe(0)
+  const onTop = await page.evaluate(() => {
+    const el = document.elementFromPoint(innerWidth / 2, 8)
+    return el?.closest('header.top-bar') !== null
+  })
+  expect(onTop).toBe(true)
 })
 
 // The translated buttons are longer, and Spanish carries one more hero line (relocation), so
@@ -63,7 +65,6 @@ for (const locale of ['pt', 'es']) {
       browser,
     }) => {
       const context = await browser.newContext({ viewport })
-      await skipColdOpen(context)
       const page = await context.newPage()
       await page.goto(`${locale}/`)
       await ready(page)
@@ -80,7 +81,6 @@ for (const locale of ['pt', 'es']) {
 test('the peak never makes the page scroll sideways', async ({ browser }) => {
   for (const viewport of viewports) {
     const context = await browser.newContext({ viewport })
-    await skipColdOpen(context)
     const page = await context.newPage()
     await page.goto('en/')
     await page.evaluate(() => window.scrollTo(0, 2))

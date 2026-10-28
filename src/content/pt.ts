@@ -53,7 +53,6 @@ export const pt: SiteContent = {
     },
   },
   ui: {
-    skipIntro: 'Pular abertura',
     skipToContent: 'Pular para o conteúdo',
     present: 'atual',
     quickView: 'Visão rápida',
@@ -67,7 +66,6 @@ export const pt: SiteContent = {
     close: 'Fechar',
     internalNoLink: 'Sistema interno, sem link público',
     rewind: 'Rebobinar o filme',
-    openingTitles: 'Créditos de abertura',
     sectionsNav: 'Seções',
     languageNav: 'Escolha o idioma',
     bts: {
@@ -86,7 +84,6 @@ export const pt: SiteContent = {
     howIWork: { act: 'Ato III', title: 'Como trabalho' },
     contact: { title: 'Contato' },
   },
-  production: 'Uma produção de Gabriel Santos',
   experience: en.experience.map((m) => ({ ...m, ...experience[m.id] })),
   projects: [
     {

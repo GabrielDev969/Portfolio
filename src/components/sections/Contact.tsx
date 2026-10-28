@@ -35,7 +35,7 @@ export function Contact({ content }: Props) {
       data-act=""
       data-act-title={chapters.contact.title}
       aria-labelledby="contact-title"
-      data-bars-close
+
       className="credits"
     >
       <CreditsRoll>
@@ -58,6 +58,7 @@ export function Contact({ content }: Props) {
             <div className="credits-end">
               <p>{contact.basedIn}</p>
               {person.relocation ? <p>{person.relocation}.</p> : null}
+              <p>{person.availability}</p>
               <a
                 href={`mailto:${contact.email}`}
                 className="write-to-me"

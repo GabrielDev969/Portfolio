@@ -2,13 +2,13 @@
 import { useSyncExternalStore } from 'react'
 import { viewModeStorageKey } from './storage-keys'
 
-/** Film is the default; Quick view turns all motion off and shows a compact summary. */
-export type ViewMode = 'film' | 'quick'
+/** The full page is the default; Quick view turns all motion off and shows a compact summary. */
+export type ViewMode = 'full' | 'quick'
 
 const changeEvent = 'viewmodechange'
 
 function read(): ViewMode {
-  return document.documentElement.dataset.view === 'quick' ? 'quick' : 'film'
+  return document.documentElement.dataset.view === 'quick' ? 'quick' : 'full'
 }
 
 /** Switches the page in place; `remember: false` is for printing, which must not change the choice. */
@@ -37,6 +37,6 @@ export function useViewMode(): ViewMode {
       return () => window.removeEventListener(changeEvent, onChange)
     },
     read,
-    () => 'film',
+    () => 'full',
   )
 }

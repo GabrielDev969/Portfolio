@@ -1,8 +1,8 @@
 /**
  * pnpm measure:vitals — LCP and CLS of the first screen on a throttled phone (Lighthouse's
- * mobile profile: Slow 4G and a 4× slower CPU), with and without the cold open, in every
- * locale (LOCALE=es for one): the font swap can rewrap a translated line, as the Spanish hero
- * once did (CLS 0.23). Prints the median of five runs per case. Needs `pnpm build && pnpm preview`.
+ * mobile profile: Slow 4G and a 4× slower CPU), in every locale (LOCALE=es for one): the font
+ * swap can rewrap a translated line, as the Spanish hero once did (CLS 0.23). Prints the median
+ * of five runs per locale. Needs `pnpm build && pnpm preview`.
  */
 import { chromium, type Page } from '@playwright/test'
 import { locales } from '../src/lib/i18n'
@@ -23,7 +23,7 @@ async function throttle(page: Page) {
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 })
 }
 
-async function measure(url: string, intro: boolean) {
+async function measure(url: string) {
   const browser = await chromium.launch()
   const context = await browser.newContext({
     viewport: { width: 390, height: 844 },
@@ -31,7 +31,6 @@ async function measure(url: string, intro: boolean) {
     isMobile: true,
     hasTouch: true,
   })
-  if (!intro) await context.addInitScript(() => sessionStorage.setItem('introSeen', '1'))
   await context.addInitScript(() => {
     const w = window as unknown as { __lcp: { t: number; el: string }; __cls: number }
     w.__lcp = { t: 0, el: '' }
@@ -65,18 +64,16 @@ async function measure(url: string, intro: boolean) {
 const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)]!
 
 for (const locale of locales.filter((l) => !only || l === only)) {
-  for (const intro of [false, true]) {
-    const results = []
-    for (let i = 0; i < runs; i++) results.push(await measure(`${base}/${locale}/`, intro))
-    const lcps = results.map((r) => r.lcp)
-    const lcp = median(lcps)
-    // The range shows when runs split into two groups (font swap before or after the intro's cut),
-    // which a median alone hides.
-    const range = `${(Math.min(...lcps) / 1000).toFixed(2)}–${(Math.max(...lcps) / 1000).toFixed(2)} s`
-    const cls = median(results.map((r) => r.cls))
-    const elements = [...new Set(results.map((r) => r.element))].join(', ')
-    console.log(
-      `${locale}  ${intro ? 'with cold open   ' : 'without cold open'}  LCP ${(lcp / 1000).toFixed(2)} s (range ${range}, element: ${elements})  CLS ${cls.toFixed(3)}  [${runs} runs]`,
-    )
-  }
+  const results = []
+  for (let i = 0; i < runs; i++) results.push(await measure(`${base}/${locale}/`))
+  const lcps = results.map((r) => r.lcp)
+  const lcp = median(lcps)
+  // The range shows when runs split into two groups (font swap before or after the first
+  // paint), which a median alone hides.
+  const range = `${(Math.min(...lcps) / 1000).toFixed(2)}–${(Math.max(...lcps) / 1000).toFixed(2)} s`
+  const cls = median(results.map((r) => r.cls))
+  const elements = [...new Set(results.map((r) => r.element))].join(', ')
+  console.log(
+    `${locale}  LCP ${(lcp / 1000).toFixed(2)} s (range ${range}, element: ${elements})  CLS ${cls.toFixed(3)}  [${runs} runs]`,
+  )
 }

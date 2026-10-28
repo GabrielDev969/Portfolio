@@ -30,7 +30,7 @@ const button =
 /**
  * A project's behind the scenes, in the form each view needs:
  * - without JS (and until hydration), a native <details> that opens in place;
- * - in film mode, a button that opens a modal <dialog> drawer from the right. Esc, the close
+ * - in the full view, a button that opens a modal <dialog> drawer from the right. Esc, the close
  *   button and a click on the backdrop close it, and focus returns to the button. The drawer
  *   scrolls natively (data-lenis-prevent) while the page behind it stays still;
  * - in Quick view, the parts inline, with no button.

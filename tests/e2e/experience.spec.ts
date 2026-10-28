@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test'
-import { expect, skipColdOpen, test } from './fixtures'
+import { expect, test } from './fixtures'
 import { startInViewMode, viewports } from './helpers'
 
 const titles = [
@@ -89,7 +89,6 @@ test.describe('reduced motion', () => {
 
 test('Quick view lists one milestone per line, with years and no frames', async ({ browser }) => {
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } })
-  await skipColdOpen(context)
   await startInViewMode(context, 'quick')
   const page = await context.newPage()
   await page.goto('en/')
@@ -111,7 +110,6 @@ for (const viewport of viewports) {
     browser,
   }) => {
     const context = await browser.newContext({ viewport })
-    await skipColdOpen(context)
     const page = await context.newPage()
     await page.goto('en/')
     const boxes = await page
@@ -137,24 +135,5 @@ test.describe('deep links after the reel is pinned', () => {
       await page.waitForTimeout(500)
       await expect(page.locator(`#${id}`)).toBeInViewport()
     })
-  }
-})
-
-test('the HUD names the section that crosses the middle of the screen', async ({ page }) => {
-  // Every section here sits after the Act I pin: a trigger measured before the pin existed
-  // named each of them about 850 px early.
-  await page.setViewportSize({ width: 1440, height: 900 })
-  await page.goto('en/')
-  await expect(strip(page)).toHaveAttribute('data-strip', 'on')
-  for (const [id, label] of [
-    ['projects', 'Projects'],
-    ['how-i-work', 'How I work'],
-    ['contact', 'Contact'],
-  ] as const) {
-    await page.evaluate((target) => {
-      const top = document.getElementById(target)!.getBoundingClientRect().top + scrollY
-      scrollTo(0, top - innerHeight / 2 + 40)
-    }, id)
-    await expect(page.locator('.bar-bottom')).toContainText(label)
   }
 })

@@ -8,7 +8,7 @@ export const viewports = [
   { width: 1440, height: 900 },
 ]
 
-export async function startInViewMode(context: BrowserContext, mode: 'film' | 'quick') {
+export async function startInViewMode(context: BrowserContext, mode: 'full' | 'quick') {
   await context.addInitScript((m) => localStorage.setItem('viewMode', m), mode)
 }
 
@@ -36,16 +36,16 @@ export async function factVisibility(page: Page) {
 }
 
 /**
- * Wait until the page has settled: fonts loaded, and in film mode every scene mounted and
+ * Wait until the page has settled: fonts loaded, and in the full view every scene mounted and
  * measured (html[data-motion="ready"]) and no chapter card still rising (data-revealing).
  */
 export async function settled(page: Page) {
   await page.evaluate(() => document.fonts.ready)
-  const film = await page.evaluate(
+  const full = await page.evaluate(
     () =>
       'js' in document.documentElement.dataset && document.documentElement.dataset.view !== 'quick',
   )
-  if (film) await page.locator('html[data-motion="ready"]').waitFor({ state: 'attached' })
+  if (full) await page.locator('html[data-motion="ready"]').waitFor({ state: 'attached' })
   await page.waitForFunction(() => document.querySelectorAll('[data-revealing]').length === 0)
 }
 

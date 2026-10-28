@@ -1,4 +1,4 @@
-import { expect, skipColdOpen, test } from './fixtures'
+import { expect, test } from './fixtures'
 import { startInViewMode } from './helpers'
 
 const steps = [
@@ -36,7 +36,6 @@ test('the pencil finishes every drawing once the sheet has passed', async ({ pag
 
 test('Quick view lists the steps without drawings', async ({ browser }) => {
   const context = await browser.newContext()
-  await skipColdOpen(context)
   await startInViewMode(context, 'quick')
   const page = await context.newPage()
   await page.goto('en/')

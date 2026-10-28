@@ -15,7 +15,7 @@ export function SmoothScroll() {
   const reduced = useReducedMotion()
   const mode = useViewMode()
   const runtime = useMotion()
-  const enabled = runtime !== null && !reduced && mode === 'film'
+  const enabled = runtime !== null && !reduced && mode === 'full'
 
   useEffect(() => {
     if (!enabled || !runtime) return

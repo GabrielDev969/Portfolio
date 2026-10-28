@@ -1,17 +1,16 @@
 import type { SiteContent } from '@/content/schema'
 import type { Locale } from '@/lib/i18n'
-import { ChapterNav } from '../ui/ChapterNav'
 import { LanguageSwitcher } from '../ui/LanguageSwitcher'
 import { QuickViewToggle } from '../ui/QuickViewToggle'
-import { Timecode } from './Timecode'
+import { SectionsMenu } from '../ui/SectionsMenu'
 
 type Props = { locale: Locale; content: SiteContent }
 
 /**
- * The black masking bars, with the HUD living inside them so it never sits on content.
- * Top: wordmark, sections, Quick view and language. Bottom: timecode and availability.
+ * The one bar, fixed at the top on the page's own ground: name, sections, Quick view and
+ * language. Before it in the tab order comes "Skip to content", visible only on focus.
  */
-export function Letterbox({ locale, content }: Props) {
+export function TopBar({ locale, content }: Props) {
   const { person, ui, chapters } = content
   const sections = [
     { href: '#experience', label: chapters.experience.title },
@@ -28,8 +27,8 @@ export function Letterbox({ locale, content }: Props) {
       >
         {ui.skipToContent}
       </a>
-      <header className="bar bar-top">
-        <div className="absolute inset-x-0 bottom-0 flex h-(--bar-open) items-center justify-between gap-2 px-(--page-margin)">
+      <header className="top-bar">
+        <div className="flex h-full items-center justify-between gap-2 px-(--page-margin)">
           <a
             href="#top"
             className="font-display text-body font-bold tracking-[0.01em] whitespace-nowrap"
@@ -45,18 +44,12 @@ export function Letterbox({ locale, content }: Props) {
             <span className="max-sm:sr-only">{person.name}</span>
           </a>
           <div className="flex items-center sm:gap-3">
-            <ChapterNav label={ui.sections} navLabel={ui.sectionsNav} chapters={sections} />
+            <SectionsMenu label={ui.sections} navLabel={ui.sectionsNav} sections={sections} />
             <QuickViewToggle quickView={ui.quickView} fullView={ui.fullView} />
             <LanguageSwitcher current={locale} label={ui.languageNav} />
           </div>
         </div>
       </header>
-      <footer className="bar bar-bottom">
-        <div className="absolute inset-x-0 top-0 flex h-(--bar-open) items-center justify-between gap-4 px-(--page-margin)">
-          <Timecode openingTitles={ui.openingTitles} />
-          <p className="hidden text-small sm:block">{person.availability}</p>
-        </div>
-      </footer>
     </>
   )
 }

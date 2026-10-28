@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test'
-import { expect, skipColdOpen, test } from './fixtures'
+import { expect, test } from './fixtures'
 import { startInViewMode, viewports } from './helpers'
 
 const projects = ['Sistema Wave', 'Campaign BI', 'Zibby', 'Hostly', 'BookOwl']
@@ -33,7 +33,7 @@ test('the production build shows no TODO placeholder anywhere', async ({ page })
 
 // A fact still missing is left out with its label: no "The problem" over nothing, no empty
 // decision, in the drawer or inline in Quick view, in any language.
-for (const mode of ['film', 'quick'] as const) {
+for (const mode of ['full', 'quick'] as const) {
   test(`no behind-the-scenes label is left without its content · ${mode}`, async ({
     context,
     page,
@@ -131,7 +131,6 @@ test('Quick view shows every project’s behind the scenes inline, with no still
   browser,
 }) => {
   const context = await browser.newContext()
-  await skipColdOpen(context)
   await startInViewMode(context, 'quick')
   const page = await context.newPage()
   await page.goto('en/')
@@ -145,13 +144,12 @@ test('Quick view shows every project’s behind the scenes inline, with no still
 })
 
 test('the drawer and Quick view hold the same parts', async ({ browser }) => {
-  const read = async (mode: 'film' | 'quick') => {
+  const read = async (mode: 'full' | 'quick') => {
     const context = await browser.newContext()
-    await skipColdOpen(context)
     await startInViewMode(context, mode)
     const page = await context.newPage()
     await page.goto('en/')
-    if (mode === 'film') await btsButton(page, 'campaign-bi').click()
+    if (mode === 'full') await btsButton(page, 'campaign-bi').click()
     // The parts only: Quick view leaves out the drawer's copy of the links, already on the project.
     const sections = page.locator('#campaign-bi .bts-parts > section')
     // Read them once they are on screen: CI once read them mid-hydration and got empty text.
@@ -160,7 +158,7 @@ test('the drawer and Quick view hold the same parts', async ({ browser }) => {
     await context.close()
     return parts.map((text) => text.replace(/\s+/g, ' ').trim())
   }
-  expect(await read('quick')).toEqual(await read('film'))
+  expect(await read('quick')).toEqual(await read('full'))
 })
 
 test('before hydration, Quick view already looks as it will: parts open, nothing moves', async ({
@@ -168,7 +166,6 @@ test('before hydration, Quick view already looks as it will: parts open, nothing
 }) => {
   const layout = async (hydrate: boolean) => {
     const context = await browser.newContext({ viewport: { width: 1280, height: 800 } })
-    await skipColdOpen(context)
     await startInViewMode(context, 'quick')
     // Without the app's scripts (its CSS still loads) the inline head script runs, but React
     // never hydrates.
@@ -180,7 +177,7 @@ test('before hydration, Quick view already looks as it will: parts open, nothing
     await expect(sections.first()).toBeVisible()
     if (hydrate) await expect(page.locator('#campaign-bi details')).toHaveCount(0)
     else await expect(page.locator('#campaign-bi details')).toHaveCount(1)
-    await expect(page.locator('header.bar-top button[aria-pressed]')).toHaveAccessibleName(
+    await expect(page.locator('header.top-bar button[aria-pressed]')).toHaveAccessibleName(
       'Full view',
     )
     const result = {
@@ -218,7 +215,6 @@ test.describe('without JavaScript', () => {
 test('the projects never widen the page', async ({ browser }) => {
   for (const viewport of viewports) {
     const context = await browser.newContext({ viewport })
-    await skipColdOpen(context)
     const page = await context.newPage()
     await page.goto('en/#projects')
     for (const id of ['sistema-wave', 'zibby', 'bookowl']) {

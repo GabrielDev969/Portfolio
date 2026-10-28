@@ -24,7 +24,7 @@ export function ExperienceStrip({ children }: { children: ReactNode }) {
         const pin = root.querySelector<HTMLElement>('.strip-pin')!
         const track = root.querySelector<HTMLElement>('.strip-track')!
         const barOpen = () =>
-          parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bar-open')) || 0
+          parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--top-bar')) || 0
         const distance = () => Math.max(0, track.scrollWidth - pin.clientWidth)
 
         const reel = gsap.to(track, {

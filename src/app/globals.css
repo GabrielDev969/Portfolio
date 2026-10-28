@@ -50,20 +50,11 @@
 }
 
 :root {
-  /* Masking bars: closed around the hero, open everywhere else. */
-  --bar-open: 44px;
-  /* Whole pixels: a half-pixel bar edge rasterizes unevenly across GPU tiles (a stray line). */
-  --bar-closed: round(9svh, 1px);
+  --top-bar: 56px;
   --page-margin: clamp(16px, 4vw, 64px);
   --grid-gap: clamp(12px, 1.6vw, 24px);
-  scroll-padding-top: calc(var(--bar-open) + 16px);
+  scroll-padding-top: calc(var(--top-bar) + 16px);
   color-scheme: light;
-}
-
-@media (min-width: 768px) {
-  :root {
-    --bar-closed: round(13.5svh, 1px);
-  }
 }
 
 @layer base {
@@ -104,162 +95,14 @@
   font-variant-numeric: tabular-nums lining-nums;
 }
 
-/* ---- Cinema devices ---- */
-
-/* Film grain: a noise tile stepped at 10 fps. Smooth grain reads as video noise. */
-.film-grain {
+/* The top bar: fixed, on the page's own ground, with a hairline under it. */
+.top-bar {
   position: fixed;
-  inset: -50%;
-  z-index: 40;
-  pointer-events: none;
-  opacity: 0.07;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.6 -0.3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  animation: grain 1s steps(10) infinite;
-}
-
-/* The texture is twice the screen (inset -50%), so a shift of up to ±25% of its size still
-   covers it; stay within ±15% so no edge of the frame is ever left without grain. */
-@keyframes grain {
-  0% {
-    transform: translate(0, 0);
-  }
-  10% {
-    transform: translate(-5%, -8%);
-  }
-  20% {
-    transform: translate(-12%, 4%);
-  }
-  30% {
-    transform: translate(6%, -14%);
-  }
-  40% {
-    transform: translate(-4%, 15%);
-  }
-  50% {
-    transform: translate(-14%, 8%);
-  }
-  60% {
-    transform: translate(12%, 0);
-  }
-  70% {
-    transform: translate(0, 12%);
-  }
-  80% {
-    transform: translate(3%, 15%);
-  }
-  90% {
-    transform: translate(-8%, 8%);
-  }
-  100% {
-    transform: translate(0, 0);
-  }
-}
-
-/* Projector falloff toward the edges of the screen. */
-.vignette {
-  position: fixed;
-  inset: 0;
-  z-index: 39;
-  pointer-events: none;
-  background: radial-gradient(
-    ellipse 120% 90% at 50% 50%,
-    transparent 58%,
-    oklch(0 0 0 / 0.16) 100%
-  );
-}
-
-/*
- * Masking bars. Each plate is as tall as the closed bar; opening slides it out of the frame
- * (transform only), so its 44px HUD row stays in view. No JS: bars stay open.
- */
-.bar {
-  position: fixed;
-  inset-inline: 0;
+  inset: 0 0 auto;
   z-index: 50;
-  height: var(--bar-closed);
-  background: var(--color-house);
-  color: var(--color-screen);
-  transition: transform var(--dur-bars) var(--ease-expo);
-}
-
-.bar-top {
-  top: 0;
-  transform: translateY(calc(var(--bar-open) - var(--bar-closed)));
-}
-
-.bar-bottom {
-  bottom: 0;
-  transform: translateY(calc(var(--bar-closed) - var(--bar-open)));
-}
-
-:root[data-bars='closed'] .bar {
-  transform: none;
-}
-
-/* ---- Cold open: shown only under html[data-intro]; CSS performs the cut ---- */
-.cold-open {
-  display: none;
-}
-
-:root[data-intro] .cold-open {
-  display: block;
-  position: fixed;
-  inset: 0;
-  z-index: 70;
-  animation: cut 0s linear var(--dur-intro) forwards;
-}
-
-@keyframes cut {
-  to {
-    visibility: hidden;
-  }
-}
-
-/* Light, not glow: a soft cone from the booth, warming up in two steps. */
-.cold-open-beam {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    ellipse 55% 95% at 90% 0%,
-    oklch(0.94 0.006 240 / 0.5),
-    transparent 72%
-  );
-  clip-path: polygon(86% 0, 95% 0, 72% 100%, 18% 100%);
-  opacity: 0;
-  animation: lamp 400ms steps(1, end) forwards;
-}
-
-@keyframes lamp {
-  0% {
-    opacity: 0;
-  }
-  30% {
-    opacity: 0.45;
-  }
-  55% {
-    opacity: 0.15;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-/* The grain tile is dark; on black it has to be inverted to read. Kept faint so the black
-   stays black instead of turning into a tinted near-black. */
-.cold-open .film-grain {
-  filter: invert(1);
-  opacity: 0.05;
-}
-
-.cold-open-card {
-  opacity: 0;
-  animation: appear 1ms linear 400ms forwards;
-}
-
-@keyframes appear {
-  to {
-    opacity: 1;
-  }
+  height: var(--top-bar);
+  background: var(--color-screen);
+  border-bottom: 1px solid color-mix(in oklch, var(--color-ink) 15%, transparent);
 }
 
 /* ---- Hero: family A, the name rises from behind its mask (CSS, so first paint needs no JS) ---- */
@@ -283,34 +126,10 @@
   animation-delay: calc(var(--i, 0) * var(--stagger-lines));
 }
 
-:root[data-js][data-intro] .hero-name .rise-line > span {
-  animation-delay: calc(var(--dur-intro) + var(--i, 0) * var(--stagger-lines));
-}
-
 @keyframes rise {
   from {
     transform: translateY(110%);
   }
-}
-
-/* The peak: as the bars part, the name grows upward into the space the top bar gave up. */
-.hero-name {
-  transform-origin: 0 100%;
-  transition: transform var(--dur-bars) var(--ease-expo);
-}
-
-:root[data-bars='open'] .hero-name {
-  transform: scale(1.06);
-}
-
-/* The cue mark lives in the right page margin, centred in it and never wider than three
-   quarters of it, so it can flash without covering a word (28px on desktop, 12px on phones). */
-.cue-mark {
-  --cue-size: min(28px, calc(var(--page-margin) * 0.75));
-  top: calc(var(--bar-open) + 24px);
-  right: calc((var(--page-margin) - var(--cue-size)) / 2);
-  width: var(--cue-size);
-  height: var(--cue-size);
 }
 
 /* ---- Act I · Experience: a 35 mm strip ----
@@ -423,7 +242,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    height: calc(100svh - 2 * var(--bar-open));
+    height: calc(100svh - var(--top-bar));
     padding-inline: 0;
     overflow-x: clip;
   }
@@ -931,12 +750,12 @@
   /* A deliberate rest of black, then one card; the bottom bar is closed by now. */
   .post-credits {
     display: grid;
-    padding: 60svh var(--page-margin) calc(var(--bar-closed) + 4rem);
+    padding: 60svh var(--page-margin) 4rem;
     text-align: center;
   }
 
   .post-credits-card {
-    min-height: calc(100svh - 2 * var(--bar-closed) - 4rem);
+    min-height: calc(100svh - 8rem);
     display: grid;
     place-content: center;
     justify-items: center;
@@ -1014,9 +833,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .film-grain {
-    animation: none;
-  }
   /* The drawer fades instead of wiping. */
   .bts-drawer,
   .bts-drawer:not([open]) {
@@ -1031,41 +847,19 @@
   .bts-drawer:not([open]) {
     opacity: 0;
   }
-  /* No movement: the bars switch state in place and the name neither rises nor grows. */
-  .bar,
-  .hero-name {
-    transition: none;
-  }
+  /* No movement: the name is simply there. */
   :root[data-js] .hero-name .rise-line > span {
     animation: none;
   }
-  :root[data-bars='open'] .hero-name {
-    transform: none;
-  }
 }
 
-[data-view='quick'] :is(.film-grain, .vignette, .bar-bottom) {
-  display: none;
-}
-
-[data-view='quick'] :is(.hero-name .rise-line > span, .hero-name) {
+[data-view='quick'] .hero-name .rise-line > span {
   animation: none;
-  transform: none;
-  transition: none;
 }
 
-[data-view='quick'] .bar-top {
-  transform: translateY(calc(var(--bar-open) - var(--bar-closed)));
-  transition: none;
-}
-
-/* Paper gets Quick view (the quick: variant) without the film's furniture: no bars, grain,
-   vignette or cold open, even if the reader prints while the intro is still running. */
+/* Paper gets Quick view (the quick: variant), without the top bar. */
 @media print {
-  .film-grain,
-  .vignette,
-  .bar,
-  .cold-open,
+  .top-bar,
   a[href='#main'] {
     display: none !important;
   }

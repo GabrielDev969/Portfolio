@@ -21,7 +21,7 @@ function englishPhrases() {
 }
 
 for (const locale of locales) {
-  for (const mode of ['film', 'quick'] as const) {
+  for (const mode of ['full', 'quick'] as const) {
     test(`axe finds no serious or critical violations · ${locale} · ${mode}`, async ({
       context,
       page,
@@ -100,7 +100,7 @@ for (const locale of locales) {
     await page.setViewportSize({ width: 360, height: 780 })
     await page.goto(`${locale}/`)
     await settled(page)
-    const wide = await overflowing(page, 'header.bar-top', '.sr-only')
+    const wide = await overflowing(page, 'header.top-bar', '.sr-only')
     expect(wide, `Wider than the screen:\n${wide.join('\n')}`).toEqual([])
   })
 }
@@ -122,14 +122,16 @@ for (const locale of locales) {
 }
 
 for (const locale of locales) {
-  test(`the hero line clears the bars at every hero viewport · ${locale}`, async ({ page }) => {
+  test(`the hero line is on the first screen at every hero viewport · ${locale}`, async ({
+    page,
+  }) => {
     for (const viewport of [...viewports, { width: 768, height: 900 }]) {
       await page.setViewportSize(viewport)
       await page.goto(`${locale}/`)
       await page.evaluate(() => document.fonts.ready)
       const { line, bar } = await page.evaluate(() => ({
         line: document.querySelector('#top > p.font-text')!.getBoundingClientRect().bottom,
-        bar: document.querySelector('.bar-bottom')!.getBoundingClientRect().top,
+        bar: innerHeight,
       }))
       expect(line, `${viewport.width}×${viewport.height}`).toBeLessThanOrEqual(bar)
     }

@@ -25,7 +25,6 @@ export const en: SiteContent = {
     },
   },
   ui: {
-    skipIntro: 'Skip intro',
     skipToContent: 'Skip to content',
     present: 'present',
     quickView: 'Quick view',
@@ -39,7 +38,6 @@ export const en: SiteContent = {
     close: 'Close',
     internalNoLink: 'Internal system, no public link',
     rewind: 'Rewind the reel',
-    openingTitles: 'Opening titles',
     sectionsNav: 'Sections',
     languageNav: 'Choose a language',
     bts: {
@@ -58,7 +56,6 @@ export const en: SiteContent = {
     howIWork: { act: 'Act III', title: 'How I work' },
     contact: { title: 'Contact' },
   },
-  production: 'A Gabriel Santos production',
   experience: [
     {
       id: 'fator',

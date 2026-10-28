@@ -54,7 +54,6 @@ export const es: SiteContent = {
     },
   },
   ui: {
-    skipIntro: 'Saltar intro',
     skipToContent: 'Saltar al contenido',
     present: 'actualidad',
     quickView: 'Vista rápida',
@@ -68,7 +67,6 @@ export const es: SiteContent = {
     close: 'Cerrar',
     internalNoLink: 'Sistema interno, sin enlace público',
     rewind: 'Rebobinar la cinta',
-    openingTitles: 'Créditos iniciales',
     sectionsNav: 'Secciones',
     languageNav: 'Elige un idioma',
     bts: {
@@ -87,7 +85,6 @@ export const es: SiteContent = {
     howIWork: { act: 'Acto III', title: 'Cómo trabajo' },
     contact: { title: 'Contacto' },
   },
-  production: 'Una producción de Gabriel Santos',
   experience: en.experience.map((m) => ({ ...m, ...experience[m.id] })),
   projects: [
     {

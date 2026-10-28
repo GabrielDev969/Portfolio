@@ -55,10 +55,7 @@ export function renderCopy(locale: Locale): string {
     `Photo alt: ${person.photo.alt}`,
   )
 
-  section('Cold open')
-  line(c.production, `[button] ${ui.skipIntro}`)
-
-  section('Bars')
+  section('Top bar')
   line(
     `[link] ${ui.skipToContent}`,
     person.name,
@@ -70,8 +67,6 @@ export function renderCopy(locale: Locale): string {
     ].join(' · ')}`,
     `[button] ${ui.quickView} / ${ui.fullView}`,
     `[nav] ${ui.languageNav}: PT · EN · ES`,
-    `[timecode label] ${ui.openingTitles}`,
-    person.availability,
   )
 
   section('Hero')
@@ -134,6 +129,7 @@ export function renderCopy(locale: Locale): string {
   line(...c.credits.cast.map(credit), credit(c.credits.languages), '')
   line(c.contact.basedIn)
   if (person.relocation) line(`${person.relocation}.`)
+  line(person.availability)
   line(
     `[link] ${c.contact.cta}`,
     c.contact.email,

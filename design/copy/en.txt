@@ -8,20 +8,13 @@ Description: Full Stack Developer in Salvador, Brazil, working remotely. Next.js
 About: Full Stack Developer with about 5 years of experience: 4 as a Systems Analyst and over 1 working remotely. I build complete products, from the database to the interface: frontends and dashboards with Next.js and React, APIs with Node.js and NestJS, and data in PostgreSQL. I use AI coding agents daily to move faster without giving up technical judgment, and I am pursuing a postgraduate degree in Software Engineering for Applied AI.
 Photo alt: Gabriel Santos, smiling, in a blue blazer and glasses.
 
-== Cold open ==
-
-A Gabriel Santos production
-[button] Skip intro
-
-== Bars ==
+== Top bar ==
 
 [link] Skip to content
 Gabriel Santos
 [menu] Sections (Sections): Experience · Projects · How I work · Contact
 [button] Quick view / Full view
 [nav] Choose a language: PT · EN · ES
-[timecode label] Opening titles
-Available for new projects
 
 == Hero ==
 
@@ -176,6 +169,7 @@ Architecture: Clean Architecture, SOLID, TDD
 Languages: Portuguese (native), Spanish (studying), English (studying)
 
 Based in Salvador, Brazil, working remotely.
+Available for new projects
 [link] Write to me
 gabriel.dev969@gmail.com
 LinkedIn · GitHub · YouTube · TikTok

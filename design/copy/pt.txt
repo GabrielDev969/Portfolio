@@ -8,20 +8,13 @@ Description: Desenvolvedor Full Stack em Salvador, Bahia, trabalhando remoto. Ne
 About: Desenvolvedor Full Stack com cerca de 5 anos de experiência: 4 como Analista de Sistemas e mais de 1 trabalhando remoto. Construo produtos completos, do banco de dados à interface: frontends e dashboards com Next.js e React, APIs com Node.js e NestJS, e dados em PostgreSQL. Programo todos os dias com agentes de IA para ir mais rápido sem abrir mão do critério técnico, e faço pós-graduação em Engenharia de Software com IA Aplicada.
 Photo alt: Gabriel Santos, sorrindo, de blazer azul e óculos.
 
-== Cold open ==
-
-Uma produção de Gabriel Santos
-[button] Pular abertura
-
-== Bars ==
+== Top bar ==
 
 [link] Pular para o conteúdo
 Gabriel Santos
 [menu] Seções (Seções): Experiência · Projetos · Como trabalho · Contato
 [button] Visão rápida / Visão completa
 [nav] Escolha o idioma: PT · EN · ES
-[timecode label] Créditos de abertura
-Disponível para novos projetos
 
 == Hero ==
 
@@ -176,6 +169,7 @@ Arquitetura: Clean Architecture, SOLID, TDD
 Idiomas: Português (nativo), Espanhol (estudando), Inglês (estudando)
 
 Moro em Salvador, Bahia, e trabalho remoto.
+Disponível para novos projetos
 [link] Me escreva
 gabriel.dev969@gmail.com
 LinkedIn · GitHub · YouTube · TikTok

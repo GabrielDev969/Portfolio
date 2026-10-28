@@ -65,7 +65,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   if (!isLocale(locale)) notFound()
 
   return (
-    // The head script sets data-js, data-view and data-bars before React hydrates.
+    // The head script sets data-js and data-view before React hydrates.
     <html
       lang={languageTags[locale]}
       className={`${display.variable} ${text.variable}`}

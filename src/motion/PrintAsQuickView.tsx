@@ -8,7 +8,7 @@ import { peekMotion } from './runtime'
  * Paper gets Quick view. The print media query alone is not enough: scenes that already ran
  * leave GSAP's inline styles behind (hidden titles, a horizontal strip, pin spacers). So the
  * page switches to Quick view before printing, which reverts every scene, without saving the
- * choice, and goes back to the film, on the same section, afterwards.
+ * choice, and goes back to the full page, on the same section, afterwards.
  */
 export function PrintAsQuickView() {
   useEffect(() => {
@@ -25,7 +25,7 @@ export function PrintAsQuickView() {
     const after = () => {
       if (!switched) return
       switched = false
-      setViewMode('film', { remember: false })
+      setViewMode('full', { remember: false })
       requestAnimationFrame(() => {
         section?.scrollIntoView({ block: 'start' })
         peekMotion()?.ScrollTrigger.refresh()

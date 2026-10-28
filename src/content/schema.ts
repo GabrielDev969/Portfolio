@@ -106,7 +106,6 @@ export type SiteContent = {
     photo: { still: StillId; alt: string }
   }
   ui: {
-    skipIntro: string
     skipToContent: string
     /** For date ranges that are still open: "2025–present". */
     present: string
@@ -121,8 +120,6 @@ export type SiteContent = {
     close: string
     internalNoLink: string
     rewind: string
-    /** HUD label while the hero is on screen. */
-    openingTitles: string
     sectionsNav: string
     languageNav: string
     bts: {
@@ -141,7 +138,6 @@ export type SiteContent = {
     howIWork: { act: string; title: string }
     contact: { title: string }
   }
-  production: string
   experience: Milestone[]
   projects: Project[]
   workflow: { steps: string[]; closing: string }
