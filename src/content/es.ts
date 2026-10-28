@@ -45,7 +45,7 @@ export const es: SiteContent = {
     workMode: 'Remoto',
     relocation: 'Disponible para trasladarme a Santiago, Chile',
     heroLine: 'De la base de datos a la pantalla.',
-    availability: 'Disponible · Santiago, Chile',
+    availability: 'Disponible para nuevos proyectos',
     about:
       'Desarrollador Full Stack con unos 5 años de experiencia: 4 como Analista de Sistemas y más de 1 trabajando en remoto. Construyo productos completos, de la base de datos a la interfaz: frontends y dashboards con Next.js y React, APIs con Node.js y NestJS, y datos en PostgreSQL. Programo a diario con agentes de IA para avanzar más rápido sin renunciar al criterio técnico, y curso un posgrado en Ingeniería de Software con IA Aplicada.',
     photo: {
