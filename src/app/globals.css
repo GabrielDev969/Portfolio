@@ -1,0 +1,1081 @@
+@import 'tailwindcss';
+@import 'lenis/dist/lenis.css';
+
+/* Quick view, and print, which uses the same compact layout. */
+@custom-variant quick {
+  &:where([data-view='quick'], [data-view='quick'] *) {
+    @slot;
+  }
+  @media print {
+    @slot;
+  }
+}
+
+/* Only when JavaScript runs (set by the head script). */
+@custom-variant js (&:where([data-js], [data-js] *));
+
+/* Tokens from design/COMMIT-SHEET.md. tests/unit/contrast.test.ts checks every text pairing. */
+@theme {
+  --color-*: initial;
+  --color-screen: oklch(0.94 0.006 240);
+  --color-screen-2: oklch(0.895 0.008 240);
+  --color-ink: oklch(0.22 0.025 255);
+  --color-ink-2: oklch(0.42 0.02 255);
+  --color-velvet: oklch(0.47 0.17 22);
+  --color-house: oklch(0 0 0);
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  /* Title: capped by height too, so the 5-second test passes on short laptop screens. */
+  --text-title: min(30vw, 22svh, 13rem);
+  --text-title--line-height: 0.86;
+  --text-title--letter-spacing: -0.03em;
+  /* Chapter titles: same role as the title. .chapter-title shrinks it further when the longest
+     word would spill out of its column ("Experiencia" is wider than "Experience"). */
+  --text-chapter: min(22vw, 22svh, 13rem);
+  --text-chapter--line-height: 0.86;
+  --text-chapter--letter-spacing: -0.03em;
+  --text-scene: clamp(2.75rem, 6vw, 5rem);
+  --text-scene--line-height: 0.95;
+  --text-scene--letter-spacing: -0.02em;
+  --text-body: 1.1875rem;
+  --text-body--line-height: 1.55;
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.4;
+}
+
+@theme inline {
+  --font-display: var(--font-big-shoulders), 'Arial Narrow', sans-serif;
+  --font-text: var(--font-newsreader), Georgia, serif;
+}
+
+:root {
+  /* Masking bars: closed around the hero, open everywhere else. */
+  --bar-open: 44px;
+  /* Whole pixels: a half-pixel bar edge rasterizes unevenly across GPU tiles (a stray line). */
+  --bar-closed: round(9svh, 1px);
+  --page-margin: clamp(16px, 4vw, 64px);
+  --grid-gap: clamp(12px, 1.6vw, 24px);
+  scroll-padding-top: calc(var(--bar-open) + 16px);
+  color-scheme: light;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --bar-closed: round(13.5svh, 1px);
+  }
+}
+
+@layer base {
+  body {
+    background: var(--color-screen);
+    color: var(--color-ink);
+    font-family: var(--font-text);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: var(--color-ink);
+    color: var(--color-screen);
+  }
+}
+
+/* 12 columns with equal outer margins (design/COMMIT-SHEET.md §4). */
+@utility page-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--grid-gap);
+  padding-inline: var(--page-margin);
+}
+
+@utility measure {
+  max-width: 62ch;
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* ---- Cinema devices ---- */
+
+/* Film grain: a noise tile stepped at 10 fps. Smooth grain reads as video noise. */
+.film-grain {
+  position: fixed;
+  inset: -50%;
+  z-index: 40;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.6 -0.3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 1s steps(10) infinite;
+}
+
+/* The texture is twice the screen (inset -50%), so a shift of up to ±25% of its size still
+   covers it; stay within ±15% so no edge of the frame is ever left without grain. */
+@keyframes grain {
+  0% {
+    transform: translate(0, 0);
+  }
+  10% {
+    transform: translate(-5%, -8%);
+  }
+  20% {
+    transform: translate(-12%, 4%);
+  }
+  30% {
+    transform: translate(6%, -14%);
+  }
+  40% {
+    transform: translate(-4%, 15%);
+  }
+  50% {
+    transform: translate(-14%, 8%);
+  }
+  60% {
+    transform: translate(12%, 0);
+  }
+  70% {
+    transform: translate(0, 12%);
+  }
+  80% {
+    transform: translate(3%, 15%);
+  }
+  90% {
+    transform: translate(-8%, 8%);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+/* Projector falloff toward the edges of the screen. */
+.vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 39;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 120% 90% at 50% 50%,
+    transparent 58%,
+    oklch(0 0 0 / 0.16) 100%
+  );
+}
+
+/*
+ * Masking bars. Each plate is as tall as the closed bar; opening slides it out of the frame
+ * (transform only), so its 44px HUD row stays in view. No JS: bars stay open.
+ */
+.bar {
+  position: fixed;
+  inset-inline: 0;
+  z-index: 50;
+  height: var(--bar-closed);
+  background: var(--color-house);
+  color: var(--color-screen);
+  transition: transform var(--dur-bars) var(--ease-expo);
+}
+
+.bar-top {
+  top: 0;
+  transform: translateY(calc(var(--bar-open) - var(--bar-closed)));
+}
+
+.bar-bottom {
+  bottom: 0;
+  transform: translateY(calc(var(--bar-closed) - var(--bar-open)));
+}
+
+:root[data-bars='closed'] .bar {
+  transform: none;
+}
+
+/* ---- Cold open: shown only under html[data-intro]; CSS performs the cut ---- */
+.cold-open {
+  display: none;
+}
+
+:root[data-intro] .cold-open {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  animation: cut 0s linear var(--dur-intro) forwards;
+}
+
+@keyframes cut {
+  to {
+    visibility: hidden;
+  }
+}
+
+/* Light, not glow: a soft cone from the booth, warming up in two steps. */
+.cold-open-beam {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 55% 95% at 90% 0%,
+    oklch(0.94 0.006 240 / 0.5),
+    transparent 72%
+  );
+  clip-path: polygon(86% 0, 95% 0, 72% 100%, 18% 100%);
+  opacity: 0;
+  animation: lamp 400ms steps(1, end) forwards;
+}
+
+@keyframes lamp {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.45;
+  }
+  55% {
+    opacity: 0.15;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* The grain tile is dark; on black it has to be inverted to read. Kept faint so the black
+   stays black instead of turning into a tinted near-black. */
+.cold-open .film-grain {
+  filter: invert(1);
+  opacity: 0.05;
+}
+
+.cold-open-card {
+  opacity: 0;
+  animation: appear 1ms linear 400ms forwards;
+}
+
+@keyframes appear {
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---- Hero: family A, the name rises from behind its mask (CSS, so first paint needs no JS) ---- */
+.rise-line {
+  display: block;
+  /* The mask only needs to hide the line below it. Clip vertically, never sideways: a single
+     long word ("Experience") can be wider than its column and must stay whole. */
+  overflow-x: visible;
+  overflow-y: clip;
+  /* Room for the cap tops at leading 0.86 so the mask does not crop them. */
+  padding-top: 0.06em;
+  margin-top: -0.06em;
+}
+
+.rise-line > span {
+  display: inline-block;
+}
+
+:root[data-js] .hero-name .rise-line > span {
+  animation: rise var(--dur-reveal) var(--ease-expo) both;
+  animation-delay: calc(var(--i, 0) * var(--stagger-lines));
+}
+
+:root[data-js][data-intro] .hero-name .rise-line > span {
+  animation-delay: calc(var(--dur-intro) + var(--i, 0) * var(--stagger-lines));
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(110%);
+  }
+}
+
+/* The peak: as the bars part, the name grows upward into the space the top bar gave up. */
+.hero-name {
+  transform-origin: 0 100%;
+  transition: transform var(--dur-bars) var(--ease-expo);
+}
+
+:root[data-bars='open'] .hero-name {
+  transform: scale(1.06);
+}
+
+/* The cue mark lives in the right page margin, centred in it and never wider than three
+   quarters of it, so it can flash without covering a word (28px on desktop, 12px on phones). */
+.cue-mark {
+  --cue-size: min(28px, calc(var(--page-margin) * 0.75));
+  top: calc(var(--bar-open) + 24px);
+  right: calc((var(--page-margin) - var(--cue-size)) / 2);
+  width: var(--cue-size);
+  height: var(--cue-size);
+}
+
+/* ---- Act I · Experience: a 35 mm strip ----
+   The default is a vertical strip (phones, reduced motion, no JS). ExperienceStrip sets
+   data-strip="on" when it pins the reel, and only then is the strip laid out sideways. */
+.strip {
+  padding-bottom: clamp(5rem, 12vw, 12rem);
+}
+
+.strip-pin {
+  padding-inline: var(--page-margin);
+}
+
+.strip-track {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  max-width: 64rem;
+  margin-inline: auto;
+}
+
+.strip-item {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .strip-item {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    column-gap: var(--grid-gap);
+    align-items: center;
+  }
+}
+
+.strip-cell {
+  position: relative;
+  padding: 0.75rem 1.75rem;
+  background: var(--color-house);
+  color: var(--color-screen);
+}
+
+/* Sprocket holes: the ground showing through the film base, down both edges. */
+.strip-cell::before,
+.strip-cell::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  width: 0.5rem;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 0.4rem,
+    var(--color-screen) 0.4rem 0.8rem,
+    transparent 0.8rem 1.25rem
+  );
+}
+
+.strip-cell::before {
+  left: 0.6rem;
+}
+
+.strip-cell::after {
+  right: 0.6rem;
+}
+
+.strip-frame {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  aspect-ratio: 2.39 / 1;
+  overflow: hidden;
+  padding: clamp(0.75rem, 1.4vw, 1.25rem);
+  background: var(--color-screen);
+  color: var(--color-ink);
+}
+
+/* The protagonist's still: the same muted treatment as every frame on the site. */
+.strip-still {
+  position: absolute;
+  inset-block: 0;
+  right: 0;
+  width: 42%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 20%;
+  filter: saturate(0.7) contrast(1.05);
+}
+
+/* Edge print: the frame's year, like the code printed along the film stock. */
+.strip-edge {
+  margin-top: 0.35rem;
+  font-size: var(--text-small);
+  letter-spacing: 0.2em;
+}
+
+/* Years are drawn in the frame; the caption carries them for screen readers and Quick view. */
+.strip-years {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+[data-strip='on'] {
+  /* The pinned frame already leaves space below the reel; more would open a blank stretch. */
+  padding-bottom: 0;
+
+  .strip-pin {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: calc(100svh - 2 * var(--bar-open));
+    padding-inline: 0;
+    overflow-x: clip;
+  }
+
+  .strip-track {
+    flex-direction: row;
+    gap: 0;
+    width: max-content;
+    max-width: none;
+    margin-inline: 0;
+    padding-inline: var(--page-margin);
+  }
+
+  /* min(28vw, 420px) keeps the reel's overflow, and so the pin, within one screen height. */
+  .strip-item {
+    display: flex;
+    flex-direction: column;
+    /* The vertical layout centres items; the reel needs the cell at the item's full width. */
+    align-items: stretch;
+    width: calc(min(28vw, 420px) + 2vw);
+  }
+
+  .strip-cell {
+    padding: 1.9rem 1vw;
+  }
+
+  .strip-cell::before,
+  .strip-cell::after {
+    inset-inline: 0;
+    inset-block: 0.7rem auto;
+    width: auto;
+    height: 0.5rem;
+    background: repeating-linear-gradient(
+      to right,
+      transparent 0 0.4rem,
+      var(--color-screen) 0.4rem 0.8rem,
+      transparent 0.8rem 1.25rem
+    );
+  }
+
+  .strip-cell::after {
+    inset-block: auto 0.7rem;
+  }
+
+  .strip-caption {
+    padding: 1.5rem 1vw 0;
+  }
+}
+
+/* Quick view: a dated list, one milestone per line. */
+[data-view='quick'] {
+  .strip {
+    padding-bottom: 2rem;
+  }
+
+  .strip-cell {
+    display: none;
+  }
+
+  .strip-track {
+    gap: 0.75rem;
+    max-width: 62ch;
+    margin-inline: 0;
+  }
+
+  .strip-item {
+    display: block;
+  }
+
+  .strip-caption > * {
+    display: inline;
+  }
+
+  .strip-years {
+    position: static;
+    width: auto;
+    height: auto;
+    margin-right: 0.5em;
+    clip-path: none;
+    font-weight: 700;
+  }
+
+  .strip-caption h3::after {
+    content: ', ';
+  }
+
+  .strip-caption h3 + p::after {
+    content: '. ';
+  }
+
+  .strip-summary::after {
+    content: ' ';
+  }
+}
+
+/* Section components live in a layer, so Tailwind utilities on the same element (quick:hidden,
+   say) always win over them, the way utilities are meant to. */
+@layer components {
+  /* ---- Act II · Projects ----
+   Phones and tablets stack the parts in order: still (full bleed), title, cast, actions.
+   From 1024 px the grid break (design/COMMIT-SHEET.md §4): the still bleeds off the left edge
+   to column 8, the title sits on the ground in 9–12, and the cast panel overlaps the still's
+   bottom-right corner across columns 8–10. */
+  .projects {
+    display: grid;
+    row-gap: clamp(6rem, 14vw, 12rem);
+    padding-bottom: clamp(6rem, 12vw, 12rem);
+  }
+
+  .project {
+    --cast-overlap: 4rem;
+    row-gap: 1.5rem;
+    align-items: start;
+
+    > * {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .project-still {
+    margin-inline: calc(-1 * var(--page-margin));
+  }
+
+  /* The push-in scales this layer inside the frame's crop. */
+  .project-still-inner {
+    width: 100%;
+    height: 100%;
+    transform-origin: 50% 50%;
+  }
+
+  .project-cast {
+    /* Set like a credit block: the role on the left, one name per line on the right. */
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-content: start;
+    column-gap: 1.5rem;
+    justify-self: start;
+    min-width: min(100%, 22rem);
+    padding: 1.25rem 1.5rem;
+    background: var(--color-screen-2);
+  }
+
+  /* Each cast line rises from behind its own mask, like a credit. */
+  .cast-line {
+    overflow: clip;
+
+    > span {
+      display: block;
+    }
+  }
+
+  .project-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .project {
+      row-gap: 0;
+    }
+
+    .project-still {
+      grid-area: 1 / 1 / 2 / 9;
+      align-self: end;
+      margin-inline: calc(-1 * var(--page-margin)) 0;
+    }
+
+    /* Room under the logline for the cast panel, so the two never meet. */
+    .project-head {
+      grid-area: 1 / 9 / 2 / 13;
+      padding-bottom: calc(var(--cast-overlap) + 2rem);
+    }
+
+    .project-cast {
+      position: relative;
+      grid-area: 2 / 8 / 3 / 11;
+      margin-top: calc(-1 * var(--cast-overlap));
+    }
+
+    .project-actions {
+      grid-area: 3 / 8 / 4 / 13;
+      margin-top: 1.5rem;
+    }
+  }
+
+  /* ---- Behind the scenes ---- */
+  .bts-parts {
+    display: grid;
+    gap: 1.75rem;
+  }
+
+  .bts-heading {
+    margin-bottom: 0.35rem;
+    font-size: var(--text-small);
+    font-style: italic;
+    color: var(--color-ink-2);
+  }
+
+  /* No JS: the native <details> opens the parts in place, under the button. */
+  .bts-details[open] > summary {
+    margin-bottom: 1.5rem;
+  }
+
+  .bts-inline {
+    max-width: 62ch;
+  }
+
+  /* The drawer: a modal <dialog> on the right edge, full height, scrolling on its own. It opens
+   with a clip-path wipe from the right (CSS @starting-style, no JS); reduced motion fades. */
+  .bts-drawer {
+    position: fixed;
+    inset: 0 0 0 auto;
+    width: min(36rem, 100vw);
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: var(--color-screen-2);
+    color: var(--color-ink);
+    clip-path: inset(0);
+    transition:
+      clip-path var(--dur-ui) var(--ease-out),
+      overlay var(--dur-ui) allow-discrete,
+      display var(--dur-ui) allow-discrete;
+
+    &:not([open]) {
+      clip-path: inset(0 0 0 100%);
+    }
+
+    &::backdrop {
+      background: oklch(0 0 0 / 0.45);
+      transition:
+        opacity var(--dur-ui) var(--ease-out),
+        overlay var(--dur-ui) allow-discrete,
+        display var(--dur-ui) allow-discrete;
+    }
+
+    &:not([open])::backdrop {
+      opacity: 0;
+    }
+  }
+
+  @starting-style {
+    .bts-drawer[open] {
+      clip-path: inset(0 0 0 100%);
+    }
+
+    .bts-drawer[open]::backdrop {
+      opacity: 0;
+    }
+  }
+
+  /* The page behind an open drawer stays still. */
+  :root:has(.bts-drawer[open]) {
+    overflow: hidden;
+  }
+
+  .bts-sheet {
+    min-height: 100%;
+    padding: 1.25rem clamp(1.25rem, 4vw, 2.5rem) 3rem;
+  }
+
+  .bts-sheet-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Quick view: one column inside the grid, no bleed, no stills, the parts inline. */
+  [data-view='quick'] {
+    .projects {
+      row-gap: 3rem;
+      padding-bottom: 2rem;
+    }
+
+    .project {
+      row-gap: 0.75rem;
+
+      > * {
+        grid-area: auto / 1 / auto / -1;
+        margin: 0;
+        padding: 0;
+      }
+    }
+
+    .project-head {
+      padding-bottom: 0;
+    }
+
+    .project-actions {
+      display: block;
+    }
+
+    .bts-inline,
+    .bts-details {
+      margin-top: 0.75rem;
+      padding-left: 1rem;
+      border-left: 1px solid color-mix(in oklch, var(--color-ink) 25%, transparent);
+    }
+
+    /* Before hydration (or if the app's JS never arrives) the native <details> stands in for
+       the inline block: it takes the rule line, its summary is set as the label (utilities in
+       BehindTheScenes) and the parts show open, so nothing moves when React takes over.
+       Browsers without ::details-content keep the <details> closed. */
+    .bts-details {
+      &::details-content {
+        content-visibility: visible;
+        height: auto;
+      }
+
+      > .bts-inline {
+        margin: 0;
+        padding: 0;
+        border: 0;
+      }
+    }
+
+    .bts-parts {
+      gap: 1rem;
+    }
+
+    .diagram svg {
+      max-width: 22rem;
+    }
+  }
+
+  /* ---- Act III · How I work: a storyboard sheet ----
+   Six panels in workflow order: one column on phones, two from 768 px, three from 1024 px. */
+  .board {
+    display: grid;
+    gap: clamp(2rem, 4vw, 3rem) var(--grid-gap);
+  }
+
+  @media (min-width: 768px) {
+    .board {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .board {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  /* Pencil on paper: ink strokes with round ends. The pencil pass sets the dashes from JS. */
+  .board-drawing {
+    display: block;
+    width: 100%;
+    height: auto;
+    fill: none;
+    stroke: var(--color-ink);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .board-frame {
+    stroke-width: 1.5;
+  }
+
+  .board-caption {
+    margin-top: 0.75rem;
+    font-style: italic;
+  }
+
+  /* The panel number, as pencilled on a real board. */
+  .board-number {
+    margin-right: 0.6em;
+    font-family: var(--font-display);
+    font-style: normal;
+    font-weight: 700;
+    color: var(--color-ink-2);
+  }
+
+  /* Quick view: the numbered list, without drawings. */
+  [data-view='quick'] {
+    .board {
+      display: block;
+    }
+
+    .board-drawing {
+      display: none;
+    }
+
+    .board-caption {
+      margin-top: 0.25rem;
+      font-style: normal;
+    }
+  }
+
+  /* ---- End credits / Contact ----
+   The ground fades to black as the section arrives: --fade runs 0 → 1, scrubbed. Without JS
+   it stays at 1, so the credits are simply light on black. */
+  .credits {
+    --fade: 1;
+    /* Mixed in OKLab, which has no hue: in OKLCH, black's hue of 0 would tint the fade pink. */
+    background: color-mix(
+      in oklab,
+      var(--color-house) calc(var(--fade) * 100%),
+      var(--color-screen)
+    );
+    color: color-mix(in oklab, var(--color-screen) calc(var(--fade) * 100%), var(--color-ink));
+
+    :focus-visible {
+      outline-color: var(--color-screen);
+    }
+  }
+
+  .credits-roll {
+    text-align: center;
+  }
+
+  /* Film credits: the role on the left of a central gutter, the names on the right. */
+  .credit-list {
+    display: grid;
+    gap: 2rem;
+    margin-block: 0 4rem;
+  }
+
+  .credit {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 1.5rem;
+    text-align: left;
+
+    dt {
+      grid-row: 1 / span 20;
+      font-size: var(--text-small);
+      font-style: italic;
+      line-height: var(--text-body--line-height);
+      text-align: right;
+    }
+
+    dd {
+      grid-column: 2;
+    }
+  }
+
+  .credits-heading {
+    margin-bottom: 2rem;
+    font-family: var(--font-display);
+    font-size: var(--text-scene);
+    font-weight: 700;
+    line-height: var(--text-scene--line-height);
+    text-transform: uppercase;
+  }
+
+  .credits-end {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    margin-top: clamp(4rem, 10vw, 8rem);
+  }
+
+  /* The one action, at title size: screen on a solid velvet plate (6.3:1; velvet text on black
+   would be 2.8:1). */
+  /* Chapter size, unless the longest word (--chars, set by ChapterCard) would overflow its
+     column: "EXPERIENCIA" is wider than "EXPERIENCE". 0.44 em is the widest letter average. */
+  .chapter-title {
+    font-size: min(var(--text-chapter), calc(100cqi / (var(--chars) * 0.44)));
+    line-height: var(--text-chapter--line-height);
+    letter-spacing: var(--text-chapter--letter-spacing);
+  }
+
+  .write-to-me {
+    display: inline-block;
+    margin-block: 1.5rem 1rem;
+    padding: 0.12em 0.25em 0.04em;
+    border-radius: 2px;
+    background: var(--color-velvet);
+    color: var(--color-screen);
+    font-family: var(--font-display);
+    /* One line at any width and in any language: the plate shrinks to fit its label
+       (--chars, set by Contact) where the title size would overflow. Big Shoulders caps
+       run at most 0.44 em a letter; the padding adds 0.5 em. */
+    font-size: min(
+      var(--text-title),
+      calc((100vw - 2 * var(--page-margin)) / (var(--chars) * 0.44 + 0.5))
+    );
+    font-weight: 800;
+    line-height: var(--text-title--line-height);
+    letter-spacing: var(--text-title--letter-spacing);
+    text-transform: uppercase;
+    transition: opacity var(--dur-ui) var(--ease-out);
+
+    &:hover {
+      opacity: 0.88;
+    }
+  }
+
+  /* A deliberate rest of black, then one card; the bottom bar is closed by now. */
+  .post-credits {
+    display: grid;
+    padding: 60svh var(--page-margin) calc(var(--bar-closed) + 4rem);
+    text-align: center;
+  }
+
+  .post-credits-card {
+    min-height: calc(100svh - 2 * var(--bar-closed) - 4rem);
+    display: grid;
+    place-content: center;
+    justify-items: center;
+  }
+
+  /* Quick view: a plain contact block on the ground. */
+  [data-view='quick'] {
+    .credits {
+      --fade: 0;
+      padding-bottom: 4rem;
+    }
+
+    .credits-roll,
+    .credit {
+      text-align: left;
+    }
+
+    .credit-list {
+      gap: 0.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* The crew credits belong to the film; Quick view starts at the facts, with the cast. */
+    .credit-list.crew {
+      display: none;
+    }
+
+    .credit {
+      display: block;
+
+      dt {
+        display: inline;
+        font-size: inherit;
+        font-weight: 600;
+
+        &::after {
+          content: ': ';
+        }
+      }
+
+      dd {
+        display: inline;
+
+        &:not(:last-child)::after {
+          content: ', ';
+        }
+      }
+    }
+
+    .credits-heading {
+      margin-bottom: 0.5rem;
+      font-family: var(--font-text);
+      font-size: var(--text-body);
+      font-weight: 600;
+      line-height: var(--text-body--line-height);
+      text-transform: none;
+    }
+
+    .credits-end {
+      justify-items: start;
+      margin-top: 1.5rem;
+    }
+
+    .write-to-me {
+      margin: 0;
+      padding: 0.6rem 1.5rem;
+      font-family: var(--font-text);
+      font-size: var(--text-body);
+      font-weight: 600;
+      line-height: var(--text-body--line-height);
+      letter-spacing: normal;
+      text-transform: none;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .film-grain {
+    animation: none;
+  }
+  /* The drawer fades instead of wiping. */
+  .bts-drawer,
+  .bts-drawer:not([open]) {
+    clip-path: none;
+  }
+  .bts-drawer {
+    transition:
+      opacity var(--dur-ui) var(--ease-out),
+      overlay var(--dur-ui) allow-discrete,
+      display var(--dur-ui) allow-discrete;
+  }
+  .bts-drawer:not([open]) {
+    opacity: 0;
+  }
+  /* No movement: the bars switch state in place and the name neither rises nor grows. */
+  .bar,
+  .hero-name {
+    transition: none;
+  }
+  :root[data-js] .hero-name .rise-line > span {
+    animation: none;
+  }
+  :root[data-bars='open'] .hero-name {
+    transform: none;
+  }
+}
+
+[data-view='quick'] :is(.film-grain, .vignette, .bar-bottom) {
+  display: none;
+}
+
+[data-view='quick'] :is(.hero-name .rise-line > span, .hero-name) {
+  animation: none;
+  transform: none;
+  transition: none;
+}
+
+[data-view='quick'] .bar-top {
+  transform: translateY(calc(var(--bar-open) - var(--bar-closed)));
+  transition: none;
+}
+
+/* Paper gets Quick view (the quick: variant) without the film's furniture: no bars, grain,
+   vignette or cold open, even if the reader prints while the intro is still running. */
+@media print {
+  .film-grain,
+  .vignette,
+  .bar,
+  .cold-open,
+  a[href='#main'] {
+    display: none !important;
+  }
+
+  .write-to-me {
+    border: 1px solid;
+    color: var(--color-ink);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @starting-style {
+    .bts-drawer[open] {
+      clip-path: none;
+      opacity: 0;
+    }
+  }
+}

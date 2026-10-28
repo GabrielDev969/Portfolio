@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master, rebuild/cinematic]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Lint, typecheck, test, build, e2e
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm format:check
+      - run: pnpm test
+      - run: pnpm build
+      - name: Initial JS budget (180 KB gzipped)
+        run: pnpm measure:js
+      - name: Install Chromium for Playwright
+        run: pnpm exec playwright install --with-deps chromium
+      - name: End-to-end tests (5-second test, view modes, no-JS)
+        run: pnpm test:e2e
+      # Runs even after a failure; any test that needed its retry is listed, never hidden.
+      - name: Tests that passed only on retry
+        id: flaky
+        if: always()
+        run: pnpm --silent flaky
+      - name: Upload the Playwright report
+        if: failure() || steps.flaky.outputs.flaky != '0'
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
+      - name: Open TODO(gabriel) items
+        run: pnpm --silent todos >> "$GITHUB_STEP_SUMMARY"
+
+  lighthouse:
+    name: Lighthouse (mobile, desktop, simulated)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      # Gated on mobile (applied throttling) and desktop; the simulated run is reported only.
+      # The median of each config lands in the run summary (lighthouse/README.md).
+      - name: Lighthouse
+        run: pnpm lighthouse
+      - name: Upload the Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci/
+          # The folder is hidden, which upload-artifact skips unless told otherwise.
+          include-hidden-files: true
+          retention-days: 14
