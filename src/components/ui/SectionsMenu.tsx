@@ -3,8 +3,8 @@ import { m } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
 import { dur } from '@/motion/tokens'
 
-type Chapter = { href: string; label: string }
-type Props = { label: string; navLabel: string; chapters: Chapter[] }
+type Section = { href: string; label: string }
+type Props = { label: string; navLabel: string; sections: Section[] }
 
 const easeOut = [0.215, 0.61, 0.355, 1] as const
 
@@ -13,7 +13,7 @@ const easeOut = [0.215, 0.61, 0.355, 1] as const
  * to the button), on an outside click and after choosing a section, and the list opens with
  * a short clip-path reveal.
  */
-export function ChapterNav({ label, navLabel, chapters }: Props) {
+export function SectionsMenu({ label, navLabel, sections }: Props) {
   const [open, setOpen] = useState(false)
   const details = useRef<HTMLDetailsElement>(null)
 
@@ -51,17 +51,17 @@ export function ChapterNav({ label, navLabel, chapters }: Props) {
         initial={{ clipPath: 'inset(0 0 100% 0)', opacity: 0 }}
         animate={{ clipPath: 'inset(0 0 0% 0)', opacity: 1 }}
         transition={{ duration: dur.ui, ease: easeOut }}
-        className="absolute top-full right-0 mt-2 min-w-56 bg-house p-2 text-screen"
+        className="absolute top-full right-0 mt-2 min-w-56 border border-ink/15 bg-screen-2 p-2 text-ink"
       >
         <ul>
-          {chapters.map((chapter) => (
-            <li key={chapter.href}>
+          {sections.map((section) => (
+            <li key={section.href}>
               <a
-                href={chapter.href}
+                href={section.href}
                 onClick={() => setOpen(false)}
                 className="flex min-h-11 items-center px-3 text-body underline-offset-4 hover:underline"
               >
-                {chapter.label}
+                {section.label}
               </a>
             </li>
           ))}

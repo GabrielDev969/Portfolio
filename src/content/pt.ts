@@ -48,29 +48,28 @@ export const pt: SiteContent = {
     about:
       'Desenvolvedor Full Stack com cerca de 5 anos de experiência: 4 como Analista de Sistemas e mais de 1 trabalhando remoto. Construo produtos completos, do banco de dados à interface: frontends e dashboards com Next.js e React, APIs com Node.js e NestJS, e dados em PostgreSQL. Programo todos os dias com agentes de IA para ir mais rápido sem abrir mão do critério técnico, e faço pós-graduação em Engenharia de Software com IA Aplicada.',
     photo: {
-      still: en.person.photo.still,
+      id: en.person.photo.id,
       alt: 'Gabriel Santos, sorrindo, de blazer azul e óculos.',
     },
   },
   ui: {
-    skipIntro: 'Pular abertura',
     skipToContent: 'Pular para o conteúdo',
     present: 'atual',
     quickView: 'Visão rápida',
-    filmView: 'Visão de filme',
-    chapters: 'Capítulos',
+    fullView: 'Visão completa',
+    sections: 'Seções',
     language: 'Idioma',
     contact: 'Contato',
     downloadCv: 'Baixar CV',
-    watchTrailer: 'Ver o trailer',
-    behindTheScenes: 'Bastidores',
+    seeProjects: 'Ver projetos',
+    technicalDetails: 'Detalhes técnicos',
     close: 'Fechar',
     internalNoLink: 'Sistema interno, sem link público',
-    rewind: 'Rebobinar o filme',
-    openingTitles: 'Créditos de abertura',
-    chaptersNav: 'Seções',
+    backToTop: 'Voltar ao topo',
+    stack: 'Stack',
+    sectionsNav: 'Seções',
     languageNav: 'Escolha o idioma',
-    bts: {
+    details: {
       problem: 'O problema',
       role: 'Meu papel',
       architecture: 'Arquitetura',
@@ -80,30 +79,29 @@ export const pt: SiteContent = {
       links: 'Links',
     },
   },
-  chapters: {
-    experience: { act: 'Ato I', title: 'Experiência' },
-    projects: { act: 'Ato II', title: 'Projetos' },
-    howIWork: { act: 'Ato III', title: 'Como eu trabalho' },
+  sections: {
+    experience: { title: 'Experiência' },
+    projects: { title: 'Projetos' },
+    howIWork: { title: 'Como trabalho' },
     contact: { title: 'Contato' },
   },
-  production: 'Uma produção de Gabriel Santos',
   experience: en.experience.map((m) => ({ ...m, ...experience[m.id] })),
   projects: [
     {
       ...wave,
       logline:
         'Uma plataforma interna para publicar campanhas, gerenciar solicitações entre equipes (no estilo do ClickUp), gerar relatórios e acompanhar resultados em um dashboard.',
-      still: {
+      image: {
         kind: 'mockup',
         mockup: 'wave-board',
         description:
           'Um quadro de solicitações estilizado, com equipes e tarefas fictícias, no lugar do sistema interno.',
       },
-      behindTheScenes: {
+      technicalDetails: {
         problem: missing.problem(),
         role: missing.role(),
         architecture: {
-          ...wave.behindTheScenes.architecture,
+          ...wave.technicalDetails.architecture,
           nodes: [
             { id: 'web', label: 'App web (Next.js, React)', kind: 'client' },
             { id: 'api', label: 'API (NestJS)', kind: 'service' },
@@ -119,31 +117,36 @@ export const pt: SiteContent = {
     {
       ...bi,
       logline:
-        'Dashboards sobre os dados do RedTrack: análises mensais e semanais, e o desempenho de cada media buyer nas campanhas que subiu.',
-      still: {
+        'Um sistema interno para dados de campanhas: workers em NestJS processam os dados do RedTrack a partir de uma fila no RabbitMQ e gravam no PostgreSQL, e um app em Next.js com login Google os lê pela API em NestJS: resultados mensais e semanais, e o desempenho de cada media buyer.',
+      image: {
         kind: 'mockup',
         mockup: 'campaign-chart',
         description:
-          'Um gráfico de desempenho semanal com campanhas fictícias e media buyers inventados, no lugar dos dashboards internos.',
+          'Um gráfico de desempenho semanal com campanhas fictícias e media buyers inventados, no lugar do sistema interno.',
       },
-      behindTheScenes: {
+      technicalDetails: {
         problem: missing.problem(),
         role: missing.role(),
         architecture: {
-          ...bi.behindTheScenes.architecture,
+          ...bi.technicalDetails.architecture,
           nodes: [
             { id: 'redtrack', label: 'RedTrack', kind: 'external' },
-            { id: 'n8n', label: 'Pipelines no n8n', kind: 'service' },
+            { id: 'n8n', label: 'n8n', kind: 'service' },
+            { id: 'queue', label: 'RabbitMQ', kind: 'service' },
+            { id: 'web', label: 'App Next.js (login Google)', kind: 'client' },
+            { id: 'api', label: 'NestJS (workers e API)', kind: 'service' },
             { id: 'db', label: 'PostgreSQL', kind: 'data' },
-            { id: 'dashboards', label: 'Dashboards', kind: 'client' },
           ],
         },
         decisions: [
           {
-            what: 'Dashboards sobre os dados do RedTrack, com visões mensais e semanais e o desempenho de cada media buyer.',
+            what: 'Visões mensais e semanais dos dados do RedTrack, e o desempenho de cada media buyer.',
             why: todo('why these views'),
           },
-          { what: 'Pipelines no n8n alimentam o PostgreSQL.', why: todo('why n8n and PostgreSQL') },
+          {
+            what: 'O n8n leva os dados do RedTrack para uma fila no RabbitMQ, e workers em NestJS os processam até o PostgreSQL.',
+            why: todo('why a queue between n8n and the workers'),
+          },
           {
             what: 'Um script de alocação pelo método dos maiores restos para conversões e receita.',
             why: 'As métricas estavam infladas. O script corrigiu os números, e os resultados foram conferidos com as planilhas de referência.',
@@ -158,19 +161,19 @@ export const pt: SiteContent = {
       ...zibby,
       logline:
         'Minha própria plataforma de e-commerce multiloja, lançada em outubro de 2026: vitrine, painel administrativo, pagamentos com Stripe e fulfillment pela Zendrop.',
-      still: {
+      image: {
         kind: 'mockup',
         mockup: 'zibby-store',
         description: 'Uma vitrine fictícia ao lado do seu painel administrativo.',
       },
-      behindTheScenes: {
+      technicalDetails: {
         problem: missing.problem(),
         role: [
           'Produto próprio.',
           'Construí em fases com agentes de IA para programar, e cada fase seguiu plano → revisão → implementação → testes → revisão do diff → merge.',
         ],
         architecture: {
-          ...zibby.behindTheScenes.architecture,
+          ...zibby.technicalDetails.architecture,
           nodes: [
             { id: 'storefront', label: 'Vitrine (Next.js)', kind: 'client' },
             { id: 'admin', label: 'Painel administrativo (Next.js)', kind: 'client' },
@@ -204,17 +207,17 @@ export const pt: SiteContent = {
       ...hostly,
       logline:
         'Um sistema para robôs de atendimento OrionStar: um painel administrativo que agenda campanhas de anúncios e músicas, um backend em uma VPS e um app no RobotOS que reproduz tudo e conversa com as pessoas.',
-      still: {
+      image: {
         kind: 'mockup',
         mockup: 'hostly-schedule',
         description:
           'Uma tela de agenda do robô com uma playlist de campanhas fictícia, no lugar do sistema real.',
       },
-      behindTheScenes: {
+      technicalDetails: {
         problem: missing.problem(),
         role: missing.role(),
         architecture: {
-          ...hostly.behindTheScenes.architecture,
+          ...hostly.technicalDetails.architecture,
           nodes: [
             { id: 'admin', label: 'Painel administrativo', kind: 'client' },
             { id: 'app', label: 'App do robô', kind: 'client' },
@@ -249,20 +252,20 @@ export const pt: SiteContent = {
       ...bookowl,
       logline:
         'Um sistema open source de gestão de bibliotecas em Python e Django, feito para a biblioteca de uma igreja de verdade.',
-      still: {
+      image: {
         kind: 'image',
-        still: 'bookowl',
+        id: 'bookowl',
         alt: 'A tela inicial do BookOwl: o logo da coruja sobre uma mensagem de boas-vindas.',
       },
       links: {
         kind: 'public',
         links: [{ label: 'Código no GitHub', href: 'https://github.com/GabrielDev969/BookOwl' }],
       },
-      behindTheScenes: {
+      technicalDetails: {
         problem: missing.problem(),
         role: missing.role(),
         architecture: {
-          ...bookowl.behindTheScenes.architecture,
+          ...bookowl.technicalDetails.architecture,
           nodes: [
             { id: 'app', label: 'App Django (Python)', kind: 'service' },
             { id: 'db', label: todo('the BookOwl database'), kind: 'data' },
@@ -289,26 +292,20 @@ export const pt: SiteContent = {
     ],
     closing: 'A IA acelera. O critério é meu.',
   },
-  credits: {
-    crew: [
-      { role: 'Direção', names: ['Gabriel Santos'] },
-      { role: 'Roteiro', names: ['Gabriel Santos'] },
-      { role: 'Fotografia', names: ['Gabriel Santos'] },
-    ],
-    castLabel: 'Elenco',
-    cast: [
-      { role: 'Frontend', names: en.credits.cast[0]!.names },
+  skills: {
+    stack: [
+      { label: 'Frontend', items: en.skills.stack[0]!.items },
       {
-        role: 'Backend',
-        names: ['Node.js', 'NestJS', 'Express', 'APIs REST', 'Spring Boot', 'Django'],
+        label: 'Backend',
+        items: ['Node.js', 'NestJS', 'Express', 'APIs REST', 'Spring Boot', 'Django'],
       },
-      { role: 'Dados', names: en.credits.cast[2]!.names },
-      { role: 'DevOps e automação', names: en.credits.cast[3]!.names },
-      { role: 'Arquitetura', names: en.credits.cast[4]!.names },
+      { label: 'Dados', items: en.skills.stack[2]!.items },
+      { label: 'DevOps e automação', items: en.skills.stack[3]!.items },
+      { label: 'Arquitetura', items: en.skills.stack[4]!.items },
     ],
     languages: {
-      role: 'Idiomas',
-      names: ['Português (nativo)', 'Espanhol (estudando)', 'Inglês (estudando)'],
+      label: 'Idiomas',
+      items: ['Português (nativo)', 'Espanhol (estudando)', 'Inglês (estudando)'],
     },
   },
   contact: {
@@ -320,9 +317,5 @@ export const pt: SiteContent = {
       label: 'Baixar CV',
     },
     basedIn: 'Moro em Salvador, Bahia, e trabalho remoto.',
-  },
-  postCredits: {
-    line: 'Gabriel Santos voltará no seu próximo projeto.',
-    rewind: 'Rebobinar o filme',
   },
 }

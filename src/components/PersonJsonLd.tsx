@@ -1,7 +1,7 @@
 import type { SiteContent } from '@/content/schema'
 import type { Locale } from '@/lib/i18n'
 import { siteUrl } from '@/lib/site'
-import { stillPath } from '@/lib/stills'
+import { imagePath } from '@/lib/images'
 
 type Props = { locale: Locale; content: SiteContent }
 
@@ -15,7 +15,7 @@ export function PersonJsonLd({ locale, content }: Props) {
     jobTitle: person.role,
     description: person.about,
     url: `${siteUrl}/${locale}/`,
-    image: `${siteUrl}/${stillPath(person.photo.still, 460, 'webp')}`,
+    image: `${siteUrl}/${imagePath(person.photo.id, 460, 'webp')}`,
     email: `mailto:${contact.email}`,
     address: { '@type': 'PostalAddress', addressLocality: 'Salvador', addressCountry: 'BR' },
     knowsAbout: person.coreStack,

@@ -8,14 +8,15 @@ import { Button } from '../ui/Button'
 type Props = { locale: Locale; content: SiteContent }
 
 /**
- * The title sequence, and the 5-second test: name, role, core stack, "Remote", Contact and
- * Download CV all sit inside the band between the closed bars at every width, without scrolling.
- * The facts and buttons are never animated in and never covered (design/STORYBOARD.md §1).
- * Phones align it to the top instead of centring it: if the text font swaps in and a fact
- * rewraps, only what is below that line moves, not the name.
+ * The hero, and the 5-second test: name, role, core stack, "Remote", Contact and Download CV
+ * all sit on the first screen, under the top bar, at every width, without scrolling. Only the
+ * name animates (it rises once on load, in CSS); the facts and buttons are there at first
+ * paint and never covered (design/STORYBOARD.md §1). Phones align it to the top instead of
+ * centring it: if the text font swaps in and a fact rewraps, only what is below that line
+ * moves, not the name.
  */
 export function Hero({ locale, content }: Props) {
-  const { person, ui, contact, chapters } = content
+  const { person, ui, contact } = content
   const stack = new Intl.ListFormat(languageTags[locale], { type: 'conjunction' }).format(
     person.coreStack,
   )
@@ -24,15 +25,13 @@ export function Hero({ locale, content }: Props) {
     <section
       id="top"
       data-section
-      data-act=""
-      data-act-title={ui.openingTitles}
       aria-labelledby="hero-name"
-      className="page-grid min-h-svh content-center gap-y-[clamp(16px,3svh,32px)] py-[calc(var(--bar-closed)+clamp(12px,3svh,40px))] max-md:content-start quick:min-h-0 quick:pt-[calc(var(--bar-open)+48px)] quick:pb-8"
+      className="page-grid min-h-svh content-center gap-y-[clamp(16px,3svh,32px)] pt-[calc(var(--top-bar)+clamp(16px,4svh,48px))] pb-[clamp(16px,4svh,48px)] max-md:content-start quick:min-h-0 quick:pt-[calc(var(--top-bar)+48px)] quick:pb-8"
     >
       <h1
         id="hero-name"
         data-fact="name"
-        className="hero-name col-span-12 w-fit justify-self-start font-display text-title font-extrabold uppercase lg:col-span-7 quick:col-span-12 quick:text-scene"
+        className="hero-name col-span-12 w-fit justify-self-start font-display text-title font-extrabold uppercase lg:col-span-7 quick:col-span-12 quick:text-heading"
       >
         {person.name.split(' ').map((word, i) => (
           <span key={word} className="rise-line">
@@ -69,32 +68,26 @@ export function Hero({ locale, content }: Props) {
         </div>
       </div>
 
-      {/* On wide screens the line sits beside the name, on its last baseline, like a poster title.
-          On tablets it sits beside the facts, so the stack stays inside the bars when standing up. */}
-      <p className="col-span-12 self-end font-text text-scene text-balance italic md:col-span-5 md:col-start-8 md:row-start-2 lg:col-span-5 lg:col-start-8 lg:row-start-1 lg:pb-[0.1em] quick:col-span-12 quick:col-start-1 quick:row-start-auto quick:pb-0 quick:text-body">
+      {/* On wide screens the line sits beside the name, on its last baseline. On tablets it sits
+          beside the facts, so the stack stays on the first screen when standing up. */}
+      <p className="col-span-12 self-end font-text text-heading text-balance italic md:col-span-5 md:col-start-8 md:row-start-2 lg:col-span-5 lg:col-start-8 lg:row-start-1 lg:pb-[0.1em] quick:col-span-12 quick:col-start-1 quick:row-start-auto quick:pb-0 quick:text-body">
         {person.heroLine}
       </p>
 
       <a
-        href="#experience"
+        href="#projects"
         className="col-span-12 inline-flex min-h-11 items-center gap-2 justify-self-start text-small underline-offset-4 hover:underline lg:col-span-5 lg:col-start-8 lg:self-end quick:hidden"
-        aria-label={`${ui.watchTrailer}: ${chapters.experience.title}`}
       >
         <svg aria-hidden="true" viewBox="0 0 20 20" className="size-5" fill="none">
-          <circle cx="10" cy="10" r="8.5" stroke="currentColor" strokeWidth="1.5" />
-          <circle cx="10" cy="10" r="1.5" fill="currentColor" />
-          {[0, 72, 144, 216, 288].map((angle) => (
-            <circle
-              key={angle}
-              cx={10 + 4.6 * Math.cos(((angle - 90) * Math.PI) / 180)}
-              cy={10 + 4.6 * Math.sin(((angle - 90) * Math.PI) / 180)}
-              r="1.6"
-              stroke="currentColor"
-              strokeWidth="1.2"
-            />
-          ))}
+          <path
+            d="M10 3v13M4.5 10.5 10 16l5.5-5.5"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </svg>
-        {ui.watchTrailer}
+        {ui.seeProjects}
       </a>
     </section>
   )

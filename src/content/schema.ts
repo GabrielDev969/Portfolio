@@ -1,5 +1,5 @@
 import type { Locale } from '@/lib/i18n'
-import type { StillId } from '@/lib/stills'
+import type { ImageId } from '@/lib/images'
 
 /**
  * A fact Gabriel still has to provide. In development it renders as a marked
@@ -52,7 +52,7 @@ export type Architecture = {
 /** `why` is left out when `what` already gives the reason in one sentence. */
 export type Decision = { what: Text; why?: Text }
 
-export type BehindTheScenes = {
+export type Details = {
   problem: Prose
   role: Prose
   architecture: Architecture
@@ -65,8 +65,8 @@ export type BehindTheScenes = {
 
 export type MockupId = 'wave-board' | 'campaign-chart' | 'zibby-store' | 'hostly-schedule'
 
-export type Still =
-  | { kind: 'image'; still: StillId; alt: string }
+export type ProjectImage =
+  | { kind: 'image'; id: ImageId; alt: string }
   | { kind: 'mockup'; mockup: MockupId; description: string }
 
 export type ProjectLinks = { kind: 'public'; links: Link[] } | { kind: 'internal' } | Todo
@@ -78,14 +78,15 @@ export type Project = {
   organization?: string
   logline: string
   stack: Text[]
-  /** Internal systems show architecture only: fictional stills, no links, no real data. */
+  /** Internal systems show architecture only: fictional images, no links, no real data. */
   internal: boolean
-  still: Still
+  image: ProjectImage
   links: ProjectLinks
-  behindTheScenes: BehindTheScenes
+  technicalDetails: Details
 }
 
-export type CreditBlock = { role: string; names: string[] }
+/** A labelled list: a stack area and its tools, or the languages Gabriel speaks. */
+export type Group = { label: string; items: string[] }
 
 export type SiteContent = {
   locale: Locale
@@ -103,29 +104,28 @@ export type SiteContent = {
     heroLine: string
     availability: string
     about: string
-    photo: { still: StillId; alt: string }
+    photo: { id: ImageId; alt: string }
   }
   ui: {
-    skipIntro: string
     skipToContent: string
     /** For date ranges that are still open: "2025–present". */
     present: string
     quickView: string
-    filmView: string
-    chapters: string
+    fullView: string
+    sections: string
     language: string
     contact: string
     downloadCv: string
-    watchTrailer: string
-    behindTheScenes: string
+    seeProjects: string
+    technicalDetails: string
     close: string
     internalNoLink: string
-    rewind: string
-    /** HUD label while the hero is on screen. */
-    openingTitles: string
-    chaptersNav: string
+    backToTop: string
+    /** The heading over the stack, in a project and in the contact section. */
+    stack: string
+    sectionsNav: string
     languageNav: string
-    bts: {
+    details: {
       problem: string
       role: string
       architecture: string
@@ -135,17 +135,16 @@ export type SiteContent = {
       links: string
     }
   }
-  chapters: {
-    experience: { act: string; title: string }
-    projects: { act: string; title: string }
-    howIWork: { act: string; title: string }
+  sections: {
+    experience: { title: string }
+    projects: { title: string }
+    howIWork: { title: string }
     contact: { title: string }
   }
-  production: string
   experience: Milestone[]
   projects: Project[]
   workflow: { steps: string[]; closing: string }
-  credits: { crew: CreditBlock[]; cast: CreditBlock[]; castLabel: string; languages: CreditBlock }
+  skills: { stack: Group[]; languages: Group }
   contact: {
     cta: string
     email: string
@@ -154,5 +153,4 @@ export type SiteContent = {
     cv: { href: string; label: string }
     basedIn: string
   }
-  postCredits: { line: string; rewind: string }
 }

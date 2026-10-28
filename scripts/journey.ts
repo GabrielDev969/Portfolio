@@ -34,7 +34,6 @@ for (const width of [390, 768, 1440]) {
       viewport: { width, height: width < 768 ? 844 : 900 },
       reducedMotion: motion,
     })
-    await context.addInitScript(() => sessionStorage.setItem('introSeen', '1'))
     if (quick) await context.addInitScript(() => localStorage.setItem('viewMode', 'quick'))
     const page = await context.newPage()
     await page.goto(base, { waitUntil: 'networkidle' })

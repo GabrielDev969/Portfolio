@@ -20,29 +20,28 @@ export const en: SiteContent = {
     about:
       'Full Stack Developer with about 5 years of experience: 4 as a Systems Analyst and over 1 working remotely. I build complete products, from the database to the interface: frontends and dashboards with Next.js and React, APIs with Node.js and NestJS, and data in PostgreSQL. I use AI coding agents daily to move faster without giving up technical judgment, and I am pursuing a postgraduate degree in Software Engineering for Applied AI.',
     photo: {
-      still: 'gabriel',
+      id: 'gabriel',
       alt: 'Gabriel Santos, smiling, in a blue blazer and glasses.',
     },
   },
   ui: {
-    skipIntro: 'Skip intro',
     skipToContent: 'Skip to content',
     present: 'present',
     quickView: 'Quick view',
-    filmView: 'Film view',
-    chapters: 'Chapters',
+    fullView: 'Full view',
+    sections: 'Sections',
     language: 'Language',
     contact: 'Contact',
     downloadCv: 'Download CV',
-    watchTrailer: 'Watch the trailer',
-    behindTheScenes: 'Behind the scenes',
+    seeProjects: 'See projects',
+    technicalDetails: 'Technical details',
     close: 'Close',
     internalNoLink: 'Internal system, no public link',
-    rewind: 'Rewind the reel',
-    openingTitles: 'Opening titles',
-    chaptersNav: 'Sections',
+    backToTop: 'Back to top',
+    stack: 'Stack',
+    sectionsNav: 'Sections',
     languageNav: 'Choose a language',
-    bts: {
+    details: {
       problem: 'The problem',
       role: 'My role',
       architecture: 'Architecture',
@@ -52,13 +51,12 @@ export const en: SiteContent = {
       links: 'Links',
     },
   },
-  chapters: {
-    experience: { act: 'Act I', title: 'Experience' },
-    projects: { act: 'Act II', title: 'Projects' },
-    howIWork: { act: 'Act III', title: 'How I work' },
+  sections: {
+    experience: { title: 'Experience' },
+    projects: { title: 'Projects' },
+    howIWork: { title: 'How I work' },
     contact: { title: 'Contact' },
   },
-  production: 'A Gabriel Santos production',
   experience: [
     {
       id: 'fator',
@@ -110,14 +108,14 @@ export const en: SiteContent = {
         'An internal platform to publish campaigns, manage requests between teams (ClickUp-style), generate reports and track results on a dashboard.',
       stack: ['Next.js', 'React', 'NestJS', 'TypeScript', 'PostgreSQL'],
       internal: true,
-      still: {
+      image: {
         kind: 'mockup',
         mockup: 'wave-board',
         description:
           'A stylized request board with fictional teams and tasks, standing in for the internal system.',
       },
       links: { kind: 'internal' },
-      behindTheScenes: {
+      technicalDetails: {
         problem: missing.problem(),
         role: missing.role(),
         architecture: {
@@ -143,39 +141,46 @@ export const en: SiteContent = {
       title: 'Campaign BI',
       organization: 'Group Wave Enterprise',
       logline:
-        "Dashboards built on RedTrack data: monthly and weekly analysis, and each media buyer's performance by the campaigns they launched.",
-      stack: ['RedTrack', 'n8n', 'PostgreSQL', todo('what the dashboards are built with')],
+        "An internal system for campaign data: NestJS workers process RedTrack data from a RabbitMQ queue into PostgreSQL, and a Next.js app with Google sign-in reads it through the NestJS API: monthly and weekly results, and each media buyer's performance.",
+      stack: ['Next.js', 'NestJS', 'PostgreSQL', 'RabbitMQ', 'n8n', 'RedTrack'],
       internal: true,
-      still: {
+      image: {
         kind: 'mockup',
         mockup: 'campaign-chart',
         description:
-          'A weekly performance chart with fictional campaigns and invented media buyers, standing in for the internal dashboards.',
+          'A weekly performance chart with fictional campaigns and invented media buyers, standing in for the internal system.',
       },
       links: { kind: 'internal' },
-      behindTheScenes: {
+      technicalDetails: {
         problem: missing.problem(),
         role: missing.role(),
         architecture: {
           nodes: [
             { id: 'redtrack', label: 'RedTrack', kind: 'external' },
-            { id: 'n8n', label: 'n8n pipelines', kind: 'service' },
+            { id: 'n8n', label: 'n8n', kind: 'service' },
+            { id: 'queue', label: 'RabbitMQ', kind: 'service' },
+            { id: 'web', label: 'Next.js app (Google sign-in)', kind: 'client' },
+            { id: 'api', label: 'NestJS (workers, API)', kind: 'service' },
             { id: 'db', label: 'PostgreSQL', kind: 'data' },
-            { id: 'dashboards', label: 'Dashboards', kind: 'client' },
           ],
           edges: [
             { from: 'redtrack', to: 'n8n' },
-            { from: 'n8n', to: 'db' },
-            { from: 'db', to: 'dashboards' },
+            { from: 'n8n', to: 'queue' },
+            { from: 'queue', to: 'api' },
+            { from: 'web', to: 'api' },
+            { from: 'api', to: 'db' },
           ],
           confirmed: true,
         },
         decisions: [
           {
-            what: "Dashboards on RedTrack data, with monthly and weekly views and each media buyer's performance.",
+            what: "Monthly and weekly views of RedTrack data, and each media buyer's performance.",
             why: todo('why these views'),
           },
-          { what: 'n8n pipelines feed PostgreSQL.', why: todo('why n8n and PostgreSQL') },
+          {
+            what: 'n8n brings RedTrack data into a RabbitMQ queue, and NestJS workers process it into PostgreSQL.',
+            why: todo('why a queue between n8n and the workers'),
+          },
           {
             what: 'A largest-remainder allocation script for conversions and revenue.',
             why: 'The metrics were inflated. The script corrected them, and the results were reconciled against the reference spreadsheets.',
@@ -193,13 +198,13 @@ export const en: SiteContent = {
         'My own multi-store e-commerce platform, launched in October 2026: a storefront, an admin panel, Stripe payments and Zendrop fulfillment.',
       stack: ['Next.js', 'NestJS', 'PostgreSQL', 'Prisma', 'Stripe', 'Zendrop'],
       internal: false,
-      still: {
+      image: {
         kind: 'mockup',
         mockup: 'zibby-store',
         description: 'A fictional storefront next to its admin panel.',
       },
       links: todo('a public link for Zibby, if there is one'),
-      behindTheScenes: {
+      technicalDetails: {
         problem: missing.problem(),
         role: [
           'My own product.',
@@ -251,14 +256,14 @@ export const en: SiteContent = {
         'A system for OrionStar service robots: an admin panel that schedules ad campaigns and music, a backend on a VPS, and a RobotOS app that plays them and talks to people.',
       stack: ['RobotOS', todo('the rest of the Hostly stack')],
       internal: true,
-      still: {
+      image: {
         kind: 'mockup',
         mockup: 'hostly-schedule',
         description:
           'A robot schedule screen with a fictional campaign playlist, standing in for the real system.',
       },
       links: { kind: 'internal' },
-      behindTheScenes: {
+      technicalDetails: {
         problem: missing.problem(),
         role: missing.role(),
         architecture: {
@@ -300,16 +305,16 @@ export const en: SiteContent = {
         'An open source library management system in Python and Django, built for a real church library.',
       stack: ['Python', 'Django'],
       internal: false,
-      still: {
+      image: {
         kind: 'image',
-        still: 'bookowl',
+        id: 'bookowl',
         alt: 'The BookOwl home screen: the owl logo over a welcome message.',
       },
       links: {
         kind: 'public',
         links: [{ label: 'Source on GitHub', href: 'https://github.com/GabrielDev969/BookOwl' }],
       },
-      behindTheScenes: {
+      technicalDetails: {
         problem: missing.problem(),
         role: missing.role(),
         architecture: {
@@ -341,29 +346,23 @@ export const en: SiteContent = {
     ],
     closing: 'AI speeds things up. The judgment is mine.',
   },
-  credits: {
-    crew: [
-      { role: 'Directed by', names: ['Gabriel Santos'] },
-      { role: 'Written by', names: ['Gabriel Santos'] },
-      { role: 'Shot by', names: ['Gabriel Santos'] },
-    ],
-    castLabel: 'Cast',
-    cast: [
-      { role: 'Frontend', names: ['Next.js', 'React', 'TypeScript', 'JavaScript', 'Angular'] },
+  skills: {
+    stack: [
+      { label: 'Frontend', items: ['Next.js', 'React', 'TypeScript', 'JavaScript', 'Angular'] },
       {
-        role: 'Backend',
-        names: ['Node.js', 'NestJS', 'Express', 'REST APIs', 'Spring Boot', 'Django'],
+        label: 'Backend',
+        items: ['Node.js', 'NestJS', 'Express', 'REST APIs', 'Spring Boot', 'Django'],
       },
       {
-        role: 'Data',
-        names: ['PostgreSQL', 'Prisma', 'MySQL', 'MongoDB', 'Redis', 'Firebird', 'RedTrack'],
+        label: 'Data',
+        items: ['PostgreSQL', 'Prisma', 'MySQL', 'MongoDB', 'Redis', 'Firebird', 'RedTrack'],
       },
-      { role: 'DevOps & automation', names: ['Docker', 'AWS', 'Git', 'n8n'] },
-      { role: 'Architecture', names: ['Clean Architecture', 'SOLID', 'TDD'] },
+      { label: 'DevOps & automation', items: ['Docker', 'AWS', 'Git', 'n8n'] },
+      { label: 'Architecture', items: ['Clean Architecture', 'SOLID', 'TDD'] },
     ],
     languages: {
-      role: 'Languages',
-      names: ['Portuguese (native)', 'Spanish (studying)', 'English (studying)'],
+      label: 'Languages',
+      items: ['Portuguese (native)', 'Spanish (studying)', 'English (studying)'],
     },
   },
   contact: {
@@ -380,9 +379,5 @@ export const en: SiteContent = {
       label: 'Download CV',
     },
     basedIn: 'Based in Salvador, Brazil, working remotely.',
-  },
-  postCredits: {
-    line: 'Gabriel Santos will return in your next project.',
-    rewind: 'Rewind the reel',
   },
 }

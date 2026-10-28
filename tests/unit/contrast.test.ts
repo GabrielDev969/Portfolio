@@ -46,7 +46,6 @@ const pairings: [fg: string, bg: string, min: number][] = [
   ['ink-2', 'screen-2', 4.5],
   ['screen', 'velvet', 4.5],
   ['screen', 'ink', 4.5],
-  ['screen', 'house', 4.5],
 ]
 
 describe('color contrast', () => {
@@ -56,8 +55,4 @@ describe('color contrast', () => {
       assert.ok(ratio >= min, `${ratio.toFixed(2)}:1`)
     })
   }
-
-  it('velvet is never used as text on house (2.8:1)', () => {
-    assert.ok(contrast('velvet', 'house') < 3)
-  })
 })

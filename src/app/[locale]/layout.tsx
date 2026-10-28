@@ -4,7 +4,6 @@ import type { CSSProperties, ReactNode } from 'react'
 import { getContent } from '@/content'
 import { isLocale, languageTags, locales, type Locale } from '@/lib/i18n'
 import { siteUrl } from '@/lib/site'
-import { KeepAnchor } from '@/motion/KeepAnchor'
 import { MotionProvider } from '@/motion/MotionProvider'
 import { PrintAsQuickView } from '@/motion/PrintAsQuickView'
 import { SmoothScroll } from '@/motion/SmoothScroll'
@@ -65,7 +64,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   if (!isLocale(locale)) notFound()
 
   return (
-    // The head script sets data-js, data-view and data-bars before React hydrates.
+    // The head script sets data-js and data-view before React hydrates.
     <html
       lang={languageTags[locale]}
       className={`${display.variable} ${text.variable}`}
@@ -78,7 +77,6 @@ export default async function LocaleLayout({ children, params }: Props) {
       <body>
         <MotionProvider>{children}</MotionProvider>
         <SmoothScroll />
-        <KeepAnchor />
         <PrintAsQuickView />
       </body>
     </html>

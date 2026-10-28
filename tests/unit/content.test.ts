@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
+import { mockupCopy } from '../../src/components/mockups/copy'
 import { getContent } from '../../src/content'
 import { isTodo } from '../../src/content/schema'
 import { locales } from '../../src/lib/i18n'
@@ -31,9 +32,83 @@ function strings(value: unknown, path = ''): [string, string][] {
 
 // Proper names stay as they are in every language.
 const untranslated =
-  /\.(name|names\.\d+|organization|email|href|still|mockup|id|kind)$|^\.projects\.\d+\.title$/
+  /\.(name|items\.\d+|organization|email|href|still|mockup|id|kind)$|^\.projects\.\d+\.title$/
+
+/**
+ * Words the copy does not use, in any language (design/COMMIT-SHEET.md §8): the film metaphor
+ * the first rebuild had, so it cannot creep back, and the generic portfolio tells. Whole words
+ * only, so "React" and "contacto" pass.
+ */
+const banned = {
+  film: {
+    en: [
+      'production',
+      'act',
+      'scene',
+      'cast',
+      'credits',
+      'reel',
+      'trailer',
+      'still',
+      'cinema',
+      'film',
+      'movie',
+    ],
+    pt: [
+      'produção',
+      'ato',
+      'cena',
+      'elenco',
+      'créditos',
+      'rolo',
+      'trailer',
+      'fotograma',
+      'cinema',
+      'filme',
+    ],
+    es: [
+      'producción',
+      'acto',
+      'escena',
+      'reparto',
+      'créditos',
+      'carrete',
+      'rollo',
+      'tráiler',
+      'fotograma',
+      'cine',
+      'película',
+    ],
+  },
+  clichés: {
+    en: ['seamless', 'revolutionize', 'elevate', 'unleash', 'cutting-edge', 'passionate about'],
+    pt: ['revolucionar', 'inovador', 'de ponta', 'apaixonado por'],
+    es: ['revolucionar', 'innovador', 'de vanguardia', 'apasionado por'],
+  },
+}
+
+function bannedIn(value: unknown, words: string[]) {
+  const found: string[] = []
+  for (const [path, text] of strings(value)) {
+    for (const word of words) {
+      if (new RegExp(`(?<!\\p{L})${word}(?!\\p{L})`, 'iu').test(text))
+        found.push(`${path}: ${word}`)
+    }
+  }
+  return found
+}
 
 describe('content', () => {
+  for (const [kind, lists] of Object.entries(banned)) {
+    it(`uses no ${kind} vocabulary, in the content or the mockups`, () => {
+      for (const locale of locales) {
+        const words = lists[locale]
+        assert.deepEqual(bannedIn(getContent(locale), words), [], locale)
+        assert.deepEqual(bannedIn(mockupCopy[locale], words), [], `${locale} mockups`)
+      }
+    })
+  }
+
   it('every locale has the same shape as English', () => {
     const reference = shape(getContent('en'))
     for (const locale of locales) assert.deepEqual(shape(getContent(locale)), reference, locale)
@@ -81,16 +156,16 @@ describe('content', () => {
 
   for (const project of getContent('en').projects) {
     describe(project.title, () => {
-      const bts = project.behindTheScenes
+      const td = project.technicalDetails
 
       it('has two or three key decisions', () => {
-        assert.ok(bts.decisions.length >= 2 && bts.decisions.length <= 3, `${bts.decisions.length}`)
+        assert.ok(td.decisions.length >= 2 && td.decisions.length <= 3, `${td.decisions.length}`)
       })
 
       it('has an architecture whose edges join existing nodes', () => {
-        const ids = new Set(bts.architecture.nodes.map((n) => n.id))
+        const ids = new Set(td.architecture.nodes.map((n) => n.id))
         assert.ok(ids.size >= 2)
-        for (const edge of bts.architecture.edges) {
+        for (const edge of td.architecture.edges) {
           assert.ok(ids.has(edge.from) && ids.has(edge.to), `${edge.from} → ${edge.to}`)
         }
       })
@@ -98,7 +173,7 @@ describe('content', () => {
       if (project.internal) {
         it('as an internal system, has no links and a fictional still', () => {
           assert.deepEqual(project.links, { kind: 'internal' })
-          assert.equal(project.still.kind, 'mockup')
+          assert.equal(project.image.kind, 'mockup')
         })
       }
 

@@ -2,7 +2,9 @@
 
 Read with `STORYBOARD.md` and `COMMIT-SHEET.md`. Every phase ends with lint, typecheck, tests and `next build`, a short summary, and a stop for approval.
 
-**Rule zero:** a developer's portfolio first. The film is the frame, never an obstacle. The repository is part of the portfolio too.
+**Rule zero:** a developer's portfolio first. The repository is part of the portfolio too.
+
+> **2026-10-28, after phase 7:** Gabriel dropped the film metaphor ("cinematic" meant production quality, not a film). Phases 0–7 below are the history of the first build; the cleanup that followed is its own section, [Without the film](#without-the-film-2026-10-28), and the current design is in `COMMIT-SHEET.md` and `STORYBOARD.md`.
 
 ## Branch and deploy
 
@@ -130,8 +132,9 @@ Each pin is the newest stable release that is **at least 2 weeks old** (as of 20
 | Phase 5 | **178.4 KB**         | Act III's pencil, the credits roll and the rewind. The drawings and the credits are server-rendered                                                                                                                      |
 | Phase 6 | **178.7 KB**         | PT and ES (content, so no JS), the print switch to Quick view and the phone monogram. Every locale ships the same bundle                                                                                                 |
 | Phase 7 | **178.9 KB**         | The pre-hydration Quick view label (CSS picks it), the motion-ready signal for tests and the scene queue                                                                                                                 |
+| Cleanup | **176.9 KB**         | Without the film: the timecode, bars, cue mark, credits roll, rewind, the pinned strip and KeepAnchor leave the first-load bundle                                                                                        |
 
-The margin is 1.1 KB. **Standing rule (from Gabriel):** if a later phase goes over 180 KB, Motion is replaced by CSS transitions (`@starting-style` for the menu and panels) without asking.
+The margin is 3.1 KB (1.1 KB at the end of phase 7). **Standing rule (from Gabriel):** if a later phase goes over 180 KB, Motion is replaced by CSS transitions (`@starting-style` for the menu and panels) without asking.
 
 A Quick view reader on a return visit downloads the same JS (one bundle) but runs none of the motion code.
 
@@ -140,6 +143,7 @@ A Quick view reader on a return visit downloads the same JS (one bundle) but run
 `pnpm measure:vitals` loads the page on a 390 px phone with Slow 4G (150 ms latency, 1.6 Mbps) and a 4× CPU slowdown, five times with the cold open and five without, in each locale (from phase 6; `LOCALE=es` for one). It prints the median and the range of the runs.
 
 - **Gzip, from phase 4.** `pnpm preview` now gzips text the way GitHub Pages does. Before, the HTML arrived uncompressed and competed with the render-blocking CSS for the throttled bandwidth. When Act II grew the HTML from 64 KB to 177 KB raw, some runs reached 3–4 s although the gzipped page is 27 KB. Numbers before phase 4 (1.33 s and 1.94 s in phase 2, 1.52 s in phase 3) come from that uncompressed setup.
+- **After the cleanup, per locale:** PT 0.62 s, EN 0.62 s, ES 0.62 s; CLS 0.002 or less. There is no cold open to measure with and without any more.
 - **Phase 7, per locale** (without / with the cold open): PT 0.66 / 0.66 s, EN 0.66 / 0.66 s, ES 0.65 / 0.66 s; CLS 0.002 or less. Every run now lands between 0.64 and 0.67 s: the slow runs near 1.07 s were the hero waiting on bandwidth shared with the unused `latin-ext` fonts.
 - **Phase 6, per locale** (without / with the cold open): PT 0.71 / 0.71 s, EN 0.70 / 0.71 s, ES 0.71 / 0.71 s; CLS 0.003 or less everywhere. The Spanish hero first measured **CLS 0.234**: its relocation line set in two lines in the fallback font and one in Newsreader, so the swap moved the whole centred hero. Fixed by capping that line at 30ch on phones and top-aligning the hero there (see STORYBOARD §1).
 - **Phase 5:** LCP 0.69 s (range 0.68–1.10 s), 0.70 s with the cold open; CLS 0.002.
@@ -182,6 +186,29 @@ A Quick view reader on a return visit downloads the same JS (one bundle) but run
 | 7   | Playwright suite, screenshot journey (3 widths × film / reduced / quick, every frame read), Lighthouse CI, performance pass, `DESIGN.md`, README completed with the `TODO(gabriel)` list, **Pages source switch (Gabriel)**, merge and deploy                                                                                                                                                                                                     | The report table from `landing-page-qa`                                      |
 
 Each section is built in all four versions (film, reduced, Quick view, no-JS) in the phase that introduces it, not patched later.
+
+## Without the film (2026-10-28)
+
+Gabriel's direction after phase 7: "Sou desenvolvedor, não diretor." Keep the palette, type, grid, motion quality, performance, tests, Quick view, the three languages and the CV; remove every cinema metaphor. Approved as a plan first, then built on `rebuild/developer` in six commits, each green:
+
+1. **Content:** Campaign BI as a system (RedTrack → n8n → RabbitMQ → NestJS workers and API → PostgreSQL; the Next.js app with Google sign-in → NestJS API), and plain labels: Technical details, Stack, See projects, Sections, Full view. A Quick view fix came first: before hydration, the technical details wrapped 17 px wider, which the new Campaign BI text exposed.
+2. **Furniture out:** cold open, masking bars, timecode, cue mark, grain and vignette; one plain top bar; the hero name rises once on load; the view mode `film` is now `full`.
+3. **Sections:** plain titles on a hairline, a dated timeline with no pin, How I work traced once per drawing, a normal contact section with Back to top. A unit test bans film vocabulary and portfolio clichés in all three languages.
+4. **Projects:** a plain tone-step frame instead of the black mat, the `--house` black removed, and neutral names in the code (TechnicalDetails, ProjectFrame, Picture, lib/images.ts).
+5. **Icon and share images:** the GS monogram from Big Shoulders 800 outlines; share images on the ground, without bars.
+6. **Docs:** this section, STORYBOARD, README and DESIGN.
+
+| Measure (local)                              | Phase 7           | After the cleanup          |
+| -------------------------------------------- | ----------------- | -------------------------- |
+| Initial JS (gzip)                            | 178.9 KB          | **176.9 KB**               |
+| LCP, throttled phone (`pnpm measure:vitals`) | 0.64–0.66 s       | **0.62 s** in every locale |
+| Lighthouse mobile, CPU calibrated            | 98, TBT 97–99 ms  | 98–99, TBT 95–150 ms       |
+| Lighthouse desktop                           | 99                | **100**                    |
+| Lighthouse mobile, simulated (PageSpeed)     | 84–85, LCP 4.28 s | 86–89, LCP 3.76–4.22 s     |
+| Stylesheet (`globals.css`, source lines)     | 1,082             | 660                        |
+| Tests                                        | 44 unit, 112 e2e  | 40 unit, 103 e2e           |
+
+The mobile TBT moved between 87 and 185 ms from run to run on this Mac (load average 3.5–5), as it did before; Accessibility, Best Practices and SEO stay at 100 everywhere.
 
 ## Tests added by the adjustment
 

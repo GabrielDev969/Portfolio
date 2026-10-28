@@ -55,7 +55,7 @@ for (const [locale, todos] of todosByLocale) {
 }
 
 for (const project of en.projects) {
-  if (!project.behindTheScenes.architecture.confirmed) {
+  if (!project.technicalDetails.architecture.confirmed) {
     add(`Project: ${project.title}`, 'confirm the architecture diagram (boxes and arrows)')
   }
 }

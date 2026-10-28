@@ -33,11 +33,20 @@ function wrap(label: string, boxWidth: number) {
   return lines
 }
 
-/** Each node's row: the longest path that reaches it, so every arrow points down. */
+/**
+ * Each node's row: the longest path that reaches it, so every arrow points down. A node that
+ * nothing points to then moves down to the row just above its nearest target, so its arrow
+ * never runs past the boxes in between (Campaign BI's app sits beside RabbitMQ, over NestJS).
+ */
 function layers(nodes: { id: string }[], edges: { from: string; to: string }[]) {
   const depth = new Map(nodes.map((n) => [n.id, 0]))
   for (let pass = 0; pass < nodes.length; pass++) {
     for (const e of edges) depth.set(e.to, Math.max(depth.get(e.to)!, depth.get(e.from)! + 1))
+  }
+  for (const n of nodes) {
+    if (edges.some((e) => e.to === n.id)) continue
+    const targets = edges.filter((e) => e.from === n.id).map((e) => depth.get(e.to)!)
+    if (targets.length > 0) depth.set(n.id, Math.min(...targets) - 1)
   }
   const rows: string[][] = []
   for (const n of nodes) (rows[depth.get(n.id)!] ??= []).push(n.id)

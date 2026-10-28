@@ -10,18 +10,12 @@ import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { mockupCopy, type MockupCopy } from '../src/components/mockups/copy'
 import { getContent } from '../src/content'
-import {
-  isTodo,
-  type CreditBlock,
-  type MockupId,
-  type Prose,
-  type Text,
-} from '../src/content/schema'
+import { isTodo, type Group, type MockupId, type Prose, type Text } from '../src/content/schema'
 import { languageTags, locales, type Locale } from '../src/lib/i18n'
 
 const text = (value: Text) => (isTodo(value) ? `[TODO(gabriel): ${value.todo}]` : value)
 const prose = (value: Prose) => (Array.isArray(value) ? value : [value]).map(text).join(' ')
-const credit = (block: CreditBlock) => `${block.role}: ${block.names.join(', ')}`
+const group = (g: Group) => `${g.label}: ${g.items.join(', ')}`
 
 const mockupKey: Record<MockupId, keyof MockupCopy> = {
   'wave-board': 'wave',
@@ -37,7 +31,7 @@ const words = (value: unknown): string[] =>
 
 export function renderCopy(locale: Locale): string {
   const c = getContent(locale)
-  const { person, ui, chapters } = c
+  const { person, ui, sections } = c
   const out: string[] = []
   const section = (name: string) => out.push('', `== ${name} ==`, '')
   const line = (...values: string[]) => out.push(...values)
@@ -55,23 +49,18 @@ export function renderCopy(locale: Locale): string {
     `Photo alt: ${person.photo.alt}`,
   )
 
-  section('Cold open')
-  line(c.production, `[button] ${ui.skipIntro}`)
-
-  section('Bars')
+  section('Top bar')
   line(
     `[link] ${ui.skipToContent}`,
     person.name,
-    `[menu] ${ui.chapters} (${ui.chaptersNav}): ${[
-      chapters.experience.title,
-      chapters.projects.title,
-      chapters.howIWork.title,
-      chapters.contact.title,
+    `[menu] ${ui.sections} (${ui.sectionsNav}): ${[
+      sections.experience.title,
+      sections.projects.title,
+      sections.howIWork.title,
+      sections.contact.title,
     ].join(' · ')}`,
-    `[button] ${ui.quickView} / ${ui.filmView}`,
+    `[button] ${ui.quickView} / ${ui.fullView}`,
     `[nav] ${ui.languageNav}: PT · EN · ES`,
-    `[timecode label] ${ui.openingTitles}`,
-    person.availability,
   )
 
   section('Hero')
@@ -86,63 +75,65 @@ export function renderCopy(locale: Locale): string {
     `[button] ${ui.contact}`,
     `[button] ${ui.downloadCv}`,
     person.heroLine,
-    `[link] ${ui.watchTrailer}`,
+    `[link] ${ui.seeProjects}`,
   )
 
-  section(`${chapters.experience.act} · ${chapters.experience.title}`)
+  section(sections.experience.title)
   for (const m of c.experience) {
     line(`${m.start}–${m.end === 'present' ? ui.present : m.end} · ${m.title} · ${m.organization}`)
     if (m.summary) line(`  ${m.summary}`)
     if (m.place) line(`  ${m.place}`)
   }
 
-  section(`${chapters.projects.act} · ${chapters.projects.title}`)
+  section(sections.projects.title)
   for (const p of c.projects) {
-    const bts = p.behindTheScenes
+    const td = p.technicalDetails
     line(`-- ${p.title}${p.organization ? ` (${p.organization})` : ''} --`, p.logline)
-    line(p.still.kind === 'image' ? `[still alt] ${p.still.alt}` : `[still] ${p.still.description}`)
-    if (p.still.kind === 'mockup') {
-      const drawn = [...new Set(words(mockupCopy[locale][mockupKey[p.still.mockup]]))]
+    line(p.image.kind === 'image' ? `[image alt] ${p.image.alt}` : `[image] ${p.image.description}`)
+    if (p.image.kind === 'mockup') {
+      const drawn = [...new Set(words(mockupCopy[locale][mockupKey[p.image.mockup]]))]
       line(`[mockup words] ${drawn.join(' · ')}`)
     }
-    line(`${c.credits.castLabel}: ${p.stack.map(text).join(', ')}`)
-    line(`[button] ${ui.behindTheScenes}`)
-    line(`  ${ui.bts.problem}: ${prose(bts.problem)}`)
-    line(`  ${ui.bts.role}: ${prose(bts.role)}`)
-    line(`  ${ui.bts.architecture}:`)
-    const label = new Map(bts.architecture.nodes.map((n) => [n.id, text(n.label)]))
-    for (const e of bts.architecture.edges) {
+    line(`${ui.stack}: ${p.stack.map(text).join(', ')}`)
+    line(`[button] ${ui.technicalDetails}`)
+    line(`  ${ui.details.problem}: ${prose(td.problem)}`)
+    line(`  ${ui.details.role}: ${prose(td.role)}`)
+    line(`  ${ui.details.architecture}:`)
+    const label = new Map(td.architecture.nodes.map((n) => [n.id, text(n.label)]))
+    for (const e of td.architecture.edges) {
       line(`    ${label.get(e.from)} → ${label.get(e.to)}${e.label ? ` (${e.label})` : ''}`)
     }
-    line(`  ${ui.bts.decisions}:`)
-    for (const d of bts.decisions) line(`    - ${text(d.what)}${d.why ? ` ${text(d.why)}` : ''}`)
-    line(`  ${ui.bts.testingAndDeploy}: ${prose(bts.testing)} ${prose(bts.deploy)}`)
-    line(`  ${ui.bts.outcome}: ${prose(bts.outcome)}`)
-    if (isTodo(p.links)) line(`  ${ui.bts.links}: ${text(p.links)}`)
+    line(`  ${ui.details.decisions}:`)
+    for (const d of td.decisions) line(`    - ${text(d.what)}${d.why ? ` ${text(d.why)}` : ''}`)
+    line(`  ${ui.details.testingAndDeploy}: ${prose(td.testing)} ${prose(td.deploy)}`)
+    line(`  ${ui.details.outcome}: ${prose(td.outcome)}`)
+    if (isTodo(p.links)) line(`  ${ui.details.links}: ${text(p.links)}`)
     else if (p.links.kind === 'internal') line(`  ${ui.internalNoLink}`)
     else for (const l of p.links.links) line(`  [link] ${l.label}`)
     line(`  [button] ${ui.close}`, '')
   }
   out.pop()
 
-  section(`${chapters.howIWork.act} · ${chapters.howIWork.title}`)
+  section(sections.howIWork.title)
   c.workflow.steps.forEach((step, i) => line(`${i + 1}. ${step}`))
   line(c.workflow.closing)
 
-  section(chapters.contact.title)
-  line(...c.credits.crew.map(credit), '', c.credits.castLabel)
-  line(...c.credits.cast.map(credit), credit(c.credits.languages), '')
+  section(sections.contact.title)
   line(c.contact.basedIn)
   if (person.relocation) line(`${person.relocation}.`)
+  line(person.availability)
   line(
     `[link] ${c.contact.cta}`,
     c.contact.email,
     c.contact.links.map((l) => l.label).join(' · '),
     `[link] ${c.contact.cv.label}`,
+    '',
+    ui.stack,
+    ...c.skills.stack.map(group),
+    group(c.skills.languages),
+    '',
+    `[link] ${ui.backToTop}`,
   )
-
-  section('Post-credits')
-  line(c.postCredits.line, `[button] ${c.postCredits.rewind}`)
 
   return `${out.join('\n')}\n`
 }

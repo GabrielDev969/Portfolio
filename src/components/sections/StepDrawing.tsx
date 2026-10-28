@@ -1,5 +1,5 @@
-// The six storyboard drawings, one per workflow step, in a 240 × 150 panel. Every stroke has
-// pathLength 1, so the pencil pass can draw any of them with the same dash values.
+// The six workflow drawings, one per step, in a 240 × 150 box. Every stroke has pathLength 1,
+// so StepsDraw can trace any of them with the same dash values.
 const drawings: string[][] = [
   // 1 · I plan: a sheet with a checklist
   [
@@ -64,11 +64,10 @@ const drawings: string[][] = [
   ],
 ]
 
-/** One storyboard panel: its frame, then its drawing, as pencil strokes the scene can draw. */
-export function StoryboardPanel({ index }: { index: number }) {
+/** One step's drawing, as strokes StepsDraw can trace. */
+export function StepDrawing({ index }: { index: number }) {
   return (
-    <svg aria-hidden="true" viewBox="0 0 240 150" className="board-drawing">
-      <path pathLength={1} d="M2 2h236v146h-236z" className="board-frame" />
+    <svg aria-hidden="true" viewBox="0 0 240 150" className="step-drawing">
       {drawings[index]!.map((d) => (
         <path key={d} pathLength={1} d={d} />
       ))}

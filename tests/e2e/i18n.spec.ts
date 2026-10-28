@@ -21,7 +21,7 @@ function englishPhrases() {
 }
 
 for (const locale of locales) {
-  for (const mode of ['film', 'quick'] as const) {
+  for (const mode of ['full', 'quick'] as const) {
     test(`axe finds no serious or critical violations · ${locale} · ${mode}`, async ({
       context,
       page,
@@ -38,7 +38,7 @@ for (const locale of locales) {
   test(`axe passes with a behind-the-scenes drawer open · ${locale}`, async ({ page }) => {
     const { ui } = getContent(locale)
     await page.goto(`${locale}/`)
-    await page.locator('#zibby').getByRole('button', { name: ui.behindTheScenes }).click()
+    await page.locator('#zibby').getByRole('button', { name: ui.technicalDetails }).click()
     await expect(page.getByRole('dialog')).toBeVisible()
     const { violations } = await new AxeBuilder({ page }).include('dialog[open]').analyze()
     const blocking = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical')
@@ -66,7 +66,7 @@ test.describe('the root picks a language', () => {
     test(`from the browser: ${languages[0]} → ${expected}`, async ({ browser }) => {
       const context = await browser.newContext({ locale: languages[0] })
       const page = await context.newPage()
-      await page.goto('http://localhost:4173/Portfolio/')
+      await page.goto('./')
       await expect(page).toHaveURL(new RegExp(`/Portfolio/${expected}/$`))
       await context.close()
     })
@@ -76,7 +76,7 @@ test.describe('the root picks a language', () => {
     const context = await browser.newContext({ locale: 'pt-BR' })
     await context.addInitScript(() => localStorage.setItem('locale', 'es'))
     const page = await context.newPage()
-    await page.goto('http://localhost:4173/Portfolio/#contact')
+    await page.goto('./#contact')
     await expect(page).toHaveURL(/\/Portfolio\/es\/#contact$/)
     await context.close()
   })
@@ -100,7 +100,7 @@ for (const locale of locales) {
     await page.setViewportSize({ width: 360, height: 780 })
     await page.goto(`${locale}/`)
     await settled(page)
-    const wide = await overflowing(page, 'header.bar-top', '.sr-only')
+    const wide = await overflowing(page, 'header.top-bar', '.sr-only')
     expect(wide, `Wider than the screen:\n${wide.join('\n')}`).toEqual([])
   })
 }
@@ -111,25 +111,23 @@ for (const locale of locales) {
       await page.setViewportSize({ width, height: 800 })
       await page.goto(`${locale}/`)
       await settled(page)
-      const wide = await overflowing(
-        page,
-        'main',
-        '.project-still, .strip-track, [aria-hidden="true"]',
-      )
+      const wide = await overflowing(page, 'main', '.project-image, [aria-hidden="true"]')
       expect(wide, `Wider than the screen:\n${wide.join('\n')}`).toEqual([])
     })
   }
 }
 
 for (const locale of locales) {
-  test(`the hero line clears the bars at every hero viewport · ${locale}`, async ({ page }) => {
+  test(`the hero line is on the first screen at every hero viewport · ${locale}`, async ({
+    page,
+  }) => {
     for (const viewport of [...viewports, { width: 768, height: 900 }]) {
       await page.setViewportSize(viewport)
       await page.goto(`${locale}/`)
       await page.evaluate(() => document.fonts.ready)
       const { line, bar } = await page.evaluate(() => ({
         line: document.querySelector('#top > p.font-text')!.getBoundingClientRect().bottom,
-        bar: document.querySelector('.bar-bottom')!.getBoundingClientRect().top,
+        bar: innerHeight,
       }))
       expect(line, `${viewport.width}×${viewport.height}`).toBeLessThanOrEqual(bar)
     }

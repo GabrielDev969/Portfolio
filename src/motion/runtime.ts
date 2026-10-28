@@ -23,9 +23,9 @@ let refreshQueued = false
 
 /**
  * Scenes mount in no particular order, and ScrollTrigger measures triggers in the order they
- * were created: a trigger created before the Act I pin, but placed after it on the page, would
- * miss the pin's length (the HUD named each later section about 850 px early). Once the
- * frame's last scene has mounted, put every trigger in page order and measure them again.
+ * were created: a trigger created before one that adds space above it (a pin, in the first
+ * build) would be measured too early. Once the frame's last scene has mounted, put every
+ * trigger in page order and measure them again.
  * Once no scene is waiting to mount, html[data-motion="ready"] says every scene is in place
  * (tests wait for it).
  */
