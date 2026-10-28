@@ -1,8 +1,9 @@
 /**
  * pnpm journey — scrolls the page with the mouse wheel at 390, 768 and 1440 px, with and without
  * reduced motion, and saves a frame every 0.6 screens to qa/journey/. SECTION=<id> limits it to
- * one section (from just above it to its end); LOCALE=pt|es picks the language and saves to
- * qa/journey-<locale>/. Needs `pnpm build && pnpm preview`.
+ * one section (from just above it to its end); LOCALE=pt|es picks the language and VIEW=quick
+ * the Quick view (one motion pass, since it has no motion), saving to qa/journey[-<locale>][-quick]/.
+ * Needs `pnpm build && pnpm preview`.
  * Every frame is meant to be looked at (landing-page-qa).
  */
 import { mkdirSync, rmSync } from 'node:fs'
@@ -12,7 +13,13 @@ import { chromium } from '@playwright/test'
 const locale = process.env.LOCALE ?? 'en'
 const base = process.env.BASE_URL ?? `http://localhost:4173/Portfolio/${locale}/`
 const section = process.env.SECTION
-const out = join(import.meta.dirname, '..', 'qa', locale === 'en' ? 'journey' : `journey-${locale}`)
+const quick = process.env.VIEW === 'quick'
+const out = join(
+  import.meta.dirname,
+  '..',
+  'qa',
+  ['journey', locale === 'en' ? '' : locale, quick ? 'quick' : ''].filter(Boolean).join('-'),
+)
 rmSync(out, { recursive: true, force: true })
 mkdirSync(out, { recursive: true })
 
@@ -20,12 +27,15 @@ const browser = await chromium.launch()
 let frames = 0
 
 for (const width of [390, 768, 1440]) {
-  for (const motion of ['no-preference', 'reduce'] as const) {
+  for (const motion of quick
+    ? (['no-preference'] as const)
+    : (['no-preference', 'reduce'] as const)) {
     const context = await browser.newContext({
       viewport: { width, height: width < 768 ? 844 : 900 },
       reducedMotion: motion,
     })
     await context.addInitScript(() => sessionStorage.setItem('introSeen', '1'))
+    if (quick) await context.addInitScript(() => localStorage.setItem('viewMode', 'quick'))
     const page = await context.newPage()
     await page.goto(base, { waitUntil: 'networkidle' })
     await page.evaluate(() => document.fonts.ready)
