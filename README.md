@@ -96,14 +96,13 @@ Everything below is a `todo()` in the content or a missing file. None of it show
 
 <!-- todos:start -->
 
-21 open items.
+19 open items.
 
 - **Project: Zibby**
   - a public link for Zibby, if there is one
   - the problem this project solved
   - why a modular monolith in one monorepo
   - why PostgreSQL and Prisma
-  - why Stripe and Zendrop
   - one number, if you want it: orders, products or uptime
 - **Project: Hostly**
   - the rest of the Hostly stack
@@ -112,7 +111,6 @@ Everything below is a `todo()` in the content or a missing file. None of it show
   - why this split
   - what that changed in the design today
   - how it is tested
-  - the outcome, ideally with a number
 - **Project: BookOwl**
   - the problem this project solved
   - what you owned in this project

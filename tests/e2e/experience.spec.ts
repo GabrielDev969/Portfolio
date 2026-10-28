@@ -54,7 +54,7 @@ test('Quick view lists one entry per line, with its years', async ({ browser }) 
     '2021–2025',
     '2021–2025',
     '2025–present',
-    '2026–present',
+    '2025–present',
     '2026–2027',
   ])
   await context.close()

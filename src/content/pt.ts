@@ -29,7 +29,7 @@ const experience: Record<string, Partial<Milestone>> = {
   'ia-robots': {
     title: 'Consultor e Desenvolvedor de Software (contrato)',
     summary:
-      'Configuração e operação de robôs de atendimento OrionStar, e desenvolvimento do Hostly.',
+      'Configuração e operação de robôs de atendimento OrionStar, e desenvolvimento do Hostly, que transmite anúncios nos robôs e em telões.',
   },
   unipds: { title: 'Pós-graduação em Engenharia de Software com IA Aplicada' },
 }
@@ -182,7 +182,7 @@ export const pt: SiteContent = {
     {
       ...zibby,
       logline:
-        'Minha própria plataforma de e-commerce multiloja, lançada em outubro de 2026: vitrine, painel administrativo, pagamentos com Stripe e fulfillment pela Zendrop.',
+        'Minha própria plataforma de e-commerce multiloja, lançada em outubro de 2026: vitrine, painel administrativo, pagamentos com Stripe e fulfillment pela Zendrop. Cada integração é um provider, então cada loja pode ser criada e personalizada com as APIs de que precisa.',
       image: {
         kind: 'mockup',
         mockup: 'zibby-store',
@@ -201,8 +201,8 @@ export const pt: SiteContent = {
             { id: 'admin', label: 'Painel administrativo (Next.js)', kind: 'client' },
             { id: 'api', label: 'API (NestJS, monólito modular)', kind: 'service' },
             { id: 'db', label: 'PostgreSQL (Prisma)', kind: 'data' },
-            { id: 'stripe', label: 'Stripe (pagamentos)', kind: 'external' },
-            { id: 'zendrop', label: 'Zendrop (fulfillment)', kind: 'external' },
+            { id: 'stripe', label: 'Stripe (provider de pagamentos)', kind: 'external' },
+            { id: 'zendrop', label: 'Zendrop (provider de fulfillment)', kind: 'external' },
           ],
         },
         decisions: [
@@ -212,13 +212,13 @@ export const pt: SiteContent = {
           },
           { what: 'PostgreSQL com Prisma.', why: todo('why PostgreSQL and Prisma') },
           {
-            what: 'Stripe para pagamentos e Zendrop para fulfillment.',
-            why: todo('why Stripe and Zendrop'),
+            what: 'Cada integração é um provider: Stripe para pagamentos e Zendrop para fulfillment são os primeiros, e outras APIs se conectam do mesmo jeito.',
+            why: 'Para que cada loja possa ser criada e personalizada como precisar, com os serviços que escolher.',
           },
         ],
         testing:
           'Testes automatizados em todo o monorepo; cada fase passou por eles antes da revisão do diff.',
-        deploy: 'Deploy em uma VPS.',
+        deploy: 'Deploy em uma VPS, com criptografia e backups de emergência.',
         outcome: [
           'Lançada em outubro de 2026.',
           todo('one number, if you want it: orders, products or uptime'),
@@ -228,7 +228,7 @@ export const pt: SiteContent = {
     {
       ...hostly,
       logline:
-        'Um sistema para robôs de atendimento OrionStar: um painel administrativo que agenda campanhas de anúncios e músicas, um backend em uma VPS e um app no RobotOS que reproduz tudo e conversa com as pessoas.',
+        'Um sistema para robôs de atendimento OrionStar e telões cadastrados: um painel administrativo que agenda campanhas de anúncios e músicas, um backend em uma VPS e um app no RobotOS que reproduz tudo e conversa com as pessoas. Os anúncios são transmitidos no robô e nos telões, inclusive em eventos.',
       image: {
         kind: 'mockup',
         mockup: 'hostly-schedule',
@@ -245,11 +245,13 @@ export const pt: SiteContent = {
             { id: 'app', label: 'App do robô', kind: 'client' },
             { id: 'backend', label: 'Backend (VPS)', kind: 'service' },
             { id: 'robot', label: 'RobotOS no OrionStar LuckiBot Plus', kind: 'device' },
+            { id: 'screen', label: 'Telão cadastrado', kind: 'device' },
           ],
           edges: [
             { from: 'admin', to: 'backend', label: 'campanhas, músicas' },
             { from: 'app', to: 'backend' },
             { from: 'app', to: 'robot', label: 'camada de abstração' },
+            { from: 'backend', to: 'screen', label: 'anúncios' },
           ],
         },
         decisions: [
@@ -267,7 +269,8 @@ export const pt: SiteContent = {
         ],
         testing: missing.testing(),
         deploy: 'O backend fica hospedado em uma VPS.',
-        outcome: missing.outcome(),
+        outcome:
+          'Em uso: conecta ao robô e aos telões cadastrados e transmite anúncios nos dois, inclusive em eventos.',
       },
     },
     {

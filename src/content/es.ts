@@ -29,7 +29,8 @@ const experience: Record<string, Partial<Milestone>> = {
   },
   'ia-robots': {
     title: 'Consultor y Desarrollador de Software (contrato)',
-    summary: 'Configuración y operación de robots de servicio OrionStar, y desarrollo de Hostly.',
+    summary:
+      'Configuración y operación de robots de servicio OrionStar, y desarrollo de Hostly, que transmite anuncios en los robots y en pantallas gigantes.',
   },
   unipds: { title: 'Posgrado en Ingeniería de Software con IA Aplicada' },
 }
@@ -183,7 +184,7 @@ export const es: SiteContent = {
     {
       ...zibby,
       logline:
-        'Mi propia plataforma de e-commerce multitienda, lanzada en octubre de 2026: tienda online, panel de administración, pagos con Stripe y fulfillment con Zendrop.',
+        'Mi propia plataforma de e-commerce multitienda, lanzada en octubre de 2026: tienda online, panel de administración, pagos con Stripe y fulfillment con Zendrop. Cada integración es un provider, así que cada tienda puede crearse y personalizarse con las APIs que necesite.',
       image: {
         kind: 'mockup',
         mockup: 'zibby-store',
@@ -202,8 +203,8 @@ export const es: SiteContent = {
             { id: 'admin', label: 'Panel de administración (Next.js)', kind: 'client' },
             { id: 'api', label: 'API (NestJS, monolito modular)', kind: 'service' },
             { id: 'db', label: 'PostgreSQL (Prisma)', kind: 'data' },
-            { id: 'stripe', label: 'Stripe (pagos)', kind: 'external' },
-            { id: 'zendrop', label: 'Zendrop (fulfillment)', kind: 'external' },
+            { id: 'stripe', label: 'Stripe (provider de pagos)', kind: 'external' },
+            { id: 'zendrop', label: 'Zendrop (provider de fulfillment)', kind: 'external' },
           ],
         },
         decisions: [
@@ -213,13 +214,13 @@ export const es: SiteContent = {
           },
           { what: 'PostgreSQL con Prisma.', why: todo('why PostgreSQL and Prisma') },
           {
-            what: 'Stripe para pagos y Zendrop para fulfillment.',
-            why: todo('why Stripe and Zendrop'),
+            what: 'Cada integración es un provider: Stripe para pagos y Zendrop para fulfillment son los primeros, y otras APIs se conectan de la misma forma.',
+            why: 'Para que cada tienda pueda crearse y personalizarse como necesite, con los servicios que elija.',
           },
         ],
         testing:
           'Pruebas automatizadas en todo el monorepo; cada fase las pasó antes de la revisión del diff.',
-        deploy: 'Desplegado en un VPS.',
+        deploy: 'Desplegado en un VPS, con cifrado y copias de seguridad de emergencia.',
         outcome: [
           'Lanzada en octubre de 2026.',
           todo('one number, if you want it: orders, products or uptime'),
@@ -229,7 +230,7 @@ export const es: SiteContent = {
     {
       ...hostly,
       logline:
-        'Un sistema para robots de servicio OrionStar: un panel de administración que programa campañas publicitarias y música, un backend en un VPS y una app en RobotOS que las reproduce y conversa con las personas.',
+        'Un sistema para robots de servicio OrionStar y pantallas gigantes registradas: un panel de administración que programa campañas publicitarias y música, un backend en un VPS y una app en RobotOS que las reproduce y conversa con las personas. Los anuncios se transmiten en el robot y en las pantallas, también en eventos.',
       image: {
         kind: 'mockup',
         mockup: 'hostly-schedule',
@@ -246,11 +247,13 @@ export const es: SiteContent = {
             { id: 'app', label: 'App del robot', kind: 'client' },
             { id: 'backend', label: 'Backend (VPS)', kind: 'service' },
             { id: 'robot', label: 'RobotOS en OrionStar LuckiBot Plus', kind: 'device' },
+            { id: 'screen', label: 'Pantalla gigante registrada', kind: 'device' },
           ],
           edges: [
             { from: 'admin', to: 'backend', label: 'campañas, música' },
             { from: 'app', to: 'backend' },
             { from: 'app', to: 'robot', label: 'capa de abstracción' },
+            { from: 'backend', to: 'screen', label: 'anuncios' },
           ],
         },
         decisions: [
@@ -268,7 +271,8 @@ export const es: SiteContent = {
         ],
         testing: missing.testing(),
         deploy: 'El backend está alojado en un VPS.',
-        outcome: missing.outcome(),
+        outcome:
+          'En uso: se conecta al robot y a las pantallas gigantes registradas y transmite anuncios en ambos, también en eventos.',
       },
     },
     {
