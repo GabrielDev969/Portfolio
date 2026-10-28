@@ -24,7 +24,7 @@ const experience: Record<string, Partial<Milestone>> = {
     title: 'Desenvolvedor Full Stack',
     place: 'Remoto',
     summary:
-      'Desenhei e construí o Campaign BI do começo ao fim, e atuo em todo o Sistema Wave, a plataforma interna que cerca de 100 pessoas usam para publicar mais de 1.000 campanhas por dia.',
+      'Desenhei e construí o Campaign BI do começo ao fim, e atuo em todo o Sistema Wave, a plataforma interna que cerca de 100 pessoas usam para publicar mais de 500 campanhas por dia.',
   },
   'ia-robots': {
     title: 'Consultor e Desenvolvedor de Software (contrato)',
@@ -130,7 +130,7 @@ export const pt: SiteContent = {
         deploy:
           'O Jenkins roda os testes e as validações, e uma mudança só é aprovada se passar por eles. Ela vai primeiro para o ambiente de develop, onde testamos, e quando tudo está aprovado o tech lead faz o deploy.',
         outcome:
-          'Mais de 1.000 campanhas publicadas por dia pela API da Meta, por cerca de 100 pessoas dentro da empresa.',
+          'Mais de 500 campanhas publicadas por dia pela API da Meta, por cerca de 100 pessoas dentro da empresa.',
       },
     },
     {

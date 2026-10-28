@@ -34,7 +34,7 @@ Do banco de dados à tela.
   Salvador
 2021–2025 · Bacharelado em Ciência da Computação · UNIFACS
 2025–atual · Desenvolvedor Full Stack · Group Wave Enterprise
-  Desenhei e construí o Campaign BI do começo ao fim, e atuo em todo o Sistema Wave, a plataforma interna que cerca de 100 pessoas usam para publicar mais de 1.000 campanhas por dia.
+  Desenhei e construí o Campaign BI do começo ao fim, e atuo em todo o Sistema Wave, a plataforma interna que cerca de 100 pessoas usam para publicar mais de 500 campanhas por dia.
   Remoto
 2026–atual · Consultor e Desenvolvedor de Software (contrato) · IA Robots Solutions
   Configuração e operação de robôs de atendimento OrionStar, e desenvolvimento do Hostly.
@@ -58,7 +58,7 @@ Stack: Next.js, React, NestJS, TypeScript, PostgreSQL, Meta API, Prometheus, Gra
     - As campanhas sobem pela API da Meta, várias de uma vez. Antes, cada campanha era montada à mão em cada plataforma de anúncios.
     - Prometheus, Grafana e logs acompanham o sistema, e alertas vão para o Telegram em caso de erro ou quando uma rota está sobrecarregada. Para saber como o sistema está a qualquer momento, e ficar sabendo de erros e rotas sobrecarregadas assim que acontecem.
   Testes e deploy: Testes de segurança que simulam ataques reais, e testes de estresse que procuram erros e falhas que poderiam abrir uma brecha de segurança. O Jenkins roda os testes e as validações, e uma mudança só é aprovada se passar por eles. Ela vai primeiro para o ambiente de develop, onde testamos, e quando tudo está aprovado o tech lead faz o deploy.
-  Resultado: Mais de 1.000 campanhas publicadas por dia pela API da Meta, por cerca de 100 pessoas dentro da empresa.
+  Resultado: Mais de 500 campanhas publicadas por dia pela API da Meta, por cerca de 100 pessoas dentro da empresa.
   Sistema interno, sem link público
   [button] Fechar
 

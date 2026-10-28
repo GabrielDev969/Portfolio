@@ -83,7 +83,7 @@ export const en: SiteContent = {
       organization: 'Group Wave Enterprise',
       place: 'Remote',
       summary:
-        'Designed and built Campaign BI end to end, and work across Sistema Wave, the internal platform about 100 people use to publish more than 1,000 campaigns a day.',
+        'Designed and built Campaign BI end to end, and work across Sistema Wave, the internal platform about 100 people use to publish more than 500 campaigns a day.',
     },
     {
       id: 'ia-robots',
@@ -160,7 +160,7 @@ export const en: SiteContent = {
         deploy:
           'Jenkins runs the tests and validations, and a change has to pass them to be approved. It goes to the develop environment first, where we test it, and once everything is approved the tech lead deploys it.',
         outcome:
-          'More than 1,000 campaigns published every day through the Meta API, by about 100 people inside the company.',
+          'More than 500 campaigns published every day through the Meta API, by about 100 people inside the company.',
       },
     },
     {

@@ -34,7 +34,7 @@ From the database to the screen.
   Salvador
 2021–2025 · B.Sc. in Computer Science · UNIFACS
 2025–present · Full Stack Developer · Group Wave Enterprise
-  Designed and built Campaign BI end to end, and work across Sistema Wave, the internal platform about 100 people use to publish more than 1,000 campaigns a day.
+  Designed and built Campaign BI end to end, and work across Sistema Wave, the internal platform about 100 people use to publish more than 500 campaigns a day.
   Remote
 2026–present · Consultant & Software Developer (contract) · IA Robots Solutions
   Robot setup and operation for OrionStar service robots, and Hostly development.
@@ -58,7 +58,7 @@ Stack: Next.js, React, NestJS, TypeScript, PostgreSQL, Meta API, Prometheus, Gra
     - Campaigns publish through the Meta API, many at once. Before, every campaign was set up by hand on each ad platform.
     - Prometheus, Grafana and logs watch the system, and alerts go to Telegram on errors or when a route is under heavy load. To know how the system is doing at any moment, and to hear about errors and overloaded routes as soon as they happen.
   Testing and deploy: Security tests that simulate real attacks, and stress tests that look for errors and failures that could open a security hole. Jenkins runs the tests and validations, and a change has to pass them to be approved. It goes to the develop environment first, where we test it, and once everything is approved the tech lead deploys it.
-  Outcome: More than 1,000 campaigns published every day through the Meta API, by about 100 people inside the company.
+  Outcome: More than 500 campaigns published every day through the Meta API, by about 100 people inside the company.
   Internal system, no public link
   [button] Close
 
