@@ -1,56 +1,54 @@
 # Design
 
-Gabriel Santos' portfolio is a short film you watch by scrolling: a cold open, a title sequence, three acts and the end credits. This page is the summary. The decisions themselves, with their reasons, live in [`design/`](design/):
+Gabriel Santos' portfolio: one bright page, in Portuguese, English and Spanish, that says who he is, what he builds and how to reach him, with the craft in the details. This page is the summary. The decisions themselves, with their reasons, live in [`design/`](design/):
 
-- [`COMMIT-SHEET.md`](design/COMMIT-SHEET.md): concept, color, type, grid, motion budget, and every banned device that survives with its reason
-- [`STORYBOARD.md`](design/STORYBOARD.md): one sheet per section, in film, reduced motion, Quick view and without JS
+- [`COMMIT-SHEET.md`](design/COMMIT-SHEET.md): concept, color, type, grid, motion budget, the words the copy does not use, and every banned device that survives with its reason
+- [`STORYBOARD.md`](design/STORYBOARD.md): one sheet per section, with motion, reduced motion, Quick view and without JS
 - [`PLAN.md`](design/PLAN.md): the phases, pinned versions, the JS budget and every measurement
 
 ## Rule zero
 
-**It is a developer's portfolio first. The film is the frame, never an obstacle.** When a cinema device competes with finding a fact (who, what stack, where, how to reach him), the fact wins.
+**It is a developer's portfolio. "Cinematic" meant production quality, not a film metaphor.** The first rebuild framed the page as a film (a cold open, masking bars, a timecode, acts, a film strip, end credits); on 2026-10-28 Gabriel kept its craft and dropped the metaphor. When an effect competes with finding a fact (who, what stack, where, how to reach him), the fact wins.
 
-- **The 5-second test:** the first screen, at every width and without scrolling, shows the name, the role, the core stack, "Remote" and the Download CV and Contact buttons. A Playwright test checks five viewports before, during and after the peak, and the tightest two in Portuguese and Spanish.
-- **Scroll is never hijacked:** Lenis only smooths the wheel, touch is native, and the page's only pin (Act I) costs at most one screen height.
-- **Quick view** turns the film off: one readable column, every motion off, the same content.
+- **The 5-second test:** the first screen, at every width and without scrolling, shows the name, the role, the core stack, "Remote" and the Download CV and Contact buttons. A Playwright test checks five viewports, and the tightest two in Portuguese and Spanish.
+- **Nothing is pinned and scroll is never hijacked:** Lenis only smooths the wheel, touch is native.
+- **Quick view** turns the motion off: one readable column, the same content.
 
-## The concept
+## The page
 
-The page is the lit screen inside a dark auditorium. Darkness is used only where a cinema is dark: the masking bars, the cold open and the end credits. Everything you read is projected light.
-
-| Scene                 | What it does                                                                                                                                                                                                      |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Cold open             | Black, a lamp, "A Gabriel Santos production", a hard cut at 1.5 s. First visit only; Skip and Esc end it, and it never plays on a deep link, with reduced motion or in Quick view                                 |
-| Title sequence        | The peak: on the first scroll the masking bars part and the name grows upward into the space they gave up. The facts and buttons never move                                                                       |
-| Act I · Experience    | The timeline as a 35 mm film strip, pinned and scrolled sideways on wide screens, a vertical strip elsewhere                                                                                                      |
-| Act II · Projects     | Five projects, each a still that bleeds off the left edge with its stack set as a cast list. Behind the scenes opens a drawer with six parts: problem, role, architecture, decisions, testing and deploy, outcome |
-| Act III · How I work  | A storyboard sheet: six panels pencilled in as you scroll, then "AI speeds things up. The judgment is mine."                                                                                                      |
-| End credits · Contact | The screen fades to black, the bars close, and the credits run: crew, cast (the stack by area), languages, then "Write to me"                                                                                     |
-| Post-credits          | "Gabriel Santos will return in your next project." and Rewind, which scrolls back while the timecode counts down                                                                                                  |
-
-The cinema devices do interface work: the HUD (sections, Quick view, language, timecode) lives inside the masking bars so it never covers content, the velvet cue mark announces each chapter, and the credits are the contact section.
+| Section    | What it shows                                                                                                                                                                                                                                                            |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Top bar    | Name (the "GS" monogram on phones), Sections, Quick view and PT / EN / ES. Always visible, on the page's own ground                                                                                                                                                      |
+| Hero       | Name, role, core stack, location and "Remote", Contact and Download CV, the line "From the database to the screen." and a "See projects" link. Only the name animates, once, on load                                                                                     |
+| Experience | A clean dated timeline: five entries side by side on wide screens, a vertical list on phones. No pin, no sideways scroll                                                                                                                                                 |
+| Projects   | Five projects: an image that bleeds off the left edge (a screenshot, or a mockup with fictional data for internal systems), the stack beside it, and **Technical details**, a drawer with six parts: problem, role, architecture, decisions, testing and deploy, outcome |
+| How I work | Six steps, each with a small line drawing traced as it enters, then "AI speeds things up. The judgment is mine."                                                                                                                                                         |
+| Contact    | Where he is based, availability, "Write to me" with the e-mail, profile links, Download CV, the stack by area and his languages, then a small "Back to top"                                                                                                              |
 
 ## System
 
-- **Color:** a cool silver screen (`oklch(0.94 0.006 240)`), blue-black ink, one velvet red for the contact action and the cue mark, and true black for masking. Every text pairing is AA or better, checked by a unit test.
-- **Type:** Big Shoulders (a tall condensed poster grotesque) for display, Newsreader (a reading serif with optical sizes and real italics) for text. Three sizes do the visible work: title, scene and text. No mono face: the timecode is set in the display face, digit by digit.
-- **Grid:** a 12-column grid with one deliberate break, the Act II stills bleeding off the left edge with the cast panel overlapping them by one column.
-- **Motion:** three scroll families, each fitted to what it reveals: **mask rise** (one-shot reveals), **reel** (linear 1:1 scroll: the film strip, the pencil, the credits, the timecode) and **push-in** (scrubbed depth on the projects, without pinning). No section fades up.
+- **Color:** a cool silver ground (`oklch(0.94 0.006 240)`), blue-black ink, one tone step for panels and frames, and one velvet red for the contact action only. The ground never goes dark. Every text pairing is AA or better, checked by a unit test.
+- **Type:** Big Shoulders (a tall condensed grotesque) for display, Newsreader (a reading serif with optical sizes and real italics) for text. Three sizes do the visible work: title (the name), heading (section and project titles) and text. No mono face, no all-caps labels.
+- **Grid:** a 12-column grid with one deliberate break, the project images bleeding off the left edge with the stack panel overlapping them by one column.
+- **Motion:** three families, each fitted to what it reveals: **mask rise** (the name on load, section titles, project loglines), **draw** (the workflow drawings, traced once) and **push-in** (scrubbed depth on the projects, without pinning). No grain, no vignette, no section fades up.
+- **Words:** no film vocabulary in any language (production, act, scene, cast, credits, reel, trailer, still, cinema…) and no portfolio clichés; a unit test fails on either.
 
 ## Every section in four versions
 
-Each section is built for film mode, reduced motion, Quick view and no JavaScript, in the phase that introduced it:
+Each section is built for motion, reduced motion, Quick view and no JavaScript:
 
-- **Reduced motion:** the same layout, with opacity and color in place of movement.
-- **Quick view:** set by a head script before first paint, so it never flashes the film; it reverts every scene and stops Lenis, and looks the same before hydration as after.
-- **No JS:** all content is server-rendered and readable; behind the scenes opens in a native `<details>`.
-- **Print:** paper always gets Quick view, even when printed mid-film.
+- **Reduced motion:** the same layout, with opacity in place of movement.
+- **Quick view:** set by a head script before first paint, so it never flashes the motion; it reverts every scene and stops Lenis, and looks the same before hydration as after.
+- **No JS:** all content is server-rendered and readable; technical details open in a native `<details>`.
+- **Print:** paper always gets Quick view.
 
 ## Languages
 
 Portuguese (pt-BR), English and Spanish, prerendered at `/Portfolio/{pt,en,es}/`. The root picks the language (the saved choice, then the browser's) and keeps the hash. Titles fit their longest word in every language, the mockups are drawn in the page's language, and the Santiago relocation line exists only in Spanish.
 
 ## Budgets
+
+The "Now" column holds the numbers measured before this cleanup; it is updated when the cleanup is measured.
 
 |                                              | Budget                 | Now                         |
 | -------------------------------------------- | ---------------------- | --------------------------- |
@@ -60,10 +58,8 @@ Portuguese (pt-BR), English and Spanish, prerendered at `/Portfolio/{pt,en,es}/`
 | Lighthouse mobile, CPU calibrated            | Perf ≥ 90, others ≥ 95 | 98 / 100 / 100 / 100        |
 | Lighthouse desktop                           | Perf ≥ 90, others ≥ 95 | 99 / 100 / 100 / 100        |
 
-On GitHub's shared runners the same build scores 88–89 on mobile Performance, so CI raises that score as a warning instead of failing; mobile LCP, CLS and the other categories still fail it.
-
-Lighthouse's simulated mobile run (what PageSpeed Insights shows) scores 84–85 with an estimated LCP of 4.3 s: its model charges the three preloaded fonts to the hero line, which actually paints at once in the fallback font. It is reported in every CI run, next to the gated numbers ([`lighthouse/README.md`](lighthouse/README.md)).
+On GitHub's shared runners the same build scores lower on mobile Performance, so CI raises that score as a warning instead of failing; mobile LCP, CLS and the other categories still fail it ([`lighthouse/README.md`](lighthouse/README.md)). Lighthouse's simulated mobile run (what PageSpeed Insights shows) is reported alongside.
 
 ## Honest content
 
-Nothing about Gabriel is invented. A fact he has not given yet is a `todo()` in `src/content/`: a marked placeholder in development, left out of the published site with its label, and listed by `pnpm todos` and in the README. The internal systems (Sistema Wave, Campaign BI, Hostly) show their architecture and fictional stills only, never real screens, names or numbers.
+Nothing about Gabriel is invented. A fact he has not given yet is a `todo()` in `src/content/`: a marked placeholder in development, left out of the published site with its label, and listed by `pnpm todos` and in the README. The internal systems (Sistema Wave, Campaign BI, Hostly) show their architecture and fictional mockups only, never real screens, names or numbers.
