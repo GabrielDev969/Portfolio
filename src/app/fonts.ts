@@ -1,8 +1,11 @@
 import { Big_Shoulders, Newsreader } from 'next/font/google'
 
+// Latin only: every letter of PT, EN and ES is in it (tests/unit/fonts.test.ts checks the
+// content). latin-ext was preloaded too, about 280 KB the page never used.
+
 // Display: a tall condensed grotesque with a poster's stance (design/COMMIT-SHEET.md §3).
 export const display = Big_Shoulders({
-  subsets: ['latin', 'latin-ext'],
+  subsets: ['latin'],
   axes: ['opsz'],
   display: 'swap',
   variable: '--font-big-shoulders',
@@ -13,7 +16,7 @@ export const display = Big_Shoulders({
 
 // Text: a reading serif with optical sizes and real italics.
 export const text = Newsreader({
-  subsets: ['latin', 'latin-ext'],
+  subsets: ['latin'],
   style: ['normal', 'italic'],
   axes: ['opsz'],
   display: 'swap',
