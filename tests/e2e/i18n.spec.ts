@@ -66,7 +66,7 @@ test.describe('the root picks a language', () => {
     test(`from the browser: ${languages[0]} → ${expected}`, async ({ browser }) => {
       const context = await browser.newContext({ locale: languages[0] })
       const page = await context.newPage()
-      await page.goto('http://localhost:4173/Portfolio/')
+      await page.goto('./')
       await expect(page).toHaveURL(new RegExp(`/Portfolio/${expected}/$`))
       await context.close()
     })
@@ -76,7 +76,7 @@ test.describe('the root picks a language', () => {
     const context = await browser.newContext({ locale: 'pt-BR' })
     await context.addInitScript(() => localStorage.setItem('locale', 'es'))
     const page = await context.newPage()
-    await page.goto('http://localhost:4173/Portfolio/#contact')
+    await page.goto('./#contact')
     await expect(page).toHaveURL(/\/Portfolio\/es\/#contact$/)
     await context.close()
   })
