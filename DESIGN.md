@@ -48,17 +48,15 @@ Portuguese (pt-BR), English and Spanish, prerendered at `/Portfolio/{pt,en,es}/`
 
 ## Budgets
 
-The "Now" column holds the numbers measured before this cleanup; it is updated when the cleanup is measured.
+|                                              | Budget                 | Now                     |
+| -------------------------------------------- | ---------------------- | ----------------------- |
+| Initial JS (gzip)                            | 180 KB                 | 176.9 KB                |
+| LCP, throttled phone (`pnpm measure:vitals`) | 2.5 s                  | 0.62 s in every locale  |
+| CLS                                          | 0.1                    | 0.002 or less           |
+| Lighthouse mobile, CPU calibrated            | Perf ≥ 90, others ≥ 95 | 98–99 / 100 / 100 / 100 |
+| Lighthouse desktop                           | Perf ≥ 90, others ≥ 95 | 100 / 100 / 100 / 100   |
 
-|                                              | Budget                 | Now                         |
-| -------------------------------------------- | ---------------------- | --------------------------- |
-| Initial JS (gzip)                            | 180 KB                 | 178.9 KB                    |
-| LCP, throttled phone (`pnpm measure:vitals`) | 2.5 s                  | 0.64–0.66 s in every locale |
-| CLS                                          | 0.1                    | 0.002 or less               |
-| Lighthouse mobile, CPU calibrated            | Perf ≥ 90, others ≥ 95 | 98 / 100 / 100 / 100        |
-| Lighthouse desktop                           | Perf ≥ 90, others ≥ 95 | 99 / 100 / 100 / 100        |
-
-On GitHub's shared runners the same build scores lower on mobile Performance, so CI raises that score as a warning instead of failing; mobile LCP, CLS and the other categories still fail it ([`lighthouse/README.md`](lighthouse/README.md)). Lighthouse's simulated mobile run (what PageSpeed Insights shows) is reported alongside.
+On GitHub's shared runners the same build scores lower on mobile Performance, so CI raises that score as a warning instead of failing; mobile LCP, CLS and the other categories still fail it ([`lighthouse/README.md`](lighthouse/README.md)). Lighthouse's simulated mobile run (what PageSpeed Insights shows) scores 86–89 and is reported alongside.
 
 ## Honest content
 
