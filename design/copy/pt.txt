@@ -30,10 +30,11 @@ Do banco de dados à tela.
 == Experiência ==
 
 2021–2025 · Analista de Sistemas · Fator Sistemas & Consultorias
-  Desenvolvi e mantive sistemas com JavaScript, TypeScript, Node.js, Angular, SQL e Firebird.
+  Desenvolvi e mantive backends em Node.js e frontends em Angular, com JavaScript e TypeScript. Escrevi e otimizei as consultas SQL dos relatórios, ajustei bancos Firebird e migrei dados de PostgreSQL, MySQL e outros bancos para o Firebird.
   Salvador
 2021–2025 · Bacharelado em Ciência da Computação · UNIFACS
 2025–atual · Desenvolvedor Full Stack · Group Wave Enterprise
+  Desenhei e construí o Campaign BI do começo ao fim, e atuo em todo o Sistema Wave, a plataforma interna que cerca de 100 pessoas usam para publicar mais de 500 campanhas por dia.
   Remoto
 2026–atual · Consultor e Desenvolvedor de Software (contrato) · IA Robots Solutions
   Configuração e operação de robôs de atendimento OrionStar, e desenvolvimento do Hostly.
@@ -42,32 +43,33 @@ Do banco de dados à tela.
 == Projetos ==
 
 -- Sistema Wave (Group Wave Enterprise) --
-Uma plataforma interna para publicar campanhas, gerenciar solicitações entre equipes (no estilo do ClickUp), gerar relatórios e acompanhar resultados em um dashboard.
+Uma plataforma interna usada por cerca de 100 pessoas para publicar campanhas na Meta em massa, editar e melhorar criativos com IA, gerar copies, gerenciar solicitações entre equipes (no estilo do ClickUp) e acompanhar dados de campanhas, financeiro e saúde da empresa em dashboards.
 [image] Um quadro de solicitações estilizado, com equipes e tarefas fictícias, no lugar do sistema interno.
 [mockup words] Campanhas · Solicitações · Relatórios · Dashboard · Todas as equipes · Esta semana · Nova solicitação · Solicitadas · Em andamento · Em revisão · Concluídas · Criação · Dados · Redação · Mídia · Seg · Ter · Qua · Qui · Sex · Hoje · Feito · Banners, 6 tamanhos · Auditoria de UTMs · Sequência de 3 e-mails · Corte de vídeo, 15 s · Título da landing page · Oferta, versão mobile · Relatório semanal · Pixel no novo domínio · Carrossel, 5 cards · Anúncios, 2ª rodada
-Stack: Next.js, React, NestJS, TypeScript, PostgreSQL
+Stack: Next.js, React, NestJS, TypeScript, PostgreSQL, Meta API, Prometheus, Grafana, Jenkins
 [button] Detalhes técnicos
-  O problema: [TODO(gabriel): the problem this project solved]
-  Meu papel: [TODO(gabriel): what you owned in this project]
+  O problema: Antes da plataforma, cada campanha era montada à mão no NewsBreak, no Meta Ads e no Taboola.
+  Meu papel: O time divide o trabalho por áreas, e eu atuo em todas elas, para que cada parte se encaixe no sistema inteiro.
   Arquitetura:
     App web (Next.js, React) → API (NestJS)
     API (NestJS) → PostgreSQL
+    API (NestJS) → API da Meta
   Decisões principais:
-    - [TODO(gabriel): a key technical decision] [TODO(gabriel): why you made it]
-    - [TODO(gabriel): a key technical decision] [TODO(gabriel): why you made it]
-  Testes e deploy: [TODO(gabriel): how it is tested] [TODO(gabriel): how it is deployed]
-  Resultado: [TODO(gabriel): the outcome, ideally with a number]
+    - As campanhas sobem pela API da Meta, várias de uma vez. Antes, cada campanha era montada à mão em cada plataforma de anúncios.
+    - Prometheus, Grafana e logs acompanham o sistema, e alertas vão para o Telegram em caso de erro ou quando uma rota está sobrecarregada. Para saber como o sistema está a qualquer momento, e ficar sabendo de erros e rotas sobrecarregadas assim que acontecem.
+  Testes e deploy: Testes de segurança que simulam ataques reais, e testes de estresse que procuram erros e falhas que poderiam abrir uma brecha de segurança. O Jenkins roda os testes e as validações, e uma mudança só é aprovada se passar por eles. Ela vai primeiro para o ambiente de develop, onde testamos, e quando tudo está aprovado o tech lead faz o deploy.
+  Resultado: Mais de 500 campanhas publicadas por dia pela API da Meta, por cerca de 100 pessoas dentro da empresa.
   Sistema interno, sem link público
   [button] Fechar
 
 -- Campaign BI (Group Wave Enterprise) --
-Um sistema interno para dados de campanhas: workers em NestJS processam os dados do RedTrack a partir de uma fila no RabbitMQ e gravam no PostgreSQL, e um app em Next.js com login Google os lê pela API em NestJS: resultados mensais e semanais, e o desempenho de cada media buyer.
+Um sistema interno de dados de campanhas, usado todos os dias pelos donos, pelo financeiro e pelos líderes de squad: resultados mensais e semanais e o desempenho de cada media buyer, atualizados a cada hora. Workers em NestJS processam os dados do RedTrack a partir de uma fila no RabbitMQ e gravam no PostgreSQL, e um app em Next.js com login Google os lê pela API em NestJS.
 [image] Um gráfico de desempenho semanal com campanhas fictícias e media buyers inventados, no lugar do sistema interno.
 [mockup words] Desempenho das campanhas · Mensal · Semanal · S · Receita · Investimento · Por media buyer · campanhas
 Stack: Next.js, NestJS, PostgreSQL, RabbitMQ, n8n, RedTrack
 [button] Detalhes técnicos
-  O problema: [TODO(gabriel): the problem this project solved]
-  Meu papel: [TODO(gabriel): what you owned in this project]
+  O problema: O financeiro puxava os dados do RedTrack com um pequeno script em Python que gerava arquivos CSV. Cada extração levava de 45 minutos a 2 horas, conforme o período.
+  Meu papel: Desenhei a arquitetura e construí o sistema inteiro, do começo ao fim.
   Arquitetura:
     RedTrack → n8n
     n8n → RabbitMQ
@@ -75,11 +77,11 @@ Stack: Next.js, NestJS, PostgreSQL, RabbitMQ, n8n, RedTrack
     App Next.js (login Google) → NestJS (workers e API)
     NestJS (workers e API) → PostgreSQL
   Decisões principais:
-    - Visões mensais e semanais dos dados do RedTrack, e o desempenho de cada media buyer. [TODO(gabriel): why these views]
-    - O n8n leva os dados do RedTrack para uma fila no RabbitMQ, e workers em NestJS os processam até o PostgreSQL. [TODO(gabriel): why a queue between n8n and the workers]
+    - Visões mensais e semanais dos dados do RedTrack, e o desempenho de cada media buyer. Os donos, o financeiro e os líderes de squad analisam os dados todos os dias: o que está dando certo, o que está gastando e como está cada media buyer.
+    - O n8n publica os dados do RedTrack numa fila no RabbitMQ, e vários workers em NestJS os processam em paralelo até o PostgreSQL. São muitos dados de uma vez. A fila separa a chegada dos dados do processamento: o n8n publica tudo no RabbitMQ, e os workers consomem no ritmo que o banco aguenta. Um registro que falha é tentado de novo sem afetar os outros, e se um worker cai nada se perde, porque a mensagem continua na fila. O RedTrack identifica cada registro, então uma mensagem processada duas vezes não duplica dados.
     - Um script de alocação pelo método dos maiores restos para conversões e receita. As métricas estavam infladas. O script corrigiu os números, e os resultados foram conferidos com as planilhas de referência.
-  Testes e deploy: [TODO(gabriel): how it is tested] [TODO(gabriel): how it is deployed]
-  Resultado: [TODO(gabriel): the outcome, ideally with a number]
+  Testes e deploy: As verificações rodam no CI a cada mudança. Nada vai para o ar sem passar no CI, então um erro aparece no pipeline, e não depois de derrubar o sistema, mesmo que por pouco tempo.
+  Resultado: Os dados do RedTrack agora se atualizam a cada hora durante o dia, e as cargas maiores rodam de madrugada. Os dashboards leem do PostgreSQL com consultas otimizadas, em vez de esperar de 45 minutos a 2 horas por um CSV. O Campaign BI hoje roda dentro do Sistema Wave.
   Sistema interno, sem link público
   [button] Fechar
 
@@ -165,9 +167,9 @@ LinkedIn · GitHub · YouTube · TikTok
 
 Stack
 Frontend: Next.js, React, TypeScript, JavaScript, Angular
-Backend: Node.js, NestJS, Express, APIs REST, Spring Boot, Django
+Backend: Node.js, NestJS, Express, RabbitMQ, APIs REST, Spring Boot, Django
 Dados: PostgreSQL, Prisma, MySQL, MongoDB, Redis, Firebird, RedTrack
-DevOps e automação: Docker, AWS, Git, n8n
+DevOps e automação: Docker, AWS, Git, n8n, Jenkins, Prometheus, Grafana
 Arquitetura: Clean Architecture, SOLID, TDD
 Idiomas: Português (nativo), Espanhol (estudando), Inglês (estudando)
 

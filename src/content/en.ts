@@ -66,7 +66,7 @@ export const en: SiteContent = {
       organization: 'Fator Sistemas & Consultorias',
       place: 'Salvador',
       summary:
-        'Built and maintained systems with JavaScript, TypeScript, Node.js, Angular, SQL and Firebird.',
+        'Built and maintained backends in Node.js and frontends in Angular, with JavaScript and TypeScript. Wrote and optimized the SQL queries behind reports, tuned Firebird databases, and migrated data from PostgreSQL, MySQL and other databases into Firebird.',
     },
     {
       id: 'unifacs',
@@ -82,6 +82,8 @@ export const en: SiteContent = {
       title: 'Full Stack Developer',
       organization: 'Group Wave Enterprise',
       place: 'Remote',
+      summary:
+        'Designed and built Campaign BI end to end, and work across Sistema Wave, the internal platform about 100 people use to publish more than 500 campaigns a day.',
     },
     {
       id: 'ia-robots',
@@ -105,8 +107,18 @@ export const en: SiteContent = {
       title: 'Sistema Wave',
       organization: 'Group Wave Enterprise',
       logline:
-        'An internal platform to publish campaigns, manage requests between teams (ClickUp-style), generate reports and track results on a dashboard.',
-      stack: ['Next.js', 'React', 'NestJS', 'TypeScript', 'PostgreSQL'],
+        'An internal platform used by about 100 people to publish campaigns to Meta in bulk, edit and improve creatives with AI, generate copy, manage requests between teams (ClickUp-style), and follow campaign, finance and company-health data on dashboards.',
+      stack: [
+        'Next.js',
+        'React',
+        'NestJS',
+        'TypeScript',
+        'PostgreSQL',
+        'Meta API',
+        'Prometheus',
+        'Grafana',
+        'Jenkins',
+      ],
       internal: true,
       image: {
         kind: 'mockup',
@@ -116,24 +128,39 @@ export const en: SiteContent = {
       },
       links: { kind: 'internal' },
       technicalDetails: {
-        problem: missing.problem(),
-        role: missing.role(),
+        problem:
+          'Before the platform, every campaign was set up by hand in NewsBreak, Meta Ads and Taboola.',
+        role: 'The team splits the work by area, and I work across all of it, so each part fits the whole system.',
         architecture: {
           nodes: [
             { id: 'web', label: 'Web app (Next.js, React)', kind: 'client' },
             { id: 'api', label: 'API (NestJS)', kind: 'service' },
             { id: 'db', label: 'PostgreSQL', kind: 'data' },
+            { id: 'meta', label: 'Meta API', kind: 'external' },
           ],
           edges: [
             { from: 'web', to: 'api' },
             { from: 'api', to: 'db' },
+            { from: 'api', to: 'meta' },
           ],
           confirmed: true,
         },
-        decisions: [missing.decision(), missing.decision()],
-        testing: missing.testing(),
-        deploy: missing.deploy(),
-        outcome: missing.outcome(),
+        decisions: [
+          {
+            what: 'Campaigns publish through the Meta API, many at once.',
+            why: 'Before, every campaign was set up by hand on each ad platform.',
+          },
+          {
+            what: 'Prometheus, Grafana and logs watch the system, and alerts go to Telegram on errors or when a route is under heavy load.',
+            why: 'To know how the system is doing at any moment, and to hear about errors and overloaded routes as soon as they happen.',
+          },
+        ],
+        testing:
+          'Security tests that simulate real attacks, and stress tests that look for errors and failures that could open a security hole.',
+        deploy:
+          'Jenkins runs the tests and validations, and a change has to pass them to be approved. It goes to the develop environment first, where we test it, and once everything is approved the tech lead deploys it.',
+        outcome:
+          'More than 500 campaigns published every day through the Meta API, by about 100 people inside the company.',
       },
     },
     {
@@ -141,7 +168,7 @@ export const en: SiteContent = {
       title: 'Campaign BI',
       organization: 'Group Wave Enterprise',
       logline:
-        "An internal system for campaign data: NestJS workers process RedTrack data from a RabbitMQ queue into PostgreSQL, and a Next.js app with Google sign-in reads it through the NestJS API: monthly and weekly results, and each media buyer's performance.",
+        "An internal campaign-data system used every day by the owners, finance and the squad leads: monthly and weekly results and each media buyer's performance, refreshed every hour. NestJS workers process RedTrack data from a RabbitMQ queue into PostgreSQL, and a Next.js app with Google sign-in reads it through the NestJS API.",
       stack: ['Next.js', 'NestJS', 'PostgreSQL', 'RabbitMQ', 'n8n', 'RedTrack'],
       internal: true,
       image: {
@@ -152,8 +179,9 @@ export const en: SiteContent = {
       },
       links: { kind: 'internal' },
       technicalDetails: {
-        problem: missing.problem(),
-        role: missing.role(),
+        problem:
+          'Finance pulled RedTrack data with a small Python script that wrote CSV files. Each pull took 45 minutes to 2 hours, depending on the date range.',
+        role: 'I designed the architecture and built the whole system, end to end.',
         architecture: {
           nodes: [
             { id: 'redtrack', label: 'RedTrack', kind: 'external' },
@@ -175,20 +203,22 @@ export const en: SiteContent = {
         decisions: [
           {
             what: "Monthly and weekly views of RedTrack data, and each media buyer's performance.",
-            why: todo('why these views'),
+            why: 'The owners, finance and the squad leads review the data every day: what is working, what is spending, and how each media buyer is doing.',
           },
           {
-            what: 'n8n brings RedTrack data into a RabbitMQ queue, and NestJS workers process it into PostgreSQL.',
-            why: todo('why a queue between n8n and the workers'),
+            what: 'n8n publishes RedTrack data to a RabbitMQ queue, and several NestJS workers process it in parallel into PostgreSQL.',
+            why: 'There is a lot of data at once. The queue separates bringing the data in from processing it: n8n publishes everything to RabbitMQ, and the workers consume it at the pace the database can take. A record that fails is retried without affecting the others, and if a worker goes down nothing is lost, because the message stays in the queue. RedTrack identifies each record, so a message processed twice never duplicates data.',
           },
           {
             what: 'A largest-remainder allocation script for conversions and revenue.',
             why: 'The metrics were inflated. The script corrected them, and the results were reconciled against the reference spreadsheets.',
           },
         ],
-        testing: missing.testing(),
-        deploy: missing.deploy(),
-        outcome: missing.outcome(),
+        testing: 'The checks run in CI on every change.',
+        deploy:
+          'Nothing ships until CI passes, so an error shows up in the pipeline, not after it has taken the system down, even briefly.',
+        outcome:
+          'RedTrack data now refreshes every hour during the day, and the larger loads run overnight. The dashboards read it from PostgreSQL through optimized queries instead of waiting 45 minutes to 2 hours for a CSV. Campaign BI now runs inside Sistema Wave.',
       },
     },
     {
@@ -351,13 +381,16 @@ export const en: SiteContent = {
       { label: 'Frontend', items: ['Next.js', 'React', 'TypeScript', 'JavaScript', 'Angular'] },
       {
         label: 'Backend',
-        items: ['Node.js', 'NestJS', 'Express', 'REST APIs', 'Spring Boot', 'Django'],
+        items: ['Node.js', 'NestJS', 'Express', 'RabbitMQ', 'REST APIs', 'Spring Boot', 'Django'],
       },
       {
         label: 'Data',
         items: ['PostgreSQL', 'Prisma', 'MySQL', 'MongoDB', 'Redis', 'Firebird', 'RedTrack'],
       },
-      { label: 'DevOps & automation', items: ['Docker', 'AWS', 'Git', 'n8n'] },
+      {
+        label: 'DevOps & automation',
+        items: ['Docker', 'AWS', 'Git', 'n8n', 'Jenkins', 'Prometheus', 'Grafana'],
+      },
       { label: 'Architecture', items: ['Clean Architecture', 'SOLID', 'TDD'] },
     ],
     languages: {
