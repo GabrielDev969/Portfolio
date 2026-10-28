@@ -8,17 +8,44 @@
  * Lighthouse's throttling table (docs/throttling.md: 4× from a 2000 desktop, 2× from a 1000
  * one). A fixed 4× emulated a fast phone on this Mac (index about 4000) and a slow one on a CI
  * runner, so the same page scored 98 here and 78 there.
+ *
+ * On CI the phone's Performance score warns instead of failing (Gabriel's call, 2026-10-28):
+ * calibrated or not, the same commit scores 98 on this Mac and 88–89 on GitHub's shared runners,
+ * where TBT measures four times higher. Its LCP and CLS, and every other category, still fail the
+ * run, and any score below target is raised as a warning in the run, never left in a log.
+ * Locally it stays gated.
  */
 import { spawnSync } from 'node:child_process'
-import { appendFileSync, existsSync, readdirSync, readFileSync } from 'node:fs'
+import { appendFileSync, existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 const root = join(import.meta.dirname, '..')
+const ci = Boolean(process.env.CI)
 const configs = [
-  { name: 'mobile', label: 'Mobile, applied throttling', gate: true, phone: true },
-  { name: 'desktop', label: 'Desktop', gate: true, phone: false },
-  { name: 'mobile-simulated', label: 'Mobile, simulated (PageSpeed)', gate: false, phone: true },
+  { name: 'mobile', label: 'Mobile, applied throttling', gate: true, phone: true, warnOnCi: true },
+  { name: 'desktop', label: 'Desktop', gate: true, phone: false, warnOnCi: false },
+  {
+    name: 'mobile-simulated',
+    label: 'Mobile, simulated (PageSpeed)',
+    gate: false,
+    phone: true,
+    warnOnCi: false,
+  },
 ]
+
+/** The config file to run: on CI, a copy whose Performance assertion warns instead of failing. */
+function configFile(config: (typeof configs)[number]) {
+  const file = join(root, 'lighthouse', `${config.name}.json`)
+  if (!ci || !config.warnOnCi) return file
+  const rc = JSON.parse(readFileSync(file, 'utf8')) as {
+    ci: { assert: { assertions: Record<string, [string, unknown]> } }
+  }
+  rc.ci.assert.assertions['categories:performance']![0] = 'warn'
+  const copy = join(tmpdir(), `lighthouse-${config.name}-ci.json`)
+  writeFileSync(copy, JSON.stringify(rc))
+  return copy
+}
 
 function calibrate() {
   spawnSync(
@@ -55,6 +82,7 @@ type Lhr = {
 
 let failed = false
 const rows: string[] = []
+const warnings: string[] = []
 for (const config of configs) {
   const run = spawnSync(
     'pnpm',
@@ -62,7 +90,7 @@ for (const config of configs) {
       'exec',
       'lhci',
       'autorun',
-      `--config=lighthouse/${config.name}.json`,
+      `--config=${configFile(config)}`,
       ...(config.phone ? [`--collect.settings.throttling.cpuSlowdownMultiplier=${slowdown}`] : []),
     ],
     { cwd: root, stdio: 'inherit' },
@@ -80,8 +108,15 @@ for (const config of configs) {
     const lhr = JSON.parse(readFileSync(entry.jsonPath, 'utf8')) as Lhr
     const score = (k: string) => Math.round(lhr.categories[k]!.score * 100)
     const ms = (k: string) => lhr.audits[k]!.numericValue ?? 0
+    const page = new URL(entry.url).pathname
+    if (config.gate && score('performance') < 90)
+      warnings.push(`${config.label} ${page}: Performance ${score('performance')} (target 90)`)
+    if (config.gate && ms('total-blocking-time') > 200)
+      warnings.push(
+        `${config.label} ${page}: TBT ${Math.round(ms('total-blocking-time'))} ms (target 200)`,
+      )
     rows.push(
-      `| ${config.label} | ${new URL(entry.url).pathname} | ${score('performance')} | ${score('accessibility')} | ${score('best-practices')} | ${score('seo')} | ${(ms('largest-contentful-paint') / 1000).toFixed(2)} s | ${ms('cumulative-layout-shift').toFixed(3)} | ${Math.round(ms('total-blocking-time'))} ms |`,
+      `| ${config.label} | ${page} | ${score('performance')} | ${score('accessibility')} | ${score('best-practices')} | ${score('seo')} | ${(ms('largest-contentful-paint') / 1000).toFixed(2)} s | ${ms('cumulative-layout-shift').toFixed(3)} | ${Math.round(ms('total-blocking-time'))} ms |`,
     )
   }
 }
@@ -93,8 +128,10 @@ const table = [
   '| --- | --- | --- | --- | --- | --- | --- | --- | --- |',
   ...rows,
   '',
-  `Gated: mobile with applied throttling and desktop. The simulated row is reported only. Phone CPU slowdown ${slowdown}× (benchmarkIndex ${Math.round(index)}; lighthouse/README.md).`,
+  `Gated: mobile with applied throttling and desktop${ci ? ' (on CI the mobile Performance score warns)' : ''}. The simulated row is reported only. Phone CPU slowdown ${slowdown}× (benchmarkIndex ${Math.round(index)}; lighthouse/README.md).`,
+  ...(warnings.length ? ['', '**Below target:**', '', ...warnings.map((w) => `- ${w}`)] : []),
 ].join('\n')
 console.log(`\n${table}`)
+if (ci) for (const w of warnings) console.log(`::warning title=Lighthouse::${w}`)
 if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${table}\n`)
 process.exit(failed ? 1 : 0)

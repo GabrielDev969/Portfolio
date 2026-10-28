@@ -12,6 +12,14 @@ from `pnpm preview` (gzip, served like GitHub Pages) three ways:
 Targets: Performance ≥ 90; Accessibility, Best Practices and SEO ≥ 95; LCP ≤ 2.5 s; CLS ≤ 0.1.
 TBT above 200 ms is a warning.
 
+**On CI, the phone's Performance score is a warning too.** Calibrated or not, the same commit
+scores 98 on an M-series Mac and 88–89 on GitHub's shared runners, where TBT measures about four
+times higher (377–416 ms against 97 ms) on the same build. The runner's main thread, not the
+page, decides that score, so CI fails on what it measures reliably: the phone's LCP and CLS, the
+other three categories, and every desktop target. A Performance score or TBT below target is
+still raised as a warning annotation and listed under the table in the run summary. Locally,
+`pnpm lighthouse` keeps the phone's Performance as a gate.
+
 **The phone's CPU is calibrated to the machine.** A fixed 4× slowdown emulates a fast phone on a
 fast laptop and a slow one on a CI runner: the same build scored 98 on an M-series Mac
 (benchmarkIndex about 4000) and 78 on GitHub's runner. So `pnpm lighthouse` first reads the
