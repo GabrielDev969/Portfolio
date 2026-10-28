@@ -96,24 +96,19 @@ Everything below is a `todo()` in the content or a missing file. None of it show
 
 <!-- todos:start -->
 
-37 open items.
+30 open items.
 
 - **Project: Sistema Wave**
-  - the problem this project solved
   - what you owned in this project
-  - a key technical decision (×2)
-  - why you made it (×2)
-  - how it is tested
+  - a key technical decision
+  - why you made it
   - how it is deployed
-  - the outcome, ideally with a number
 - **Project: Campaign BI**
-  - the problem this project solved
   - what you owned in this project
   - why these views
   - why a queue between n8n and the workers
   - how it is tested
   - how it is deployed
-  - the outcome, ideally with a number
 - **Project: Zibby**
   - a public link for Zibby, if there is one
   - the problem this project solved

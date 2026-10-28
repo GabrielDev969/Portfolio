@@ -30,7 +30,7 @@ From the database to the screen.
 == Experience ==
 
 2021–2025 · Systems Analyst · Fator Sistemas & Consultorias
-  Built and maintained systems with JavaScript, TypeScript, Node.js, Angular, SQL and Firebird.
+  Built and maintained backends in Node.js and frontends in Angular, with JavaScript and TypeScript. Wrote and optimized the SQL queries behind reports, tuned Firebird databases, and migrated data from PostgreSQL, MySQL and other databases into Firebird.
   Salvador
 2021–2025 · B.Sc. in Computer Science · UNIFACS
 2025–present · Full Stack Developer · Group Wave Enterprise
@@ -42,21 +42,22 @@ From the database to the screen.
 == Projects ==
 
 -- Sistema Wave (Group Wave Enterprise) --
-An internal platform to publish campaigns, manage requests between teams (ClickUp-style), generate reports and track results on a dashboard.
+An internal platform to publish campaigns to Meta in bulk, edit and improve creatives with AI, generate copy, manage requests between teams (ClickUp-style), and follow campaign, finance and company-health data on dashboards.
 [image] A stylized request board with fictional teams and tasks, standing in for the internal system.
 [mockup words] Campaigns · Requests · Reports · Dashboard · All teams · This week · New request · Requested · In progress · Review · Done · Creative · Data · Copy · Media · Mon · Tue · Wed · Thu · Fri · Today · Launch banners, 6 sizes · UTM audit, spring offers · Email sequence, 3 parts · Video cut, 15 seconds · Landing page headline · Offer page, mobile · Weekly results report · Pixel check, new domain · Carousel, 5 slides · Ad variations, round 2
-Stack: Next.js, React, NestJS, TypeScript, PostgreSQL
+Stack: Next.js, React, NestJS, TypeScript, PostgreSQL, Meta API, Prometheus, Grafana
 [button] Technical details
-  The problem: [TODO(gabriel): the problem this project solved]
+  The problem: Before the platform, every campaign was set up by hand in NewsBreak, Meta Ads and Taboola.
   My role: [TODO(gabriel): what you owned in this project]
   Architecture:
     Web app (Next.js, React) → API (NestJS)
     API (NestJS) → PostgreSQL
+    API (NestJS) → Meta API
   Key decisions:
+    - Prometheus, Grafana and logs watch the system, and alerts go to Telegram on errors or when a route is under heavy load. To know how the system is doing at any moment, and to hear about errors and overloaded routes as soon as they happen.
     - [TODO(gabriel): a key technical decision] [TODO(gabriel): why you made it]
-    - [TODO(gabriel): a key technical decision] [TODO(gabriel): why you made it]
-  Testing and deploy: [TODO(gabriel): how it is tested] [TODO(gabriel): how it is deployed]
-  Outcome: [TODO(gabriel): the outcome, ideally with a number]
+  Testing and deploy: Security tests that simulate real attacks, and stress tests that look for errors and failures that could open a security hole. [TODO(gabriel): how it is deployed]
+  Outcome: More than 1,000 campaigns published every day through the Meta API, by about 100 people inside the company.
   Internal system, no public link
   [button] Close
 
@@ -66,7 +67,7 @@ An internal system for campaign data: NestJS workers process RedTrack data from 
 [mockup words] Campaign performance · Monthly · Weekly · W · Revenue · Spend · By media buyer · campaigns
 Stack: Next.js, NestJS, PostgreSQL, RabbitMQ, n8n, RedTrack
 [button] Technical details
-  The problem: [TODO(gabriel): the problem this project solved]
+  The problem: Finance pulled RedTrack data with a small Python script that wrote CSV files. Each pull took 45 minutes to 2 hours, depending on the date range.
   My role: [TODO(gabriel): what you owned in this project]
   Architecture:
     RedTrack → n8n
@@ -79,7 +80,7 @@ Stack: Next.js, NestJS, PostgreSQL, RabbitMQ, n8n, RedTrack
     - n8n brings RedTrack data into a RabbitMQ queue, and NestJS workers process it into PostgreSQL. [TODO(gabriel): why a queue between n8n and the workers]
     - A largest-remainder allocation script for conversions and revenue. The metrics were inflated. The script corrected them, and the results were reconciled against the reference spreadsheets.
   Testing and deploy: [TODO(gabriel): how it is tested] [TODO(gabriel): how it is deployed]
-  Outcome: [TODO(gabriel): the outcome, ideally with a number]
+  Outcome: RedTrack data now refreshes every hour during the day, and the larger loads run overnight. The dashboards read it from PostgreSQL through optimized queries instead of waiting 45 minutes to 2 hours for a CSV. Campaign BI now runs inside Sistema Wave.
   Internal system, no public link
   [button] Close
 
@@ -167,7 +168,7 @@ Stack
 Frontend: Next.js, React, TypeScript, JavaScript, Angular
 Backend: Node.js, NestJS, Express, REST APIs, Spring Boot, Django
 Data: PostgreSQL, Prisma, MySQL, MongoDB, Redis, Firebird, RedTrack
-DevOps & automation: Docker, AWS, Git, n8n
+DevOps & automation: Docker, AWS, Git, n8n, Prometheus, Grafana
 Architecture: Clean Architecture, SOLID, TDD
 Languages: Portuguese (native), Spanish (studying), English (studying)
 

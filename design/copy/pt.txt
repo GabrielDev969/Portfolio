@@ -30,7 +30,7 @@ Do banco de dados à tela.
 == Experiência ==
 
 2021–2025 · Analista de Sistemas · Fator Sistemas & Consultorias
-  Desenvolvi e mantive sistemas com JavaScript, TypeScript, Node.js, Angular, SQL e Firebird.
+  Desenvolvi e mantive backends em Node.js e frontends em Angular, com JavaScript e TypeScript. Escrevi e otimizei as consultas SQL dos relatórios, ajustei bancos Firebird e migrei dados de PostgreSQL, MySQL e outros bancos para o Firebird.
   Salvador
 2021–2025 · Bacharelado em Ciência da Computação · UNIFACS
 2025–atual · Desenvolvedor Full Stack · Group Wave Enterprise
@@ -42,21 +42,22 @@ Do banco de dados à tela.
 == Projetos ==
 
 -- Sistema Wave (Group Wave Enterprise) --
-Uma plataforma interna para publicar campanhas, gerenciar solicitações entre equipes (no estilo do ClickUp), gerar relatórios e acompanhar resultados em um dashboard.
+Uma plataforma interna para publicar campanhas na Meta em massa, editar e melhorar criativos com IA, gerar copies, gerenciar solicitações entre equipes (no estilo do ClickUp) e acompanhar dados de campanhas, financeiro e saúde da empresa em dashboards.
 [image] Um quadro de solicitações estilizado, com equipes e tarefas fictícias, no lugar do sistema interno.
 [mockup words] Campanhas · Solicitações · Relatórios · Dashboard · Todas as equipes · Esta semana · Nova solicitação · Solicitadas · Em andamento · Em revisão · Concluídas · Criação · Dados · Redação · Mídia · Seg · Ter · Qua · Qui · Sex · Hoje · Feito · Banners, 6 tamanhos · Auditoria de UTMs · Sequência de 3 e-mails · Corte de vídeo, 15 s · Título da landing page · Oferta, versão mobile · Relatório semanal · Pixel no novo domínio · Carrossel, 5 cards · Anúncios, 2ª rodada
-Stack: Next.js, React, NestJS, TypeScript, PostgreSQL
+Stack: Next.js, React, NestJS, TypeScript, PostgreSQL, Meta API, Prometheus, Grafana
 [button] Detalhes técnicos
-  O problema: [TODO(gabriel): the problem this project solved]
+  O problema: Antes da plataforma, cada campanha era montada à mão no NewsBreak, no Meta Ads e no Taboola.
   Meu papel: [TODO(gabriel): what you owned in this project]
   Arquitetura:
     App web (Next.js, React) → API (NestJS)
     API (NestJS) → PostgreSQL
+    API (NestJS) → API da Meta
   Decisões principais:
+    - Prometheus, Grafana e logs acompanham o sistema, e alertas vão para o Telegram em caso de erro ou quando uma rota está sobrecarregada. Para saber como o sistema está a qualquer momento, e ficar sabendo de erros e rotas sobrecarregadas assim que acontecem.
     - [TODO(gabriel): a key technical decision] [TODO(gabriel): why you made it]
-    - [TODO(gabriel): a key technical decision] [TODO(gabriel): why you made it]
-  Testes e deploy: [TODO(gabriel): how it is tested] [TODO(gabriel): how it is deployed]
-  Resultado: [TODO(gabriel): the outcome, ideally with a number]
+  Testes e deploy: Testes de segurança que simulam ataques reais, e testes de estresse que procuram erros e falhas que poderiam abrir uma brecha de segurança. [TODO(gabriel): how it is deployed]
+  Resultado: Mais de 1.000 campanhas publicadas por dia pela API da Meta, por cerca de 100 pessoas dentro da empresa.
   Sistema interno, sem link público
   [button] Fechar
 
@@ -66,7 +67,7 @@ Um sistema interno para dados de campanhas: workers em NestJS processam os dados
 [mockup words] Desempenho das campanhas · Mensal · Semanal · S · Receita · Investimento · Por media buyer · campanhas
 Stack: Next.js, NestJS, PostgreSQL, RabbitMQ, n8n, RedTrack
 [button] Detalhes técnicos
-  O problema: [TODO(gabriel): the problem this project solved]
+  O problema: O financeiro puxava os dados do RedTrack com um pequeno script em Python que gerava arquivos CSV. Cada extração levava de 45 minutos a 2 horas, conforme o período.
   Meu papel: [TODO(gabriel): what you owned in this project]
   Arquitetura:
     RedTrack → n8n
@@ -79,7 +80,7 @@ Stack: Next.js, NestJS, PostgreSQL, RabbitMQ, n8n, RedTrack
     - O n8n leva os dados do RedTrack para uma fila no RabbitMQ, e workers em NestJS os processam até o PostgreSQL. [TODO(gabriel): why a queue between n8n and the workers]
     - Um script de alocação pelo método dos maiores restos para conversões e receita. As métricas estavam infladas. O script corrigiu os números, e os resultados foram conferidos com as planilhas de referência.
   Testes e deploy: [TODO(gabriel): how it is tested] [TODO(gabriel): how it is deployed]
-  Resultado: [TODO(gabriel): the outcome, ideally with a number]
+  Resultado: Os dados do RedTrack agora se atualizam a cada hora durante o dia, e as cargas maiores rodam de madrugada. Os dashboards leem do PostgreSQL com consultas otimizadas, em vez de esperar de 45 minutos a 2 horas por um CSV. O Campaign BI hoje roda dentro do Sistema Wave.
   Sistema interno, sem link público
   [button] Fechar
 
@@ -167,7 +168,7 @@ Stack
 Frontend: Next.js, React, TypeScript, JavaScript, Angular
 Backend: Node.js, NestJS, Express, APIs REST, Spring Boot, Django
 Dados: PostgreSQL, Prisma, MySQL, MongoDB, Redis, Firebird, RedTrack
-DevOps e automação: Docker, AWS, Git, n8n
+DevOps e automação: Docker, AWS, Git, n8n, Prometheus, Grafana
 Arquitetura: Clean Architecture, SOLID, TDD
 Idiomas: Português (nativo), Espanhol (estudando), Inglês (estudando)
 

@@ -66,7 +66,7 @@ export const en: SiteContent = {
       organization: 'Fator Sistemas & Consultorias',
       place: 'Salvador',
       summary:
-        'Built and maintained systems with JavaScript, TypeScript, Node.js, Angular, SQL and Firebird.',
+        'Built and maintained backends in Node.js and frontends in Angular, with JavaScript and TypeScript. Wrote and optimized the SQL queries behind reports, tuned Firebird databases, and migrated data from PostgreSQL, MySQL and other databases into Firebird.',
     },
     {
       id: 'unifacs',
@@ -105,8 +105,17 @@ export const en: SiteContent = {
       title: 'Sistema Wave',
       organization: 'Group Wave Enterprise',
       logline:
-        'An internal platform to publish campaigns, manage requests between teams (ClickUp-style), generate reports and track results on a dashboard.',
-      stack: ['Next.js', 'React', 'NestJS', 'TypeScript', 'PostgreSQL'],
+        'An internal platform to publish campaigns to Meta in bulk, edit and improve creatives with AI, generate copy, manage requests between teams (ClickUp-style), and follow campaign, finance and company-health data on dashboards.',
+      stack: [
+        'Next.js',
+        'React',
+        'NestJS',
+        'TypeScript',
+        'PostgreSQL',
+        'Meta API',
+        'Prometheus',
+        'Grafana',
+      ],
       internal: true,
       image: {
         kind: 'mockup',
@@ -116,24 +125,35 @@ export const en: SiteContent = {
       },
       links: { kind: 'internal' },
       technicalDetails: {
-        problem: missing.problem(),
+        problem:
+          'Before the platform, every campaign was set up by hand in NewsBreak, Meta Ads and Taboola.',
         role: missing.role(),
         architecture: {
           nodes: [
             { id: 'web', label: 'Web app (Next.js, React)', kind: 'client' },
             { id: 'api', label: 'API (NestJS)', kind: 'service' },
             { id: 'db', label: 'PostgreSQL', kind: 'data' },
+            { id: 'meta', label: 'Meta API', kind: 'external' },
           ],
           edges: [
             { from: 'web', to: 'api' },
             { from: 'api', to: 'db' },
+            { from: 'api', to: 'meta' },
           ],
           confirmed: true,
         },
-        decisions: [missing.decision(), missing.decision()],
-        testing: missing.testing(),
+        decisions: [
+          {
+            what: 'Prometheus, Grafana and logs watch the system, and alerts go to Telegram on errors or when a route is under heavy load.',
+            why: 'To know how the system is doing at any moment, and to hear about errors and overloaded routes as soon as they happen.',
+          },
+          missing.decision(),
+        ],
+        testing:
+          'Security tests that simulate real attacks, and stress tests that look for errors and failures that could open a security hole.',
         deploy: missing.deploy(),
-        outcome: missing.outcome(),
+        outcome:
+          'More than 1,000 campaigns published every day through the Meta API, by about 100 people inside the company.',
       },
     },
     {
@@ -152,7 +172,8 @@ export const en: SiteContent = {
       },
       links: { kind: 'internal' },
       technicalDetails: {
-        problem: missing.problem(),
+        problem:
+          'Finance pulled RedTrack data with a small Python script that wrote CSV files. Each pull took 45 minutes to 2 hours, depending on the date range.',
         role: missing.role(),
         architecture: {
           nodes: [
@@ -188,7 +209,8 @@ export const en: SiteContent = {
         ],
         testing: missing.testing(),
         deploy: missing.deploy(),
-        outcome: missing.outcome(),
+        outcome:
+          'RedTrack data now refreshes every hour during the day, and the larger loads run overnight. The dashboards read it from PostgreSQL through optimized queries instead of waiting 45 minutes to 2 hours for a CSV. Campaign BI now runs inside Sistema Wave.',
       },
     },
     {
@@ -357,7 +379,10 @@ export const en: SiteContent = {
         label: 'Data',
         items: ['PostgreSQL', 'Prisma', 'MySQL', 'MongoDB', 'Redis', 'Firebird', 'RedTrack'],
       },
-      { label: 'DevOps & automation', items: ['Docker', 'AWS', 'Git', 'n8n'] },
+      {
+        label: 'DevOps & automation',
+        items: ['Docker', 'AWS', 'Git', 'n8n', 'Prometheus', 'Grafana'],
+      },
       { label: 'Architecture', items: ['Clean Architecture', 'SOLID', 'TDD'] },
     ],
     languages: {

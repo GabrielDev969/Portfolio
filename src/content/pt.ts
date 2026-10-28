@@ -17,7 +17,7 @@ const experience: Record<string, Partial<Milestone>> = {
   fator: {
     title: 'Analista de Sistemas',
     summary:
-      'Desenvolvi e mantive sistemas com JavaScript, TypeScript, Node.js, Angular, SQL e Firebird.',
+      'Desenvolvi e mantive backends em Node.js e frontends em Angular, com JavaScript e TypeScript. Escrevi e otimizei as consultas SQL dos relatórios, ajustei bancos Firebird e migrei dados de PostgreSQL, MySQL e outros bancos para o Firebird.',
   },
   unifacs: { title: 'Bacharelado em Ciência da Computação' },
   'group-wave': { title: 'Desenvolvedor Full Stack', place: 'Remoto' },
@@ -90,7 +90,7 @@ export const pt: SiteContent = {
     {
       ...wave,
       logline:
-        'Uma plataforma interna para publicar campanhas, gerenciar solicitações entre equipes (no estilo do ClickUp), gerar relatórios e acompanhar resultados em um dashboard.',
+        'Uma plataforma interna para publicar campanhas na Meta em massa, editar e melhorar criativos com IA, gerar copies, gerenciar solicitações entre equipes (no estilo do ClickUp) e acompanhar dados de campanhas, financeiro e saúde da empresa em dashboards.',
       image: {
         kind: 'mockup',
         mockup: 'wave-board',
@@ -98,7 +98,8 @@ export const pt: SiteContent = {
           'Um quadro de solicitações estilizado, com equipes e tarefas fictícias, no lugar do sistema interno.',
       },
       technicalDetails: {
-        problem: missing.problem(),
+        problem:
+          'Antes da plataforma, cada campanha era montada à mão no NewsBreak, no Meta Ads e no Taboola.',
         role: missing.role(),
         architecture: {
           ...wave.technicalDetails.architecture,
@@ -106,12 +107,21 @@ export const pt: SiteContent = {
             { id: 'web', label: 'App web (Next.js, React)', kind: 'client' },
             { id: 'api', label: 'API (NestJS)', kind: 'service' },
             { id: 'db', label: 'PostgreSQL', kind: 'data' },
+            { id: 'meta', label: 'API da Meta', kind: 'external' },
           ],
         },
-        decisions: [missing.decision(), missing.decision()],
-        testing: missing.testing(),
+        decisions: [
+          {
+            what: 'Prometheus, Grafana e logs acompanham o sistema, e alertas vão para o Telegram em caso de erro ou quando uma rota está sobrecarregada.',
+            why: 'Para saber como o sistema está a qualquer momento, e ficar sabendo de erros e rotas sobrecarregadas assim que acontecem.',
+          },
+          missing.decision(),
+        ],
+        testing:
+          'Testes de segurança que simulam ataques reais, e testes de estresse que procuram erros e falhas que poderiam abrir uma brecha de segurança.',
         deploy: missing.deploy(),
-        outcome: missing.outcome(),
+        outcome:
+          'Mais de 1.000 campanhas publicadas por dia pela API da Meta, por cerca de 100 pessoas dentro da empresa.',
       },
     },
     {
@@ -125,7 +135,8 @@ export const pt: SiteContent = {
           'Um gráfico de desempenho semanal com campanhas fictícias e media buyers inventados, no lugar do sistema interno.',
       },
       technicalDetails: {
-        problem: missing.problem(),
+        problem:
+          'O financeiro puxava os dados do RedTrack com um pequeno script em Python que gerava arquivos CSV. Cada extração levava de 45 minutos a 2 horas, conforme o período.',
         role: missing.role(),
         architecture: {
           ...bi.technicalDetails.architecture,
@@ -154,7 +165,8 @@ export const pt: SiteContent = {
         ],
         testing: missing.testing(),
         deploy: missing.deploy(),
-        outcome: missing.outcome(),
+        outcome:
+          'Os dados do RedTrack agora se atualizam a cada hora durante o dia, e as cargas maiores rodam de madrugada. Os dashboards leem do PostgreSQL com consultas otimizadas, em vez de esperar de 45 minutos a 2 horas por um CSV. O Campaign BI hoje roda dentro do Sistema Wave.',
       },
     },
     {
