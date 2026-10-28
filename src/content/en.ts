@@ -115,6 +115,7 @@ export const en: SiteContent = {
         'Meta API',
         'Prometheus',
         'Grafana',
+        'Jenkins',
       ],
       internal: true,
       image: {
@@ -127,7 +128,7 @@ export const en: SiteContent = {
       technicalDetails: {
         problem:
           'Before the platform, every campaign was set up by hand in NewsBreak, Meta Ads and Taboola.',
-        role: missing.role(),
+        role: 'We split the work by area, but I have worked in every part of it, so each piece fits the whole system.',
         architecture: {
           nodes: [
             { id: 'web', label: 'Web app (Next.js, React)', kind: 'client' },
@@ -147,11 +148,15 @@ export const en: SiteContent = {
             what: 'Prometheus, Grafana and logs watch the system, and alerts go to Telegram on errors or when a route is under heavy load.',
             why: 'To know how the system is doing at any moment, and to hear about errors and overloaded routes as soon as they happen.',
           },
-          missing.decision(),
+          {
+            what: 'Campaigns publish through the Meta API, many at once.',
+            why: 'Before, every campaign was set up by hand on each ad platform.',
+          },
         ],
         testing:
           'Security tests that simulate real attacks, and stress tests that look for errors and failures that could open a security hole.',
-        deploy: missing.deploy(),
+        deploy:
+          'Jenkins runs the tests and validations, and a change has to pass them to be approved. It goes to the develop environment first, where we test it, and once everything is approved the tech lead deploys it.',
         outcome:
           'More than 1,000 campaigns published every day through the Meta API, by about 100 people inside the company.',
       },
@@ -174,7 +179,7 @@ export const en: SiteContent = {
       technicalDetails: {
         problem:
           'Finance pulled RedTrack data with a small Python script that wrote CSV files. Each pull took 45 minutes to 2 hours, depending on the date range.',
-        role: missing.role(),
+        role: 'I designed the architecture and built the whole system, end to end.',
         architecture: {
           nodes: [
             { id: 'redtrack', label: 'RedTrack', kind: 'external' },
@@ -196,19 +201,20 @@ export const en: SiteContent = {
         decisions: [
           {
             what: "Monthly and weekly views of RedTrack data, and each media buyer's performance.",
-            why: todo('why these views'),
+            why: 'The owners, finance and the squad leads review the data every day: what is working, what is spending, and how each media buyer is doing.',
           },
           {
             what: 'n8n brings RedTrack data into a RabbitMQ queue, and NestJS workers process it into PostgreSQL.',
-            why: todo('why a queue between n8n and the workers'),
+            why: 'There is a lot of data to load, and one error must not lose everything. With a queue, a record that fails does not affect the others.',
           },
           {
             what: 'A largest-remainder allocation script for conversions and revenue.',
             why: 'The metrics were inflated. The script corrected them, and the results were reconciled against the reference spreadsheets.',
           },
         ],
-        testing: missing.testing(),
-        deploy: missing.deploy(),
+        testing: 'The checks run in CI on every change.',
+        deploy:
+          'Nothing ships until CI passes, so an error is caught before it takes the system down, even briefly, instead of being hunted for afterwards.',
         outcome:
           'RedTrack data now refreshes every hour during the day, and the larger loads run overnight. The dashboards read it from PostgreSQL through optimized queries instead of waiting 45 minutes to 2 hours for a CSV. Campaign BI now runs inside Sistema Wave.',
       },
@@ -381,7 +387,7 @@ export const en: SiteContent = {
       },
       {
         label: 'DevOps & automation',
-        items: ['Docker', 'AWS', 'Git', 'n8n', 'Prometheus', 'Grafana'],
+        items: ['Docker', 'AWS', 'Git', 'n8n', 'Jenkins', 'Prometheus', 'Grafana'],
       },
       { label: 'Architecture', items: ['Clean Architecture', 'SOLID', 'TDD'] },
     ],

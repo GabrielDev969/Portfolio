@@ -46,18 +46,18 @@ De la base de datos a la pantalla.
 Una plataforma interna para publicar campañas en Meta de forma masiva, editar y mejorar creatividades con IA, generar copies, gestionar solicitudes entre equipos (al estilo de ClickUp) y seguir datos de campañas, finanzas y salud de la empresa en dashboards.
 [image] Un tablero de solicitudes estilizado, con equipos y tareas ficticios, en lugar del sistema interno.
 [mockup words] Campañas · Solicitudes · Informes · Dashboard · Todos los equipos · Esta semana · Nueva solicitud · Solicitadas · En curso · En revisión · Listas · Creativo · Datos · Redacción · Medios · Lun · Mar · Mié · Jue · Vie · Hoy · Listo · Banners, 6 tamaños · Auditoría de UTM · Secuencia de 3 correos · Corte de video, 15 s · Título de la landing · Oferta, versión móvil · Informe semanal · Píxel del nuevo dominio · Carrusel, 5 imágenes · Anuncios, 2.ª ronda
-Stack: Next.js, React, NestJS, TypeScript, PostgreSQL, Meta API, Prometheus, Grafana
+Stack: Next.js, React, NestJS, TypeScript, PostgreSQL, Meta API, Prometheus, Grafana, Jenkins
 [button] Detalles técnicos
   El problema: Antes de la plataforma, cada campaña se armaba a mano en NewsBreak, Meta Ads y Taboola.
-  Mi rol: [TODO(gabriel): what you owned in this project]
+  Mi rol: Dividimos el trabajo por partes, pero trabajé en todas ellas, para que cada pieza encaje en el sistema completo.
   Arquitectura:
     App web (Next.js, React) → API (NestJS)
     API (NestJS) → PostgreSQL
     API (NestJS) → API de Meta
   Decisiones clave:
     - Prometheus, Grafana y logs vigilan el sistema, y las alertas llegan a Telegram ante errores o cuando una ruta está sobrecargada. Para saber cómo está el sistema en todo momento, y enterarse de errores y rutas sobrecargadas en cuanto ocurren.
-    - [TODO(gabriel): a key technical decision] [TODO(gabriel): why you made it]
-  Pruebas y despliegue: Pruebas de seguridad que simulan ataques reales, y pruebas de estrés que buscan errores y fallas que podrían abrir una brecha de seguridad. [TODO(gabriel): how it is deployed]
+    - Las campañas se publican a través de la API de Meta, varias a la vez. Antes, cada campaña se armaba a mano en cada plataforma de anuncios.
+  Pruebas y despliegue: Pruebas de seguridad que simulan ataques reales, y pruebas de estrés que buscan errores y fallas que podrían abrir una brecha de seguridad. Jenkins ejecuta las pruebas y validaciones, y un cambio solo se aprueba si las pasa. Primero va al entorno de develop, donde lo probamos, y cuando todo está aprobado el tech lead hace el deploy.
   Resultado: Más de 1.000 campañas publicadas al día a través de la API de Meta, por unas 100 personas dentro de la empresa.
   Sistema interno, sin enlace público
   [button] Cerrar
@@ -69,7 +69,7 @@ Un sistema interno para datos de campañas: workers en NestJS procesan los datos
 Stack: Next.js, NestJS, PostgreSQL, RabbitMQ, n8n, RedTrack
 [button] Detalles técnicos
   El problema: Finanzas extraía los datos de RedTrack con un pequeño script en Python que generaba archivos CSV. Cada extracción tardaba de 45 minutos a 2 horas, según el período.
-  Mi rol: [TODO(gabriel): what you owned in this project]
+  Mi rol: Diseñé la arquitectura y construí todo el sistema, de punta a punta.
   Arquitectura:
     RedTrack → n8n
     n8n → RabbitMQ
@@ -77,10 +77,10 @@ Stack: Next.js, NestJS, PostgreSQL, RabbitMQ, n8n, RedTrack
     App Next.js (inicio de sesión de Google) → NestJS (workers y API)
     NestJS (workers y API) → PostgreSQL
   Decisiones clave:
-    - Vistas mensuales y semanales de los datos de RedTrack, y el rendimiento de cada media buyer. [TODO(gabriel): why these views]
-    - n8n lleva los datos de RedTrack a una cola en RabbitMQ, y workers en NestJS los procesan hasta PostgreSQL. [TODO(gabriel): why a queue between n8n and the workers]
+    - Vistas mensuales y semanales de los datos de RedTrack, y el rendimiento de cada media buyer. Los dueños, finanzas y los líderes de squad analizan los datos todos los días: qué está funcionando, qué está gastando y cómo va cada media buyer.
+    - n8n lleva los datos de RedTrack a una cola en RabbitMQ, y workers en NestJS los procesan hasta PostgreSQL. Son muchos datos para cargar, y un error no puede hacer que se pierda todo. Con la cola, un registro que falla no afecta a los demás.
     - Un script de asignación por el método de los restos mayores para conversiones e ingresos. Las métricas estaban infladas. El script corrigió los números, y los resultados se conciliaron con las planillas de referencia.
-  Pruebas y despliegue: [TODO(gabriel): how it is tested] [TODO(gabriel): how it is deployed]
+  Pruebas y despliegue: Las verificaciones se ejecutan en CI con cada cambio. Nada se publica sin pasar el CI, así que un error se detecta antes de tumbar el sistema, aunque sea por poco tiempo, en lugar de buscarlo después.
   Resultado: Los datos de RedTrack ahora se actualizan cada hora durante el día, y las cargas más grandes corren de madrugada. Los dashboards los leen de PostgreSQL con consultas optimizadas, en lugar de esperar de 45 minutos a 2 horas por un CSV. Campaign BI hoy funciona dentro de Sistema Wave.
   Sistema interno, sin enlace público
   [button] Cerrar
@@ -170,7 +170,7 @@ Stack
 Frontend: Next.js, React, TypeScript, JavaScript, Angular
 Backend: Node.js, NestJS, Express, APIs REST, Spring Boot, Django
 Datos: PostgreSQL, Prisma, MySQL, MongoDB, Redis, Firebird, RedTrack
-DevOps y automatización: Docker, AWS, Git, n8n, Prometheus, Grafana
+DevOps y automatización: Docker, AWS, Git, n8n, Jenkins, Prometheus, Grafana
 Arquitectura: Clean Architecture, SOLID, TDD
 Idiomas: Portugués (nativo), Español (estudiando), Inglés (estudiando)
 

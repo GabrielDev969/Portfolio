@@ -101,7 +101,7 @@ export const es: SiteContent = {
       technicalDetails: {
         problem:
           'Antes de la plataforma, cada campaña se armaba a mano en NewsBreak, Meta Ads y Taboola.',
-        role: missing.role(),
+        role: 'Dividimos el trabajo por partes, pero trabajé en todas ellas, para que cada pieza encaje en el sistema completo.',
         architecture: {
           ...wave.technicalDetails.architecture,
           nodes: [
@@ -116,11 +116,15 @@ export const es: SiteContent = {
             what: 'Prometheus, Grafana y logs vigilan el sistema, y las alertas llegan a Telegram ante errores o cuando una ruta está sobrecargada.',
             why: 'Para saber cómo está el sistema en todo momento, y enterarse de errores y rutas sobrecargadas en cuanto ocurren.',
           },
-          missing.decision(),
+          {
+            what: 'Las campañas se publican a través de la API de Meta, varias a la vez.',
+            why: 'Antes, cada campaña se armaba a mano en cada plataforma de anuncios.',
+          },
         ],
         testing:
           'Pruebas de seguridad que simulan ataques reales, y pruebas de estrés que buscan errores y fallas que podrían abrir una brecha de seguridad.',
-        deploy: missing.deploy(),
+        deploy:
+          'Jenkins ejecuta las pruebas y validaciones, y un cambio solo se aprueba si las pasa. Primero va al entorno de develop, donde lo probamos, y cuando todo está aprobado el tech lead hace el deploy.',
         outcome:
           'Más de 1.000 campañas publicadas al día a través de la API de Meta, por unas 100 personas dentro de la empresa.',
       },
@@ -138,7 +142,7 @@ export const es: SiteContent = {
       technicalDetails: {
         problem:
           'Finanzas extraía los datos de RedTrack con un pequeño script en Python que generaba archivos CSV. Cada extracción tardaba de 45 minutos a 2 horas, según el período.',
-        role: missing.role(),
+        role: 'Diseñé la arquitectura y construí todo el sistema, de punta a punta.',
         architecture: {
           ...bi.technicalDetails.architecture,
           nodes: [
@@ -153,19 +157,20 @@ export const es: SiteContent = {
         decisions: [
           {
             what: 'Vistas mensuales y semanales de los datos de RedTrack, y el rendimiento de cada media buyer.',
-            why: todo('why these views'),
+            why: 'Los dueños, finanzas y los líderes de squad analizan los datos todos los días: qué está funcionando, qué está gastando y cómo va cada media buyer.',
           },
           {
             what: 'n8n lleva los datos de RedTrack a una cola en RabbitMQ, y workers en NestJS los procesan hasta PostgreSQL.',
-            why: todo('why a queue between n8n and the workers'),
+            why: 'Son muchos datos para cargar, y un error no puede hacer que se pierda todo. Con la cola, un registro que falla no afecta a los demás.',
           },
           {
             what: 'Un script de asignación por el método de los restos mayores para conversiones e ingresos.',
             why: 'Las métricas estaban infladas. El script corrigió los números, y los resultados se conciliaron con las planillas de referencia.',
           },
         ],
-        testing: missing.testing(),
-        deploy: missing.deploy(),
+        testing: 'Las verificaciones se ejecutan en CI con cada cambio.',
+        deploy:
+          'Nada se publica sin pasar el CI, así que un error se detecta antes de tumbar el sistema, aunque sea por poco tiempo, en lugar de buscarlo después.',
         outcome:
           'Los datos de RedTrack ahora se actualizan cada hora durante el día, y las cargas más grandes corren de madrugada. Los dashboards los leen de PostgreSQL con consultas optimizadas, en lugar de esperar de 45 minutos a 2 horas por un CSV. Campaign BI hoy funciona dentro de Sistema Wave.',
       },
