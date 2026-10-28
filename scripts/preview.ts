@@ -34,10 +34,10 @@ if (!existsSync(out)) {
 
 createServer((req, res) => {
   const url = new URL(req.url ?? '/', 'http://localhost')
-  if (!url.pathname.startsWith(`${basePath}/`)) {
-    res.writeHead(302, { location: `${basePath}/` }).end()
-    return
-  }
+  // Like Pages: the project lives under /Portfolio/ and nothing else on the domain is ours, so
+  // /robots.txt and the rest are 404 (Lighthouse reads /robots.txt). Only / redirects, for ease.
+  if (url.pathname === '/') return void res.writeHead(302, { location: `${basePath}/` }).end()
+  if (!url.pathname.startsWith(`${basePath}/`)) return void res.writeHead(404).end()
   let file = normalize(join(out, decodeURIComponent(url.pathname.slice(basePath.length))))
   if (!file.startsWith(out)) return void res.writeHead(403).end()
   if (existsSync(file) && statSync(file).isDirectory()) file = join(file, 'index.html')

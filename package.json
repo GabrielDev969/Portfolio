@@ -27,6 +27,7 @@
     "flaky": "tsx scripts/flaky-report.ts",
     "measure:js": "tsx scripts/measure-js.ts",
     "measure:vitals": "tsx scripts/measure-vitals.ts",
+    "lighthouse": "tsx scripts/lighthouse.ts",
     "journey": "tsx scripts/journey.ts"
   },
   "dependencies": {
