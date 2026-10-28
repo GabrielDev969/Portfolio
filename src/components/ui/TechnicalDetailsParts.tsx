@@ -6,13 +6,13 @@ import { ArchitectureDiagram } from './ArchitectureDiagram'
 type Props = { project: Project; ui: SiteContent['ui'] }
 
 /**
- * The six parts of a project's behind the scenes, always in this order (design/STORYBOARD.md §5):
+ * The six parts of a project's technical details, always in this order (design/STORYBOARD.md §3):
  * problem, role, architecture, decisions, testing and deploy, outcome, then the links. A part
  * whose facts are all missing in production is left out with its heading.
  */
-export function BehindTheScenesParts({ project, ui }: Props) {
-  const bts = project.behindTheScenes
-  const decisions = bts.decisions
+export function TechnicalDetailsParts({ project, ui }: Props) {
+  const td = project.technicalDetails
+  const decisions = td.decisions
     .map((d) => ({
       what: resolveText(d.what),
       why: d.why === undefined ? null : resolveText(d.why),
@@ -21,22 +21,22 @@ export function BehindTheScenesParts({ project, ui }: Props) {
   const paragraph = (label: string, sentences: string[]) =>
     sentences.length > 0 ? (
       <section>
-        <h4 className="bts-heading">{label}</h4>
+        <h4 className="details-heading">{label}</h4>
         <p>{sentences.join(' ')}</p>
       </section>
     ) : null
 
   return (
-    <div className="bts-parts">
-      {paragraph(ui.bts.problem, resolveProse(bts.problem))}
-      {paragraph(ui.bts.role, resolveProse(bts.role))}
+    <div className="details-parts">
+      {paragraph(ui.details.problem, resolveProse(td.problem))}
+      {paragraph(ui.details.role, resolveProse(td.role))}
       <section>
-        <h4 className="bts-heading">{ui.bts.architecture}</h4>
-        <ArchitectureDiagram id={`${project.id}-diagram`} architecture={bts.architecture} />
+        <h4 className="details-heading">{ui.details.architecture}</h4>
+        <ArchitectureDiagram id={`${project.id}-diagram`} architecture={td.architecture} />
       </section>
       {decisions.length > 0 ? (
         <section>
-          <h4 className="bts-heading">{ui.bts.decisions}</h4>
+          <h4 className="details-heading">{ui.details.decisions}</h4>
           <ul className="space-y-3">
             {decisions.map((d) => (
               <li key={d.what}>
@@ -47,11 +47,11 @@ export function BehindTheScenesParts({ project, ui }: Props) {
           </ul>
         </section>
       ) : null}
-      {paragraph(ui.bts.testingAndDeploy, [
-        ...resolveProse(bts.testing),
-        ...resolveProse(bts.deploy),
+      {paragraph(ui.details.testingAndDeploy, [
+        ...resolveProse(td.testing),
+        ...resolveProse(td.deploy),
       ])}
-      {paragraph(ui.bts.outcome, resolveProse(bts.outcome))}
+      {paragraph(ui.details.outcome, resolveProse(td.outcome))}
       {/* In Quick view the links already sit right above, on the project itself. */}
       <div className="quick:hidden">
         <ProjectLinks project={project} ui={ui} />

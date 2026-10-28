@@ -20,7 +20,7 @@ export const en: SiteContent = {
     about:
       'Full Stack Developer with about 5 years of experience: 4 as a Systems Analyst and over 1 working remotely. I build complete products, from the database to the interface: frontends and dashboards with Next.js and React, APIs with Node.js and NestJS, and data in PostgreSQL. I use AI coding agents daily to move faster without giving up technical judgment, and I am pursuing a postgraduate degree in Software Engineering for Applied AI.',
     photo: {
-      still: 'gabriel',
+      id: 'gabriel',
       alt: 'Gabriel Santos, smiling, in a blue blazer and glasses.',
     },
   },
@@ -41,7 +41,7 @@ export const en: SiteContent = {
     stack: 'Stack',
     sectionsNav: 'Sections',
     languageNav: 'Choose a language',
-    bts: {
+    details: {
       problem: 'The problem',
       role: 'My role',
       architecture: 'Architecture',
@@ -108,14 +108,14 @@ export const en: SiteContent = {
         'An internal platform to publish campaigns, manage requests between teams (ClickUp-style), generate reports and track results on a dashboard.',
       stack: ['Next.js', 'React', 'NestJS', 'TypeScript', 'PostgreSQL'],
       internal: true,
-      still: {
+      image: {
         kind: 'mockup',
         mockup: 'wave-board',
         description:
           'A stylized request board with fictional teams and tasks, standing in for the internal system.',
       },
       links: { kind: 'internal' },
-      behindTheScenes: {
+      technicalDetails: {
         problem: missing.problem(),
         role: missing.role(),
         architecture: {
@@ -144,14 +144,14 @@ export const en: SiteContent = {
         "An internal system for campaign data: NestJS workers process RedTrack data from a RabbitMQ queue into PostgreSQL, and a Next.js app with Google sign-in reads it through the NestJS API: monthly and weekly results, and each media buyer's performance.",
       stack: ['Next.js', 'NestJS', 'PostgreSQL', 'RabbitMQ', 'n8n', 'RedTrack'],
       internal: true,
-      still: {
+      image: {
         kind: 'mockup',
         mockup: 'campaign-chart',
         description:
           'A weekly performance chart with fictional campaigns and invented media buyers, standing in for the internal system.',
       },
       links: { kind: 'internal' },
-      behindTheScenes: {
+      technicalDetails: {
         problem: missing.problem(),
         role: missing.role(),
         architecture: {
@@ -198,13 +198,13 @@ export const en: SiteContent = {
         'My own multi-store e-commerce platform, launched in October 2026: a storefront, an admin panel, Stripe payments and Zendrop fulfillment.',
       stack: ['Next.js', 'NestJS', 'PostgreSQL', 'Prisma', 'Stripe', 'Zendrop'],
       internal: false,
-      still: {
+      image: {
         kind: 'mockup',
         mockup: 'zibby-store',
         description: 'A fictional storefront next to its admin panel.',
       },
       links: todo('a public link for Zibby, if there is one'),
-      behindTheScenes: {
+      technicalDetails: {
         problem: missing.problem(),
         role: [
           'My own product.',
@@ -256,14 +256,14 @@ export const en: SiteContent = {
         'A system for OrionStar service robots: an admin panel that schedules ad campaigns and music, a backend on a VPS, and a RobotOS app that plays them and talks to people.',
       stack: ['RobotOS', todo('the rest of the Hostly stack')],
       internal: true,
-      still: {
+      image: {
         kind: 'mockup',
         mockup: 'hostly-schedule',
         description:
           'A robot schedule screen with a fictional campaign playlist, standing in for the real system.',
       },
       links: { kind: 'internal' },
-      behindTheScenes: {
+      technicalDetails: {
         problem: missing.problem(),
         role: missing.role(),
         architecture: {
@@ -305,16 +305,16 @@ export const en: SiteContent = {
         'An open source library management system in Python and Django, built for a real church library.',
       stack: ['Python', 'Django'],
       internal: false,
-      still: {
+      image: {
         kind: 'image',
-        still: 'bookowl',
+        id: 'bookowl',
         alt: 'The BookOwl home screen: the owl logo over a welcome message.',
       },
       links: {
         kind: 'public',
         links: [{ label: 'Source on GitHub', href: 'https://github.com/GabrielDev969/BookOwl' }],
       },
-      behindTheScenes: {
+      technicalDetails: {
         problem: missing.problem(),
         role: missing.role(),
         architecture: {

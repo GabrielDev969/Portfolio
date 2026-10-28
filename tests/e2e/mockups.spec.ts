@@ -12,7 +12,7 @@ for (const locale of locales) {
     const problems = await page.evaluate(() => {
       const gap = 8
       const out: string[] = []
-      for (const svg of document.querySelectorAll<SVGSVGElement>('.project-still svg')) {
+      for (const svg of document.querySelectorAll<SVGSVGElement>('.project-image svg')) {
         const texts = [...svg.querySelectorAll('text')].filter((t) => t.textContent?.trim())
         const boxes = texts.map((t) => ({ t, b: t.getBBox() }))
         for (const { t, b } of boxes) {
@@ -50,11 +50,11 @@ test('the mockups speak the page language', async ({ page }) => {
   for (const locale of locales) {
     await page.goto(`${locale}/`)
     const { wave, hostly } = mockupCopy[locale]
-    await expect(page.locator('.project-still svg text', { hasText: wave.newRequest })).toHaveCount(
+    await expect(page.locator('.project-image svg text', { hasText: wave.newRequest })).toHaveCount(
       1,
     )
     await expect(
-      page.locator('.project-still svg text', { hasText: hostly.nowPlaying }),
+      page.locator('.project-image svg text', { hasText: hostly.nowPlaying }),
     ).toHaveCount(1)
   }
 })

@@ -1,5 +1,5 @@
 import type { Locale } from '@/lib/i18n'
-import type { StillId } from '@/lib/stills'
+import type { ImageId } from '@/lib/images'
 
 /**
  * A fact Gabriel still has to provide. In development it renders as a marked
@@ -52,7 +52,7 @@ export type Architecture = {
 /** `why` is left out when `what` already gives the reason in one sentence. */
 export type Decision = { what: Text; why?: Text }
 
-export type BehindTheScenes = {
+export type Details = {
   problem: Prose
   role: Prose
   architecture: Architecture
@@ -65,8 +65,8 @@ export type BehindTheScenes = {
 
 export type MockupId = 'wave-board' | 'campaign-chart' | 'zibby-store' | 'hostly-schedule'
 
-export type Still =
-  | { kind: 'image'; still: StillId; alt: string }
+export type ProjectImage =
+  | { kind: 'image'; id: ImageId; alt: string }
   | { kind: 'mockup'; mockup: MockupId; description: string }
 
 export type ProjectLinks = { kind: 'public'; links: Link[] } | { kind: 'internal' } | Todo
@@ -78,11 +78,11 @@ export type Project = {
   organization?: string
   logline: string
   stack: Text[]
-  /** Internal systems show architecture only: fictional stills, no links, no real data. */
+  /** Internal systems show architecture only: fictional images, no links, no real data. */
   internal: boolean
-  still: Still
+  image: ProjectImage
   links: ProjectLinks
-  behindTheScenes: BehindTheScenes
+  technicalDetails: Details
 }
 
 /** A labelled list: a stack area and its tools, or the languages Gabriel speaks. */
@@ -104,7 +104,7 @@ export type SiteContent = {
     heroLine: string
     availability: string
     about: string
-    photo: { still: StillId; alt: string }
+    photo: { id: ImageId; alt: string }
   }
   ui: {
     skipToContent: string
@@ -125,7 +125,7 @@ export type SiteContent = {
     stack: string
     sectionsNav: string
     languageNav: string
-    bts: {
+    details: {
       problem: string
       role: string
       architecture: string

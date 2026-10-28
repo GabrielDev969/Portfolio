@@ -156,16 +156,16 @@ describe('content', () => {
 
   for (const project of getContent('en').projects) {
     describe(project.title, () => {
-      const bts = project.behindTheScenes
+      const td = project.technicalDetails
 
       it('has two or three key decisions', () => {
-        assert.ok(bts.decisions.length >= 2 && bts.decisions.length <= 3, `${bts.decisions.length}`)
+        assert.ok(td.decisions.length >= 2 && td.decisions.length <= 3, `${td.decisions.length}`)
       })
 
       it('has an architecture whose edges join existing nodes', () => {
-        const ids = new Set(bts.architecture.nodes.map((n) => n.id))
+        const ids = new Set(td.architecture.nodes.map((n) => n.id))
         assert.ok(ids.size >= 2)
-        for (const edge of bts.architecture.edges) {
+        for (const edge of td.architecture.edges) {
           assert.ok(ids.has(edge.from) && ids.has(edge.to), `${edge.from} → ${edge.to}`)
         }
       })
@@ -173,7 +173,7 @@ describe('content', () => {
       if (project.internal) {
         it('as an internal system, has no links and a fictional still', () => {
           assert.deepEqual(project.links, { kind: 'internal' })
-          assert.equal(project.still.kind, 'mockup')
+          assert.equal(project.image.kind, 'mockup')
         })
       }
 

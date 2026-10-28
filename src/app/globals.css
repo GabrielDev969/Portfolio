@@ -22,7 +22,6 @@
   --color-ink: oklch(0.22 0.025 255);
   --color-ink-2: oklch(0.42 0.02 255);
   --color-velvet: oklch(0.47 0.17 22);
-  --color-house: oklch(0 0 0);
   --color-transparent: transparent;
   --color-current: currentColor;
 
@@ -263,10 +262,10 @@
 /* Section components live in a layer, so Tailwind utilities on the same element (quick:hidden,
    say) always win over them, the way utilities are meant to. */
 @layer components {
-  /* ---- Act II · Projects ----
-   Phones and tablets stack the parts in order: still (full bleed), title, cast, actions.
-   From 1024 px the grid break (design/COMMIT-SHEET.md §4): the still bleeds off the left edge
-   to column 8, the title sits on the ground in 9–12, and the cast panel overlaps the still's
+  /* ---- Projects ----
+   Phones and tablets stack the parts in order: image (full bleed), title, stack, actions.
+   From 1024 px the grid break (design/COMMIT-SHEET.md §4): the image bleeds off the left edge
+   to column 8, the title sits on the ground in 9–12, and the stack panel overlaps the image's
    bottom-right corner across columns 8–10. */
   .projects {
     display: grid;
@@ -275,7 +274,7 @@
   }
 
   .project {
-    --cast-overlap: 4rem;
+    --stack-overlap: 4rem;
     row-gap: 1.5rem;
     align-items: start;
 
@@ -284,19 +283,19 @@
     }
   }
 
-  .project-still {
+  .project-image {
     margin-inline: calc(-1 * var(--page-margin));
   }
 
   /* The push-in scales this layer inside the frame's crop. */
-  .project-still-inner {
+  .project-image-inner {
     width: 100%;
     height: 100%;
     transform-origin: 50% 50%;
   }
 
-  .project-cast {
-    /* Set like a credit block: the role on the left, one name per line on the right. */
+  .project-stack {
+    /* The heading on the left, one tool per line on the right. */
     display: grid;
     grid-template-columns: auto auto;
     justify-content: start;
@@ -307,8 +306,8 @@
     background: var(--color-screen-2);
   }
 
-  /* Each cast line rises from behind its own mask, like a credit. */
-  .cast-line {
+  /* Each stack line rises from behind its own mask. */
+  .stack-line {
     overflow: clip;
 
     > span {
@@ -328,22 +327,22 @@
       row-gap: 0;
     }
 
-    .project-still {
+    .project-image {
       grid-area: 1 / 1 / 2 / 9;
       align-self: end;
       margin-inline: calc(-1 * var(--page-margin)) 0;
     }
 
-    /* Room under the logline for the cast panel, so the two never meet. */
+    /* Room under the logline for the stack panel, so the two never meet. */
     .project-head {
       grid-area: 1 / 9 / 2 / 13;
-      padding-bottom: calc(var(--cast-overlap) + 2rem);
+      padding-bottom: calc(var(--stack-overlap) + 2rem);
     }
 
-    .project-cast {
+    .project-stack {
       position: relative;
       grid-area: 2 / 8 / 3 / 11;
-      margin-top: calc(-1 * var(--cast-overlap));
+      margin-top: calc(-1 * var(--stack-overlap));
     }
 
     .project-actions {
@@ -352,13 +351,13 @@
     }
   }
 
-  /* ---- Behind the scenes ---- */
-  .bts-parts {
+  /* ---- Technical details ---- */
+  .details-parts {
     display: grid;
     gap: 1.75rem;
   }
 
-  .bts-heading {
+  .details-heading {
     margin-bottom: 0.35rem;
     font-size: var(--text-small);
     font-style: italic;
@@ -366,17 +365,17 @@
   }
 
   /* No JS: the native <details> opens the parts in place, under the button. */
-  .bts-details[open] > summary {
+  .details-disclosure[open] > summary {
     margin-bottom: 1.5rem;
   }
 
-  .bts-inline {
+  .details-inline {
     max-width: 62ch;
   }
 
   /* The drawer: a modal <dialog> on the right edge, full height, scrolling on its own. It opens
    with a clip-path wipe from the right (CSS @starting-style, no JS); reduced motion fades. */
-  .bts-drawer {
+  .details-drawer {
     position: fixed;
     inset: 0 0 0 auto;
     width: min(36rem, 100vw);
@@ -414,26 +413,26 @@
   }
 
   @starting-style {
-    .bts-drawer[open] {
+    .details-drawer[open] {
       clip-path: inset(0 0 0 100%);
     }
 
-    .bts-drawer[open]::backdrop {
+    .details-drawer[open]::backdrop {
       opacity: 0;
     }
   }
 
-  /* The page behind an open drawer stays still. */
-  :root:has(.bts-drawer[open]) {
+  /* The page behind an open drawer does not scroll. */
+  :root:has(.details-drawer[open]) {
     overflow: hidden;
   }
 
-  .bts-sheet {
+  .details-sheet {
     min-height: 100%;
     padding: 1.25rem clamp(1.25rem, 4vw, 2.5rem) 3rem;
   }
 
-  .bts-sheet-head {
+  .details-sheet-head {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -441,7 +440,7 @@
     margin-bottom: 2rem;
   }
 
-  /* Quick view: one column inside the grid, no bleed, no stills, the parts inline. */
+  /* Quick view: one column inside the grid, no bleed, no images, the parts inline. */
   [data-view='quick'] {
     .projects {
       row-gap: 3rem;
@@ -466,8 +465,8 @@
       display: block;
     }
 
-    .bts-inline,
-    .bts-details {
+    .details-inline,
+    .details-disclosure {
       margin-top: 0.75rem;
       padding-left: 1rem;
       border-left: 1px solid color-mix(in oklch, var(--color-ink) 25%, transparent);
@@ -475,10 +474,10 @@
 
     /* Before hydration (or if the app's JS never arrives) the native <details> stands in for
        the inline block: it takes the rule line, its summary is set as the label (utilities in
-       BehindTheScenes) and the parts show open, so nothing moves when React takes over.
+       TechnicalDetails) and the parts show open, so nothing moves when React takes over.
        Browsers without ::details-content keep the <details> closed. */
-    .bts-details {
-      /* The same box as .bts-inline (62ch, rule line and indent included), so a line wraps
+    .details-disclosure {
+      /* The same box as .details-inline (62ch, rule line and indent included), so a line wraps
          at the same word before and after hydration. */
       max-width: 62ch;
 
@@ -487,7 +486,7 @@
         height: auto;
       }
 
-      > .bts-inline {
+      > .details-inline {
         max-width: none;
         margin: 0;
         padding: 0;
@@ -495,7 +494,7 @@
       }
     }
 
-    .bts-parts {
+    .details-parts {
       gap: 1rem;
     }
 
@@ -619,17 +618,17 @@
 
 @media (prefers-reduced-motion: reduce) {
   /* The drawer fades instead of wiping. */
-  .bts-drawer,
-  .bts-drawer:not([open]) {
+  .details-drawer,
+  .details-drawer:not([open]) {
     clip-path: none;
   }
-  .bts-drawer {
+  .details-drawer {
     transition:
       opacity var(--dur-ui) var(--ease-out),
       overlay var(--dur-ui) allow-discrete,
       display var(--dur-ui) allow-discrete;
   }
-  .bts-drawer:not([open]) {
+  .details-drawer:not([open]) {
     opacity: 0;
   }
   /* No movement: the name is simply there. */
@@ -652,7 +651,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   @starting-style {
-    .bts-drawer[open] {
+    .details-drawer[open] {
       clip-path: none;
       opacity: 0;
     }

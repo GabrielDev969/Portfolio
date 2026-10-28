@@ -52,7 +52,7 @@ export async function settled(page: Page) {
 /**
  * Every element under `root` whose right edge passes the viewport, as
  * `selector "text" width W px, right edge R px (viewport V px)`, so a failure names its cause.
- * Elements inside `skip` (stills, the Act I track, decorative layers) are left out.
+ * Elements inside `skip` (images, the Act I track, decorative layers) are left out.
  */
 export async function overflowing(page: Page, root: string, skip: string) {
   return page.evaluate(

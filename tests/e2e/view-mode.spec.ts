@@ -32,7 +32,9 @@ test('both modes expose the same headings and links', async ({ browser }) => {
     // mode; tests/e2e/projects.spec.ts checks that both hold the same parts.
     const headings = await page
       .getByRole('heading')
-      .filter({ hasNot: page.locator('xpath=self::*[ancestor::*[contains(@class,"bts-parts")]]') })
+      .filter({
+        hasNot: page.locator('xpath=self::*[ancestor::*[contains(@class,"details-parts")]]'),
+      })
       .allInnerTexts()
     const links = await page
       .locator('main a[href]')

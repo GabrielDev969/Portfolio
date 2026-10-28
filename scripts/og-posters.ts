@@ -10,7 +10,7 @@ import sharp from 'sharp'
 import { getContent } from '../src/content'
 import { languageTags, locales } from '../src/lib/i18n'
 import { asset } from '../src/lib/site'
-import { stillPath } from '../src/lib/stills'
+import { imagePath } from '../src/lib/images'
 
 const base = process.env.BASE_URL ?? 'http://localhost:4173'
 const out = join(import.meta.dirname, '..', 'public', 'og')
@@ -47,7 +47,7 @@ for (const locale of locales) {
           <p style="margin:4px 0 0;font-size:22px;font-weight:600">${escape(place)}</p>${relocation}
         </div>
         <div style="background:var(--color-screen-2);border:1px solid color-mix(in oklch, var(--color-ink) 15%, transparent);padding:18px">
-          <img src="${asset(stillPath(person.photo.still, 460, 'webp'))}" alt="" style="display:block;width:280px;height:340px;object-fit:cover">
+          <img src="${asset(imagePath(person.photo.id, 460, 'webp'))}" alt="" style="display:block;width:280px;height:340px;object-fit:cover">
         </div>
       </div>
       <div style="border-top:1px solid color-mix(in oklch, var(--color-ink) 15%, transparent);display:flex;align-items:center;justify-content:space-between;padding:0 64px;font-size:18px">

@@ -48,7 +48,7 @@ export const pt: SiteContent = {
     about:
       'Desenvolvedor Full Stack com cerca de 5 anos de experiência: 4 como Analista de Sistemas e mais de 1 trabalhando remoto. Construo produtos completos, do banco de dados à interface: frontends e dashboards com Next.js e React, APIs com Node.js e NestJS, e dados em PostgreSQL. Programo todos os dias com agentes de IA para ir mais rápido sem abrir mão do critério técnico, e faço pós-graduação em Engenharia de Software com IA Aplicada.',
     photo: {
-      still: en.person.photo.still,
+      id: en.person.photo.id,
       alt: 'Gabriel Santos, sorrindo, de blazer azul e óculos.',
     },
   },
@@ -69,7 +69,7 @@ export const pt: SiteContent = {
     stack: 'Stack',
     sectionsNav: 'Seções',
     languageNav: 'Escolha o idioma',
-    bts: {
+    details: {
       problem: 'O problema',
       role: 'Meu papel',
       architecture: 'Arquitetura',
@@ -91,17 +91,17 @@ export const pt: SiteContent = {
       ...wave,
       logline:
         'Uma plataforma interna para publicar campanhas, gerenciar solicitações entre equipes (no estilo do ClickUp), gerar relatórios e acompanhar resultados em um dashboard.',
-      still: {
+      image: {
         kind: 'mockup',
         mockup: 'wave-board',
         description:
           'Um quadro de solicitações estilizado, com equipes e tarefas fictícias, no lugar do sistema interno.',
       },
-      behindTheScenes: {
+      technicalDetails: {
         problem: missing.problem(),
         role: missing.role(),
         architecture: {
-          ...wave.behindTheScenes.architecture,
+          ...wave.technicalDetails.architecture,
           nodes: [
             { id: 'web', label: 'App web (Next.js, React)', kind: 'client' },
             { id: 'api', label: 'API (NestJS)', kind: 'service' },
@@ -118,17 +118,17 @@ export const pt: SiteContent = {
       ...bi,
       logline:
         'Um sistema interno para dados de campanhas: workers em NestJS processam os dados do RedTrack a partir de uma fila no RabbitMQ e gravam no PostgreSQL, e um app em Next.js com login Google os lê pela API em NestJS: resultados mensais e semanais, e o desempenho de cada media buyer.',
-      still: {
+      image: {
         kind: 'mockup',
         mockup: 'campaign-chart',
         description:
           'Um gráfico de desempenho semanal com campanhas fictícias e media buyers inventados, no lugar do sistema interno.',
       },
-      behindTheScenes: {
+      technicalDetails: {
         problem: missing.problem(),
         role: missing.role(),
         architecture: {
-          ...bi.behindTheScenes.architecture,
+          ...bi.technicalDetails.architecture,
           nodes: [
             { id: 'redtrack', label: 'RedTrack', kind: 'external' },
             { id: 'n8n', label: 'n8n', kind: 'service' },
@@ -161,19 +161,19 @@ export const pt: SiteContent = {
       ...zibby,
       logline:
         'Minha própria plataforma de e-commerce multiloja, lançada em outubro de 2026: vitrine, painel administrativo, pagamentos com Stripe e fulfillment pela Zendrop.',
-      still: {
+      image: {
         kind: 'mockup',
         mockup: 'zibby-store',
         description: 'Uma vitrine fictícia ao lado do seu painel administrativo.',
       },
-      behindTheScenes: {
+      technicalDetails: {
         problem: missing.problem(),
         role: [
           'Produto próprio.',
           'Construí em fases com agentes de IA para programar, e cada fase seguiu plano → revisão → implementação → testes → revisão do diff → merge.',
         ],
         architecture: {
-          ...zibby.behindTheScenes.architecture,
+          ...zibby.technicalDetails.architecture,
           nodes: [
             { id: 'storefront', label: 'Vitrine (Next.js)', kind: 'client' },
             { id: 'admin', label: 'Painel administrativo (Next.js)', kind: 'client' },
@@ -207,17 +207,17 @@ export const pt: SiteContent = {
       ...hostly,
       logline:
         'Um sistema para robôs de atendimento OrionStar: um painel administrativo que agenda campanhas de anúncios e músicas, um backend em uma VPS e um app no RobotOS que reproduz tudo e conversa com as pessoas.',
-      still: {
+      image: {
         kind: 'mockup',
         mockup: 'hostly-schedule',
         description:
           'Uma tela de agenda do robô com uma playlist de campanhas fictícia, no lugar do sistema real.',
       },
-      behindTheScenes: {
+      technicalDetails: {
         problem: missing.problem(),
         role: missing.role(),
         architecture: {
-          ...hostly.behindTheScenes.architecture,
+          ...hostly.technicalDetails.architecture,
           nodes: [
             { id: 'admin', label: 'Painel administrativo', kind: 'client' },
             { id: 'app', label: 'App do robô', kind: 'client' },
@@ -252,20 +252,20 @@ export const pt: SiteContent = {
       ...bookowl,
       logline:
         'Um sistema open source de gestão de bibliotecas em Python e Django, feito para a biblioteca de uma igreja de verdade.',
-      still: {
+      image: {
         kind: 'image',
-        still: 'bookowl',
+        id: 'bookowl',
         alt: 'A tela inicial do BookOwl: o logo da coruja sobre uma mensagem de boas-vindas.',
       },
       links: {
         kind: 'public',
         links: [{ label: 'Código no GitHub', href: 'https://github.com/GabrielDev969/BookOwl' }],
       },
-      behindTheScenes: {
+      technicalDetails: {
         problem: missing.problem(),
         role: missing.role(),
         architecture: {
-          ...bookowl.behindTheScenes.architecture,
+          ...bookowl.technicalDetails.architecture,
           nodes: [
             { id: 'app', label: 'App Django (Python)', kind: 'service' },
             { id: 'db', label: todo('the BookOwl database'), kind: 'data' },

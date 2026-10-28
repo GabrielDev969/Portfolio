@@ -111,7 +111,7 @@ for (const locale of locales) {
       await page.setViewportSize({ width, height: 800 })
       await page.goto(`${locale}/`)
       await settled(page)
-      const wide = await overflowing(page, 'main', '.project-still, [aria-hidden="true"]')
+      const wide = await overflowing(page, 'main', '.project-image, [aria-hidden="true"]')
       expect(wide, `Wider than the screen:\n${wide.join('\n')}`).toEqual([])
     })
   }

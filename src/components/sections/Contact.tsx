@@ -1,7 +1,7 @@
 import type { Group, SiteContent } from '@/content/schema'
 import { canLinkTo } from '@/lib/public-files'
 import { asset } from '@/lib/site'
-import { Still } from '../cinema/Still'
+import { Picture } from '../ui/Picture'
 import { Button } from '../ui/Button'
 import { SectionHeading } from '../ui/SectionHeading'
 
@@ -72,8 +72,8 @@ export function Contact({ content }: Props) {
         </div>
 
         <div className="contact-about col-span-12 lg:col-span-5 lg:col-start-8 quick:col-span-12 quick:col-start-1">
-          <Still
-            id={person.photo.still}
+          <Picture
+            id={person.photo.id}
             alt={person.photo.alt}
             sizes="(min-width: 1024px) 10rem, 8rem"
             className="contact-photo quick:hidden"

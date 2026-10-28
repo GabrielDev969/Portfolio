@@ -87,27 +87,27 @@ export function renderCopy(locale: Locale): string {
 
   section(sections.projects.title)
   for (const p of c.projects) {
-    const bts = p.behindTheScenes
+    const td = p.technicalDetails
     line(`-- ${p.title}${p.organization ? ` (${p.organization})` : ''} --`, p.logline)
-    line(p.still.kind === 'image' ? `[image alt] ${p.still.alt}` : `[image] ${p.still.description}`)
-    if (p.still.kind === 'mockup') {
-      const drawn = [...new Set(words(mockupCopy[locale][mockupKey[p.still.mockup]]))]
+    line(p.image.kind === 'image' ? `[image alt] ${p.image.alt}` : `[image] ${p.image.description}`)
+    if (p.image.kind === 'mockup') {
+      const drawn = [...new Set(words(mockupCopy[locale][mockupKey[p.image.mockup]]))]
       line(`[mockup words] ${drawn.join(' · ')}`)
     }
     line(`${ui.stack}: ${p.stack.map(text).join(', ')}`)
     line(`[button] ${ui.technicalDetails}`)
-    line(`  ${ui.bts.problem}: ${prose(bts.problem)}`)
-    line(`  ${ui.bts.role}: ${prose(bts.role)}`)
-    line(`  ${ui.bts.architecture}:`)
-    const label = new Map(bts.architecture.nodes.map((n) => [n.id, text(n.label)]))
-    for (const e of bts.architecture.edges) {
+    line(`  ${ui.details.problem}: ${prose(td.problem)}`)
+    line(`  ${ui.details.role}: ${prose(td.role)}`)
+    line(`  ${ui.details.architecture}:`)
+    const label = new Map(td.architecture.nodes.map((n) => [n.id, text(n.label)]))
+    for (const e of td.architecture.edges) {
       line(`    ${label.get(e.from)} → ${label.get(e.to)}${e.label ? ` (${e.label})` : ''}`)
     }
-    line(`  ${ui.bts.decisions}:`)
-    for (const d of bts.decisions) line(`    - ${text(d.what)}${d.why ? ` ${text(d.why)}` : ''}`)
-    line(`  ${ui.bts.testingAndDeploy}: ${prose(bts.testing)} ${prose(bts.deploy)}`)
-    line(`  ${ui.bts.outcome}: ${prose(bts.outcome)}`)
-    if (isTodo(p.links)) line(`  ${ui.bts.links}: ${text(p.links)}`)
+    line(`  ${ui.details.decisions}:`)
+    for (const d of td.decisions) line(`    - ${text(d.what)}${d.why ? ` ${text(d.why)}` : ''}`)
+    line(`  ${ui.details.testingAndDeploy}: ${prose(td.testing)} ${prose(td.deploy)}`)
+    line(`  ${ui.details.outcome}: ${prose(td.outcome)}`)
+    if (isTodo(p.links)) line(`  ${ui.details.links}: ${text(p.links)}`)
     else if (p.links.kind === 'internal') line(`  ${ui.internalNoLink}`)
     else for (const l of p.links.links) line(`  [link] ${l.label}`)
     line(`  [button] ${ui.close}`, '')

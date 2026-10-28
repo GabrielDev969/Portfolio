@@ -15,9 +15,9 @@ const partOrder = [
 const btsButton = (page: Page, id: string) =>
   page.locator(`#${id}`).getByRole('button', { name: 'Technical details' })
 
-/** The part headings of one project's behind the scenes, as a reader sees them. */
+/** The part headings of one project's technical details, as a reader sees them. */
 const partHeadings = (page: Page, id: string) =>
-  page.locator(`#${id} .bts-parts h4`).filter({ visible: true }).allInnerTexts()
+  page.locator(`#${id} .details-parts h4`).filter({ visible: true }).allInnerTexts()
 
 test('all five projects are there, in order', async ({ page }) => {
   await page.goto('en/')
@@ -41,7 +41,7 @@ for (const mode of ['full', 'quick'] as const) {
     await startInViewMode(context, mode)
     for (const locale of ['pt', 'en', 'es']) {
       await page.goto(`${locale}/`)
-      const empty = await page.locator('.bts-parts').evaluateAll((all) =>
+      const empty = await page.locator('.details-parts').evaluateAll((all) =>
         all.flatMap((parts) => {
           const project = parts.closest('article')?.id
           const sections = [...parts.querySelectorAll(':scope > section')]
@@ -127,18 +127,18 @@ test.describe('the behind-the-scenes drawer', () => {
   })
 })
 
-test('Quick view shows every project’s behind the scenes inline, with no stills', async ({
+test('Quick view shows every project’s technical details inline, with no images', async ({
   browser,
 }) => {
   const context = await browser.newContext()
   await startInViewMode(context, 'quick')
   const page = await context.newPage()
   await page.goto('en/')
-  await expect(page.locator('#projects .bts-parts')).toHaveCount(5)
-  for (const parts of await page.locator('#projects .bts-parts').all()) {
+  await expect(page.locator('#projects .details-parts')).toHaveCount(5)
+  for (const parts of await page.locator('#projects .details-parts').all()) {
     await expect(parts.getByRole('heading', { name: 'Architecture' })).toBeVisible()
   }
-  await expect(page.locator('#projects .project-still').filter({ visible: true })).toHaveCount(0)
+  await expect(page.locator('#projects .project-image').filter({ visible: true })).toHaveCount(0)
   await expect(page.getByRole('button', { name: 'Technical details' })).toHaveCount(0)
   await context.close()
 })
@@ -151,7 +151,7 @@ test('the drawer and Quick view hold the same parts', async ({ browser }) => {
     await page.goto('en/')
     if (mode === 'full') await btsButton(page, 'campaign-bi').click()
     // The parts only: Quick view leaves out the drawer's copy of the links, already on the project.
-    const sections = page.locator('#campaign-bi .bts-parts > section')
+    const sections = page.locator('#campaign-bi .details-parts > section')
     // Read them once they are on screen: CI once read them mid-hydration and got empty text.
     await expect(sections.first()).toBeVisible()
     const parts = await sections.allInnerTexts()
@@ -173,7 +173,7 @@ test('before hydration, Quick view already looks as it will: parts open, nothing
     const page = await context.newPage()
     await page.goto('en/')
     await page.evaluate(() => document.fonts.ready)
-    const sections = page.locator('#campaign-bi .bts-parts > section')
+    const sections = page.locator('#campaign-bi .details-parts > section')
     await expect(sections.first()).toBeVisible()
     if (hydrate) await expect(page.locator('#campaign-bi details')).toHaveCount(0)
     else await expect(page.locator('#campaign-bi details')).toHaveCount(1)
@@ -200,7 +200,7 @@ test('before hydration, Quick view already looks as it will: parts open, nothing
 test.describe('without JavaScript', () => {
   test.use({ javaScriptEnabled: false })
 
-  test('behind the scenes opens in place as a disclosure', async ({ page }) => {
+  test('technical details open in place as a disclosure', async ({ page }) => {
     await page.goto('en/')
     const details = page.locator('#zibby details')
     await expect(details.locator('h4', { hasText: 'Architecture' })).toBeHidden()
