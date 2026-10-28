@@ -54,13 +54,13 @@ Portuguese (pt-BR), English and Spanish, prerendered at `/Portfolio/{pt,en,es}/`
 
 |                                              | Budget                 | Now                         |
 | -------------------------------------------- | ---------------------- | --------------------------- |
-| Initial JS (gzip)                            | 180 KB                 | 178.8 KB                    |
+| Initial JS (gzip)                            | 180 KB                 | 178.9 KB                    |
 | LCP, throttled phone (`pnpm measure:vitals`) | 2.5 s                  | 0.65–0.66 s in every locale |
 | CLS                                          | 0.1                    | 0.002 or less               |
-| Lighthouse mobile, applied throttling        | Perf ≥ 90, others ≥ 95 | 97–98 / 100 / 100 / 100     |
+| Lighthouse mobile, CPU calibrated            | Perf ≥ 90, others ≥ 95 | 98 / 100 / 100 / 100        |
 | Lighthouse desktop                           | Perf ≥ 90, others ≥ 95 | 99 / 100 / 100 / 100        |
 
-Lighthouse's simulated mobile run (what PageSpeed Insights shows) scores 85 with an estimated LCP of 4.3 s: its model charges the three preloaded fonts to the hero line, which actually paints at once in the fallback font. It is reported in every CI run, next to the gated numbers ([`lighthouse/README.md`](lighthouse/README.md)).
+Lighthouse's simulated mobile run (what PageSpeed Insights shows) scores 84–85 with an estimated LCP of 4.3 s: its model charges the three preloaded fonts to the hero line, which actually paints at once in the fallback font. It is reported in every CI run, next to the gated numbers ([`lighthouse/README.md`](lighthouse/README.md)).
 
 ## Honest content
 

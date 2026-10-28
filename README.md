@@ -84,7 +84,7 @@ Every push runs, in CI:
 - Lighthouse: mobile with applied throttling and desktop must reach Performance ≥ 90 and Accessibility, Best Practices and SEO ≥ 95; the simulated mobile run (what PageSpeed Insights shows) is reported alongside;
 - the list of missing facts, in the run summary.
 
-Measured at the end of the rebuild: initial JS 178.8 KB; LCP 0.65–0.66 s and CLS ≤ 0.002 on a throttled phone in every locale; Lighthouse mobile 97–98 / 100 / 100 / 100, desktop 99 / 100 / 100 / 100, simulated mobile 85 (see [`DESIGN.md`](DESIGN.md#budgets)).
+Measured at the end of the rebuild: initial JS 178.9 KB; LCP 0.65–0.66 s and CLS ≤ 0.002 on a throttled phone in every locale; Lighthouse mobile (CPU calibrated to a mid-tier phone) 98 / 100 / 100 / 100, desktop 99 / 100 / 100 / 100, simulated mobile 84–85 (see [`DESIGN.md`](DESIGN.md#budgets)).
 
 ## Deploy
 

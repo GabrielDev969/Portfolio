@@ -129,9 +129,9 @@ Each pin is the newest stable release that is **at least 2 weeks old** (as of 20
 | Phase 4 | **177.7 KB**         | Act II: the drawer switch and the push-in scene. The drawer animates in CSS, and the mockups and diagrams are server-rendered SVG, so they add HTML, not JS                                                              |
 | Phase 5 | **178.4 KB**         | Act III's pencil, the credits roll and the rewind. The drawings and the credits are server-rendered                                                                                                                      |
 | Phase 6 | **178.7 KB**         | PT and ES (content, so no JS), the print switch to Quick view and the phone monogram. Every locale ships the same bundle                                                                                                 |
-| Phase 7 | **178.8 KB**         | The pre-hydration Quick view label (CSS picks it) and the motion-ready signal for tests                                                                                                                                  |
+| Phase 7 | **178.9 KB**         | The pre-hydration Quick view label (CSS picks it), the motion-ready signal for tests and the scene queue                                                                                                                 |
 
-The margin is 1.2 KB. **Standing rule (from Gabriel):** if a later phase goes over 180 KB, Motion is replaced by CSS transitions (`@starting-style` for the menu and panels) without asking.
+The margin is 1.1 KB. **Standing rule (from Gabriel):** if a later phase goes over 180 KB, Motion is replaced by CSS transitions (`@starting-style` for the menu and panels) without asking.
 
 A Quick view reader on a return visit downloads the same JS (one bundle) but runs none of the motion code.
 
@@ -153,13 +153,15 @@ A Quick view reader on a return visit downloads the same JS (one bundle) but run
 
 `pnpm lighthouse` runs three configs on the gzipped preview, for `/en/`, `/pt/` and `/es/` (`lighthouse/README.md`). Median runs:
 
-| Run                                | Perf  | A11y | Best practices | SEO | LCP         | CLS     | TBT       |
-| ---------------------------------- | ----- | ---- | -------------- | --- | ----------- | ------- | --------- |
-| Mobile, applied throttling (gated) | 97–98 | 100  | 100            | 100 | 1.49–1.50 s | ≤ 0.004 | 94–168 ms |
-| Desktop (gated)                    | 99    | 100  | 100            | 100 | 0.84 s      | 0       | 0 ms      |
-| Mobile, simulated (reported)       | 85    | 100  | 100            | 100 | 4.28 s      | 0       | ≤ 18 ms   |
+| Run                                | Perf  | A11y | Best practices | SEO | LCP    | CLS     | TBT      |
+| ---------------------------------- | ----- | ---- | -------------- | --- | ------ | ------- | -------- |
+| Mobile, applied throttling (gated) | 98    | 100  | 100            | 100 | 1.57 s | ≤ 0.004 | 97–99 ms |
+| Desktop (gated)                    | 99    | 100  | 100            | 100 | 0.84 s | 0       | 0 ms     |
+| Mobile, simulated (reported)       | 84–85 | 100  | 100            | 100 | 4.28 s | 0       | ≤ 72 ms  |
 
+- **The phone's CPU is calibrated** (since the first CI run): the slowdown is `benchmarkIndex / 500`, the Moto G4 of Lighthouse's throttling table, 8.2× on this Mac. With the default 4× the same build scored 98 here and 78 on GitHub's runner, because 4× emulates a different phone on each machine.
 - **What phase 7 fixed on the way:**
+  - Calibrated, the phone showed **TBT 460 ms and Performance 86**: when the GSAP runtime arrived, every scene mounted inside one React commit, a single 400 ms task (blocking the GSAP chunk took TBT to 90 ms). Scenes now mount one per task (`mountSoon` in `src/motion/runtime.ts`) and the triggers are measured once at the end: TBT 97–99 ms, Performance 98. The same work, no longer one block for a phone to sit through.
   - The fonts preloaded six files (about 565 KB), half of them the `latin-ext` subsets the page never used: every letter of PT, EN and ES is in `latin` (a unit test checks the content). Now three files, about 340 KB. Simulated mobile went from 78 to 85.
   - The site had no favicon, so every page logged a 404 (Best Practices 96 on desktop). It now has the reel mark as `icon.svg` and an Apple touch icon.
   - `pnpm preview` redirected every path outside `/Portfolio/` to the page, so Lighthouse read HTML as `/robots.txt` (SEO 92). It now answers 404 there, like Pages.
