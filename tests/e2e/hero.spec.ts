@@ -1,13 +1,7 @@
-import { existsSync } from 'node:fs'
-import { join } from 'node:path'
 import { expect, skipColdOpen, test } from './fixtures'
 import { factVisibility, ready, startInViewMode, viewports } from './helpers'
 
-// Download CV joins the facts once its PDF is in public/cv/; until then the build leaves it out.
-const cv = existsSync(
-  join(import.meta.dirname, '..', '..', 'public', 'cv', 'CV_Gabriel_Santos_EN.pdf'),
-)
-const facts = ['name', 'role', 'stack', 'remote', 'contact', ...(cv ? ['cv'] : [])]
+const facts = ['name', 'role', 'stack', 'remote', 'contact', 'cv']
 
 // The 5-second test (design/COMMIT-SHEET.md, Brief): the first screen, without scrolling,
 // shows name, role, core stack, "Remote", Contact and Download CV, inside the viewport and uncovered.
@@ -61,19 +55,26 @@ test('a deep link opens with the bars already open', async ({ page }) => {
   await expect(page.locator('html')).toHaveAttribute('data-bars', 'open')
 })
 
-// Spanish carries one more hero line (relocation), so check it at the tightest viewports.
-for (const viewport of [viewports[0]!, viewports[2]!]) {
-  test(`5-second test · es · ${viewport.width}×${viewport.height}`, async ({ browser }) => {
-    const context = await browser.newContext({ viewport })
-    await skipColdOpen(context)
-    const page = await context.newPage()
-    await page.goto('es/')
-    await ready(page)
-    for (const f of await factVisibility(page)) {
-      expect(f, f.fact).toMatchObject({ inViewport: true, uncovered: true })
-    }
-    await context.close()
-  })
+// The translated buttons are longer, and Spanish carries one more hero line (relocation), so
+// check both at the tightest viewports.
+for (const locale of ['pt', 'es']) {
+  for (const viewport of [viewports[0]!, viewports[2]!]) {
+    test(`5-second test · ${locale} · ${viewport.width}×${viewport.height}`, async ({
+      browser,
+    }) => {
+      const context = await browser.newContext({ viewport })
+      await skipColdOpen(context)
+      const page = await context.newPage()
+      await page.goto(`${locale}/`)
+      await ready(page)
+      const before = await factVisibility(page)
+      expect(before.map((f) => f.fact).sort()).toEqual([...facts].sort())
+      for (const f of before) {
+        expect(f, f.fact).toMatchObject({ inViewport: true, uncovered: true })
+      }
+      await context.close()
+    })
+  }
 }
 
 test('the peak never makes the page scroll sideways', async ({ browser }) => {

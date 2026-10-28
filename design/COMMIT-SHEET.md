@@ -17,7 +17,7 @@ Decided on paper before any markup. Any banned device that survives into the bui
   - "Remote"
   - two primary buttons, **Download CV** and **Contact**
 
-  A Playwright test enforces it. Until the CV PDFs are in `public/cv/`, the published page leaves Download CV out (it would be a 404), and the test checks the other five.
+  A Playwright test enforces it, in every locale. The build leaves Download CV out if its PDF is missing from `public/cv/`, so the page never links to a 404; the tests then fail.
 
 ## The concept in one line
 

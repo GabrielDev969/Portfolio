@@ -96,7 +96,7 @@ Everything below is a `todo()` in the content or a missing file. None of it show
 
 <!-- todos:start -->
 
-41 open items.
+38 open items.
 
 - **Project: Sistema Wave**
   - the problem this project solved
@@ -139,9 +139,5 @@ Everything below is a `todo()` in the content or a missing file. None of it show
   - how it is tested
   - how BookOwl is deployed
   - the outcome, ideally with a number
-- **Files**
-  - public/cv/CV_Gabriel_Santos_PT.pdf
-  - public/cv/CV_Gabriel_Santos_EN.pdf
-  - public/cv/CV_Gabriel_Santos_ES.pdf
 
 <!-- todos:end -->

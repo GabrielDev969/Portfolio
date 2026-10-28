@@ -10,7 +10,7 @@ Gabriel Santos' portfolio is a short film you watch by scrolling: a cold open, a
 
 **It is a developer's portfolio first. The film is the frame, never an obstacle.** When a cinema device competes with finding a fact (who, what stack, where, how to reach him), the fact wins.
 
-- **The 5-second test:** the first screen, at every width and without scrolling, shows the name, the role, the core stack, "Remote" and the Contact button (Download CV joins it once the PDFs are in `public/cv/`). A Playwright test checks five viewports before, during and after the peak.
+- **The 5-second test:** the first screen, at every width and without scrolling, shows the name, the role, the core stack, "Remote" and the Download CV and Contact buttons. A Playwright test checks five viewports before, during and after the peak, and the tightest two in Portuguese and Spanish.
 - **Scroll is never hijacked:** Lenis only smooths the wheel, touch is native, and the page's only pin (Act I) costs at most one screen height.
 - **Quick view** turns the film off: one readable column, every motion off, the same content.
 

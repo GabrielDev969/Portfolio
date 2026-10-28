@@ -77,13 +77,18 @@ test('printing gives Quick view on paper and returns to the film', async ({ page
   expect(await page.evaluate(() => localStorage.getItem('viewMode'))).toBeNull()
 })
 
-test('every download points to a file that exists', async ({ page, request }) => {
+test('every locale offers its own CV, and the file is there', async ({ page, request }) => {
   for (const locale of ['pt', 'en', 'es']) {
     await page.goto(`${locale}/`)
-    for (const href of await page
+    const hrefs = await page
       .locator('a[download]')
-      .evaluateAll((as) => as.map((a) => a.getAttribute('href')!))) {
-      expect((await request.get(href)).status(), href).toBe(200)
-    }
+      .evaluateAll((as) => as.map((a) => a.getAttribute('href')!))
+    // Hero and end credits, both to this locale's PDF.
+    expect(hrefs, locale).toEqual(
+      Array(2).fill(`/Portfolio/cv/CV_Gabriel_Santos_${locale.toUpperCase()}.pdf`),
+    )
+    const response = await request.get(hrefs[0]!)
+    expect(response.status(), hrefs[0]).toBe(200)
+    expect(response.headers()['content-type'], hrefs[0]).toBe('application/pdf')
   }
 })
