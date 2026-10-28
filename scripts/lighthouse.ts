@@ -2,17 +2,50 @@
  * pnpm lighthouse — the three Lighthouse configs in lighthouse/ (see its README), one after the
  * other, then a table of the median run per page and config: on stdout, and in the run summary
  * on CI. Exits non-zero if a gated config fails its assertions. Needs `pnpm build`.
+ *
+ * The phone's CPU is calibrated to the machine first: a short run reads Lighthouse's
+ * benchmarkIndex, and the slowdown is benchmarkIndex / 500, the mid-tier phone (Moto G4) of
+ * Lighthouse's throttling table (docs/throttling.md: 4× from a 2000 desktop, 2× from a 1000
+ * one). A fixed 4× emulated a fast phone on this Mac (index about 4000) and a slow one on a CI
+ * runner, so the same page scored 98 here and 78 there.
  */
 import { spawnSync } from 'node:child_process'
-import { appendFileSync, existsSync, readFileSync } from 'node:fs'
+import { appendFileSync, existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 const root = join(import.meta.dirname, '..')
 const configs = [
-  { name: 'mobile', label: 'Mobile, applied throttling', gate: true },
-  { name: 'desktop', label: 'Desktop', gate: true },
-  { name: 'mobile-simulated', label: 'Mobile, simulated (PageSpeed)', gate: false },
+  { name: 'mobile', label: 'Mobile, applied throttling', gate: true, phone: true },
+  { name: 'desktop', label: 'Desktop', gate: true, phone: false },
+  { name: 'mobile-simulated', label: 'Mobile, simulated (PageSpeed)', gate: false, phone: true },
 ]
+
+function calibrate() {
+  spawnSync(
+    'pnpm',
+    [
+      'exec',
+      'lhci',
+      'collect',
+      '--config=lighthouse/desktop.json',
+      '--url=http://localhost:4173/Portfolio/en/',
+      '--numberOfRuns=1',
+      '--settings.onlyCategories=performance',
+    ],
+    { cwd: root, stdio: 'ignore' },
+  )
+  const dir = join(root, '.lighthouseci')
+  const file = readdirSync(dir).find((f) => f.startsWith('lhr-') && f.endsWith('.json'))
+  if (!file) throw new Error('Calibration run produced no report.')
+  const lhr = JSON.parse(readFileSync(join(dir, file), 'utf8')) as {
+    environment: { benchmarkIndex: number }
+  }
+  const index = lhr.environment.benchmarkIndex
+  return { index, slowdown: Math.min(12, Math.max(1, Math.round((index / 500) * 10) / 10)) }
+}
+
+const { index, slowdown } = calibrate()
+console.log(`benchmarkIndex ${Math.round(index)}: phone CPU slowdown ${slowdown}×`)
 
 type Lhr = {
   finalDisplayedUrl: string
@@ -25,7 +58,13 @@ const rows: string[] = []
 for (const config of configs) {
   const run = spawnSync(
     'pnpm',
-    ['exec', 'lhci', 'autorun', `--config=lighthouse/${config.name}.json`],
+    [
+      'exec',
+      'lhci',
+      'autorun',
+      `--config=lighthouse/${config.name}.json`,
+      ...(config.phone ? [`--collect.settings.throttling.cpuSlowdownMultiplier=${slowdown}`] : []),
+    ],
     { cwd: root, stdio: 'inherit' },
   )
   if (run.status !== 0 && config.gate) failed = true
@@ -54,7 +93,7 @@ const table = [
   '| --- | --- | --- | --- | --- | --- | --- | --- | --- |',
   ...rows,
   '',
-  'Gated: mobile with applied throttling and desktop. The simulated row is reported only (lighthouse/README.md).',
+  `Gated: mobile with applied throttling and desktop. The simulated row is reported only. Phone CPU slowdown ${slowdown}× (benchmarkIndex ${Math.round(index)}; lighthouse/README.md).`,
 ].join('\n')
 console.log(`\n${table}`)
 if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${table}\n`)
