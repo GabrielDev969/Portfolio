@@ -96,20 +96,8 @@ Everything below is a `todo()` in the content or a missing file. None of it show
 
 <!-- todos:start -->
 
-18 open items.
+8 open items.
 
-- **Project: Zibby**
-  - a public link for Zibby, if there is one
-  - the problem this project solved
-  - why a modular monolith in one monorepo
-  - one number, if you want it: orders, products or uptime
-- **Project: Hostly**
-  - the rest of the Hostly stack
-  - the problem this project solved
-  - what you owned in this project
-  - why this split
-  - what that changed in the design today
-  - how it is tested
 - **Project: BookOwl**
   - the problem this project solved
   - what you owned in this project

@@ -91,7 +91,7 @@ My own multi-store e-commerce platform, launched in October 2026: a storefront, 
 [mockup words] New · Home · Kitchen · Cart (2) · Made for every day · Ceramic mug · Desk lamp · Linen tote · Orders · Admin · Preparing · Paid · Shipped · Delivered
 Stack: Next.js, NestJS, PostgreSQL, Prisma, Stripe, Resend, Microsoft Clarity, Meta Pixel
 [button] Technical details
-  The problem: [TODO(gabriel): the problem this project solved]
+  The problem: Running several online stores from one place, each with its own products, sales and integrations.
   My role: My own product. I built it in phases with AI coding agents, and every phase went plan → review → implement → tests → diff review → merge.
   Architecture:
     Storefront (Next.js) → API (NestJS, modular monolith)
@@ -101,32 +101,35 @@ Stack: Next.js, NestJS, PostgreSQL, Prisma, Stripe, Resend, Microsoft Clarity, M
     API (NestJS, modular monolith) → Resend (e-mail provider)
     Storefront (Next.js) → Microsoft Clarity and Meta Pixel
   Key decisions:
-    - A pnpm monorepo with the NestJS API and the Next.js storefront and admin, organized as a modular monolith. [TODO(gabriel): why a modular monolith in one monorepo]
+    - A pnpm monorepo with the NestJS API and the Next.js storefront and admin, organized as a modular monolith. One person builds and runs it, so it ships as one deploy with one database and one place to trace an error. Microservices would add network calls, separate deploys and failures spread across services, with nothing to gain at this size. Each area (stores, products, orders, payments) stays in its own module with a clear boundary, so one can become a separate service if it ever needs to scale. And in the monorepo, a change that crosses the API, the storefront and the admin goes out in one commit.
     - Microsoft Clarity in the storefront, and a Meta Pixel set per store. Clarity records sessions and builds heatmaps, so I can see where customers click, how far they scroll and where they give up. Each store adds its own Meta Pixel, which reports visits, add-to-carts and purchases back to Meta, so its ads can be measured and optimized.
     - Every integration is a provider: Stripe for payments and Resend for e-mail are the first, and other APIs plug in the same way. So each store can be created and customized however it needs, with the services it chooses.
   Testing and deploy: Automated tests across the monorepo; each phase passed them before its diff review. Deployed to a VPS, with emergency backups. Customer data and API keys are encrypted, so even after a break-in they can only be read with the decryption key.
-  Outcome: Launched in October 2026. [TODO(gabriel): one number, if you want it: orders, products or uptime]
-  Links: [TODO(gabriel): a public link for Zibby, if there is one]
+  Outcome: Launched in October 2026.
+  No public link
   [button] Close
 
 -- Hostly (IA Robots Solutions) --
-A system for OrionStar service robots and registered LED screens: an admin panel that schedules ad campaigns and music, a backend on a VPS, and a RobotOS app that plays them and talks to people. The ads stream to the robot and to the screens, at events too.
+A multi-company platform for OrionStar service robots: its own Android app replaces the factory one and plays the campaigns, music and spoken lines scheduled on a web panel. The ads also go to registered LED screens, at events too.
 [image] A robot schedule screen with a fictional campaign playlist, standing in for the real system.
 [mockup words] Today · Campaign · Music · Welcome message · Lobby set A · Spring offer · Lunch menu · Lobby set B · Now playing · Campaign, 30 seconds · Up next · Morning light · Open doors · Quiet hour · Second floor · Late check-in
-Stack: RobotOS, [TODO(gabriel): the rest of the Hostly stack]
+Stack: Kotlin, RobotOS, NestJS, Next.js, PostgreSQL, Redis, BullMQ, FFmpeg, Docker
 [button] Technical details
-  The problem: [TODO(gabriel): the problem this project solved]
-  My role: [TODO(gabriel): what you owned in this project]
+  The problem: The robot's factory app made it hard to change the media, could not schedule campaigns, failed on the big screen and kept no report.
+  My role: I wrote the specification and build the whole system, with AI coding agents working in parallel, one per issue: the API, the panel, the media worker and the Android app on the robot.
   Architecture:
-    Admin panel → Backend (VPS) (campaigns, music)
-    Robot app → Backend (VPS)
-    Robot app → RobotOS on OrionStar LuckiBot Plus (abstraction layer)
-    Backend (VPS) → Registered LED screen (ads)
+    Panel (Next.js) → API (NestJS)
+    Robot app (Kotlin) → API (NestJS) (WebSocket)
+    Robot app (Kotlin) → RobotOS on LuckiBot Plus (RobotGateway)
+    API (NestJS) → Media worker (FFmpeg) (queue)
+    API (NestJS) → PostgreSQL
+    API (NestJS) → Registered LED screen (ads)
+    Media worker (FFmpeg) → S3 storage
   Key decisions:
-    - The robot app reaches RobotOS (OrionStar LuckiBot Plus) through an abstraction layer, so it can move to AgentOS later.
-    - A backend on a VPS, and an admin panel to schedule ad campaigns and music. [TODO(gabriel): why this split]
-    - Designed to become a multi-company SaaS later. [TODO(gabriel): what that changed in the design today]
-  Testing and deploy: [TODO(gabriel): how it is tested] The backend is hosted on a VPS.
+    - The robot app reaches RobotOS through its own layer, the RobotGateway, which also has a fake for the emulator. The app runs and is tested without the real robot, and if OrionStar ever ships AgentOS for the LuckiBot Plus, only that layer changes.
+    - The cloud decides and the robot executes: every change on the panel recompiles a versioned manifest, and the robot follows the last one it received. Without internet, the robot keeps to its schedule, plays the media from its cache and stores its events to send once the network is back.
+    - Multi-company from the start: operator, clients, sites and robots, with roles and a brand per client that a robot inherits from its client or the operator. Each client, such as a shopping mall, uses the panel under its own brand and sees only its own robots and campaigns. The organization scope is enforced at the center of the API and in the database, not route by route, so the same base can become a SaaS.
+  Testing and deploy: Unit and end-to-end tests on the API, the panel and the worker, contract tests for the RobotGateway and the Android build checks, all in CI on every change. The API denies by default, with a sweep that fails if any route has no guard; login has two-factor authentication, and the audit log is a chain signed with HMAC. The API, panel, worker, PostgreSQL and Redis run with Docker Compose on a VPS behind automatic HTTPS. Media sits in private S3 storage, served only through signed URLs; deploys go only through a VPN, and a daily encrypted backup leaves the server.
   Outcome: In use: it connects to the robot and to registered LED screens and streams ads to both, at events too.
   Internal system, no public link
   [button] Close

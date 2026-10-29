@@ -37,6 +37,7 @@ export const en: SiteContent = {
     technicalDetails: 'Technical details',
     close: 'Close',
     internalNoLink: 'Internal system, no public link',
+    noPublicLink: 'No public link',
     backToTop: 'Back to top',
     stack: 'Stack',
     sectionsNav: 'Sections',
@@ -243,9 +244,10 @@ export const en: SiteContent = {
         mockup: 'zibby-store',
         description: 'A fictional storefront next to its admin panel.',
       },
-      links: todo('a public link for Zibby, if there is one'),
+      links: { kind: 'none' },
       technicalDetails: {
-        problem: missing.problem(),
+        problem:
+          'Running several online stores from one place, each with its own products, sales and integrations.',
         role: [
           'My own product.',
           'I built it in phases with AI coding agents, and every phase went plan → review → implement → tests → diff review → merge.',
@@ -273,7 +275,7 @@ export const en: SiteContent = {
         decisions: [
           {
             what: 'A pnpm monorepo with the NestJS API and the Next.js storefront and admin, organized as a modular monolith.',
-            why: todo('why a modular monolith in one monorepo'),
+            why: 'One person builds and runs it, so it ships as one deploy with one database and one place to trace an error. Microservices would add network calls, separate deploys and failures spread across services, with nothing to gain at this size. Each area (stores, products, orders, payments) stays in its own module with a clear boundary, so one can become a separate service if it ever needs to scale. And in the monorepo, a change that crosses the API, the storefront and the admin goes out in one commit.',
           },
           {
             what: 'Microsoft Clarity in the storefront, and a Meta Pixel set per store.',
@@ -288,10 +290,7 @@ export const en: SiteContent = {
           'Automated tests across the monorepo; each phase passed them before its diff review.',
         deploy:
           'Deployed to a VPS, with emergency backups. Customer data and API keys are encrypted, so even after a break-in they can only be read with the decryption key.',
-        outcome: [
-          'Launched in October 2026.',
-          todo('one number, if you want it: orders, products or uptime'),
-        ],
+        outcome: 'Launched in October 2026.',
       },
     },
     {
@@ -299,8 +298,18 @@ export const en: SiteContent = {
       title: 'Hostly',
       organization: 'IA Robots Solutions',
       logline:
-        'A system for OrionStar service robots and registered LED screens: an admin panel that schedules ad campaigns and music, a backend on a VPS, and a RobotOS app that plays them and talks to people. The ads stream to the robot and to the screens, at events too.',
-      stack: ['RobotOS', todo('the rest of the Hostly stack')],
+        'A multi-company platform for OrionStar service robots: its own Android app replaces the factory one and plays the campaigns, music and spoken lines scheduled on a web panel. The ads also go to registered LED screens, at events too.',
+      stack: [
+        'Kotlin',
+        'RobotOS',
+        'NestJS',
+        'Next.js',
+        'PostgreSQL',
+        'Redis',
+        'BullMQ',
+        'FFmpeg',
+        'Docker',
+      ],
       internal: true,
       image: {
         kind: 'mockup',
@@ -310,39 +319,49 @@ export const en: SiteContent = {
       },
       links: { kind: 'internal' },
       technicalDetails: {
-        problem: missing.problem(),
-        role: missing.role(),
+        problem:
+          "The robot's factory app made it hard to change the media, could not schedule campaigns, failed on the big screen and kept no report.",
+        role: 'I wrote the specification and build the whole system, with AI coding agents working in parallel, one per issue: the API, the panel, the media worker and the Android app on the robot.',
         architecture: {
           nodes: [
-            { id: 'admin', label: 'Admin panel', kind: 'client' },
-            { id: 'app', label: 'Robot app', kind: 'client' },
-            { id: 'backend', label: 'Backend (VPS)', kind: 'service' },
-            { id: 'robot', label: 'RobotOS on OrionStar LuckiBot Plus', kind: 'device' },
+            { id: 'panel', label: 'Panel (Next.js)', kind: 'client' },
+            { id: 'app', label: 'Robot app (Kotlin)', kind: 'client' },
+            { id: 'api', label: 'API (NestJS)', kind: 'service' },
+            { id: 'robot', label: 'RobotOS on LuckiBot Plus', kind: 'device' },
+            { id: 'worker', label: 'Media worker (FFmpeg)', kind: 'service' },
+            { id: 'db', label: 'PostgreSQL', kind: 'data' },
             { id: 'screen', label: 'Registered LED screen', kind: 'device' },
+            { id: 'storage', label: 'S3 storage', kind: 'data' },
           ],
           edges: [
-            { from: 'admin', to: 'backend', label: 'campaigns, music' },
-            { from: 'app', to: 'backend' },
-            { from: 'app', to: 'robot', label: 'abstraction layer' },
-            { from: 'backend', to: 'screen', label: 'ads' },
+            { from: 'panel', to: 'api' },
+            { from: 'app', to: 'api', label: 'WebSocket' },
+            { from: 'app', to: 'robot', label: 'RobotGateway' },
+            { from: 'api', to: 'worker', label: 'queue' },
+            { from: 'api', to: 'db' },
+            { from: 'api', to: 'screen', label: 'ads' },
+            { from: 'worker', to: 'storage' },
           ],
           confirmed: true,
         },
         decisions: [
           {
-            what: 'The robot app reaches RobotOS (OrionStar LuckiBot Plus) through an abstraction layer, so it can move to AgentOS later.',
+            what: 'The robot app reaches RobotOS through its own layer, the RobotGateway, which also has a fake for the emulator.',
+            why: 'The app runs and is tested without the real robot, and if OrionStar ever ships AgentOS for the LuckiBot Plus, only that layer changes.',
           },
           {
-            what: 'A backend on a VPS, and an admin panel to schedule ad campaigns and music.',
-            why: todo('why this split'),
+            what: 'The cloud decides and the robot executes: every change on the panel recompiles a versioned manifest, and the robot follows the last one it received.',
+            why: 'Without internet, the robot keeps to its schedule, plays the media from its cache and stores its events to send once the network is back.',
           },
           {
-            what: 'Designed to become a multi-company SaaS later.',
-            why: todo('what that changed in the design today'),
+            what: 'Multi-company from the start: operator, clients, sites and robots, with roles and a brand per client that a robot inherits from its client or the operator.',
+            why: 'Each client, such as a shopping mall, uses the panel under its own brand and sees only its own robots and campaigns. The organization scope is enforced at the center of the API and in the database, not route by route, so the same base can become a SaaS.',
           },
         ],
-        testing: missing.testing(),
-        deploy: 'The backend is hosted on a VPS.',
+        testing:
+          'Unit and end-to-end tests on the API, the panel and the worker, contract tests for the RobotGateway and the Android build checks, all in CI on every change. The API denies by default, with a sweep that fails if any route has no guard; login has two-factor authentication, and the audit log is a chain signed with HMAC.',
+        deploy:
+          'The API, panel, worker, PostgreSQL and Redis run with Docker Compose on a VPS behind automatic HTTPS. Media sits in private S3 storage, served only through signed URLs; deploys go only through a VPN, and a daily encrypted backup leaves the server.',
         outcome:
           'In use: it connects to the robot and to registered LED screens and streams ads to both, at events too.',
       },

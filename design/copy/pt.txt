@@ -91,7 +91,7 @@ Minha própria plataforma de e-commerce multiloja, lançada em outubro de 2026: 
 [mockup words] Novidades · Casa · Cozinha · Carrinho (2) · Para o dia a dia · Caneca de cerâmica · Luminária de mesa · Bolsa de linho · Pedidos · Admin · Em separação · Pago · Despachado · Entregue
 Stack: Next.js, NestJS, PostgreSQL, Prisma, Stripe, Resend, Microsoft Clarity, Meta Pixel
 [button] Detalhes técnicos
-  O problema: [TODO(gabriel): the problem this project solved]
+  O problema: Gerenciar várias lojas online num só lugar, cada uma com seus próprios produtos, vendas e integrações.
   Meu papel: Produto próprio. Construí em fases com agentes de IA para programar, e cada fase seguiu plano → revisão → implementação → testes → revisão do diff → merge.
   Arquitetura:
     Vitrine (Next.js) → API (NestJS, monólito modular)
@@ -101,32 +101,35 @@ Stack: Next.js, NestJS, PostgreSQL, Prisma, Stripe, Resend, Microsoft Clarity, M
     API (NestJS, monólito modular) → Resend (provider de e-mail)
     Vitrine (Next.js) → Microsoft Clarity, Pixel da Meta
   Decisões principais:
-    - Um monorepo pnpm com a API em NestJS e a vitrine e o painel em Next.js, organizado como monólito modular. [TODO(gabriel): why a modular monolith in one monorepo]
+    - Um monorepo pnpm com a API em NestJS e a vitrine e o painel em Next.js, organizado como monólito modular. Uma pessoa só constrói e opera, então tudo sai num deploy, com um banco e um lugar só para rastrear um erro. Microsserviços trariam chamadas de rede, deploys separados e falhas espalhadas entre serviços, sem ganho nesse tamanho. Cada área (lojas, produtos, pedidos, pagamentos) fica no próprio módulo, com fronteira clara, então uma delas pode virar um serviço separado se um dia precisar escalar. E no monorepo uma mudança que atravessa a API, a vitrine e o painel sai num único commit.
     - Microsoft Clarity na vitrine, e o Pixel da Meta configurado por loja. O Clarity grava as sessões e gera mapas de calor, então dá para ver onde os clientes clicam, até onde rolam a página e onde desistem. Cada loja coloca o próprio Pixel da Meta, que envia visitas, adições ao carrinho e compras de volta para a Meta, para medir e otimizar os anúncios dela.
     - Cada integração é um provider: Stripe para pagamentos e o Resend para e-mail são os primeiros, e outras APIs se conectam do mesmo jeito. Para que cada loja possa ser criada e personalizada como precisar, com os serviços que escolher.
   Testes e deploy: Testes automatizados em todo o monorepo; cada fase passou por eles antes da revisão do diff. Deploy em uma VPS, com backups de emergência. Os dados dos clientes e as chaves de API ficam criptografados: mesmo numa invasão, só podem ser lidos com a chave de descriptografia.
-  Resultado: Lançada em outubro de 2026. [TODO(gabriel): one number, if you want it: orders, products or uptime]
-  Links: [TODO(gabriel): a public link for Zibby, if there is one]
+  Resultado: Lançada em outubro de 2026.
+  Sem link público
   [button] Fechar
 
 -- Hostly (IA Robots Solutions) --
-Um sistema para robôs de atendimento OrionStar e telões de LED cadastrados: um painel administrativo que agenda campanhas de anúncios e músicas, um backend em uma VPS e um app no RobotOS que reproduz tudo e conversa com as pessoas. Os anúncios são transmitidos no robô e nos telões, inclusive em eventos.
+Uma plataforma multiempresa para robôs de atendimento OrionStar: um app Android próprio substitui o de fábrica e toca as campanhas, músicas e falas agendadas num painel web. Os anúncios também vão para telões de LED cadastrados, inclusive em eventos.
 [image] Uma tela de agenda do robô com uma playlist de campanhas fictícia, no lugar do sistema real.
 [mockup words] Hoje · Campanha · Música · Boas-vindas · Lobby, trilha A · Oferta semanal · Menu do almoço · Lobby, trilha B · Tocando agora · Campanha, 30 segundos · A seguir · Luz da manhã · Portas abertas · Hora calma · Segundo andar · Check-in tardio
-Stack: RobotOS, [TODO(gabriel): the rest of the Hostly stack]
+Stack: Kotlin, RobotOS, NestJS, Next.js, PostgreSQL, Redis, BullMQ, FFmpeg, Docker
 [button] Detalhes técnicos
-  O problema: [TODO(gabriel): the problem this project solved]
-  Meu papel: [TODO(gabriel): what you owned in this project]
+  O problema: O app de fábrica do robô dificultava trocar a mídia, não deixava agendar campanhas, falhava na tela grande e não gerava relatório.
+  Meu papel: Escrevi a especificação e desenvolvo o sistema inteiro, com agentes de IA trabalhando em paralelo, um por issue: a API, o painel, o worker de mídia e o app Android do robô.
   Arquitetura:
-    Painel administrativo → Backend (VPS) (campanhas, músicas)
-    App do robô → Backend (VPS)
-    App do robô → RobotOS no OrionStar LuckiBot Plus (camada de abstração)
-    Backend (VPS) → Telão de LED cadastrado (anúncios)
+    Painel (Next.js) → API (NestJS)
+    App do robô (Kotlin) → API (NestJS) (WebSocket)
+    App do robô (Kotlin) → RobotOS no LuckiBot Plus (RobotGateway)
+    API (NestJS) → Worker de mídia (FFmpeg) (fila)
+    API (NestJS) → PostgreSQL
+    API (NestJS) → Telão de LED cadastrado (anúncios)
+    Worker de mídia (FFmpeg) → Storage S3
   Decisões principais:
-    - O app do robô acessa o RobotOS (OrionStar LuckiBot Plus) por uma camada de abstração, para poder migrar para o AgentOS depois.
-    - Um backend em uma VPS e um painel administrativo para agendar campanhas de anúncios e músicas. [TODO(gabriel): why this split]
-    - Pensado para virar um SaaS para várias empresas no futuro. [TODO(gabriel): what that changed in the design today]
-  Testes e deploy: [TODO(gabriel): how it is tested] O backend fica hospedado em uma VPS.
+    - O app do robô acessa o RobotOS por uma camada própria, o RobotGateway, que também tem uma versão falsa para o emulador. O app roda e é testado sem o robô de verdade, e se a OrionStar liberar o AgentOS para o LuckiBot Plus, só essa camada muda.
+    - A nuvem decide e o robô executa: cada mudança no painel recompila um manifesto versionado, e o robô segue o último que recebeu. Sem internet, o robô continua seguindo a agenda, toca a mídia do cache e guarda os eventos para mandar quando a rede voltar.
+    - Multiempresa desde o início: operadora, clientes, locais e robôs, com papéis e marca por cliente, que o robô herda do cliente ou da operadora. Cada cliente, como um shopping, usa o painel com a própria marca e vê só os próprios robôs e campanhas. O escopo por organização é aplicado no centro da API e no banco, e não rota por rota, então a mesma base pode virar um SaaS.
+  Testes e deploy: Testes de unidade e e2e na API, no painel e no worker, testes de contrato do RobotGateway e as verificações do app Android, tudo no CI a cada mudança. A API nega por padrão, com uma varredura que falha se alguma rota ficar sem guarda; o login tem autenticação em dois fatores, e a auditoria é uma cadeia assinada com HMAC. API, painel, worker, PostgreSQL e Redis rodam com Docker Compose numa VPS, atrás de HTTPS automático. A mídia fica num storage S3 privado, servida só por URL assinada; o deploy só passa por VPN, e um backup diário criptografado sai do servidor.
   Resultado: Em uso: conecta ao robô e aos telões de LED cadastrados e transmite anúncios nos dois, inclusive em eventos.
   Sistema interno, sem link público
   [button] Fechar

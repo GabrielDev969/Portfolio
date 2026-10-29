@@ -60,11 +60,12 @@ export function TechnicalDetailsParts({ project, ui }: Props) {
   )
 }
 
-/** The public links, or the note that an internal system has none. Shown on the scene too. */
+/** The public links, or the note that there are none. Shown on the project too. */
 export function ProjectLinks({ project, ui }: Props) {
   const { links } = project
   if (isTodo(links)) return null
   if (links.kind === 'internal') return <p className="text-small text-ink-2">{ui.internalNoLink}</p>
+  if (links.kind === 'none') return <p className="text-small text-ink-2">{ui.noPublicLink}</p>
   return (
     <ul className="flex flex-wrap gap-x-6">
       {links.links.map((link) => (
