@@ -149,7 +149,8 @@ export type SiteContent = {
   }
   experience: Milestone[]
   projects: Project[]
-  workflow: { steps: string[]; closing: string }
+  /** `loop` labels the three beats of the animation beside the closing line. */
+  workflow: { steps: string[]; closing: string; loop: [string, string, string] }
   skills: { stack: Group[]; languages: Group }
   contact: {
     cta: string

@@ -161,6 +161,7 @@ Stack: Python, Django
 5. Ejecuto las pruebas
 6. Merge
 La IA acelera. El criterio es mío.
+[animation] Yo elijo → La IA construye → Queda listo
 
 == Contacto ==
 

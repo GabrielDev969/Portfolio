@@ -1,5 +1,6 @@
 import type { SiteContent } from '@/content/schema'
 import { SectionHeading } from '../ui/SectionHeading'
+import { BuildLoop } from './BuildLoop'
 import { StepDrawing } from './StepDrawing'
 import { StepsDraw } from './StepsDraw'
 
@@ -7,8 +8,9 @@ type Props = { content: SiteContent }
 
 /**
  * How I work (design/STORYBOARD.md §4): the workflow as six numbered steps, each with a small
- * line drawing, then the one line that sums it up. The drawings are complete in the markup;
- * StepsDraw traces them once as they arrive. Quick view keeps the numbered list and the line.
+ * line drawing, then the one line that sums it up, beside a loop of the work: I choose, the AI
+ * builds, it is ready. The drawings are complete in the markup; StepsDraw traces them once as
+ * they arrive. Quick view keeps the numbered list and the line.
  */
 export function HowIWork({ content }: Props) {
   const { sections, workflow } = content
@@ -30,9 +32,12 @@ export function HowIWork({ content }: Props) {
             ))}
           </ol>
         </StepsDraw>
-        <p className="col-span-12 mt-[clamp(3rem,7vw,6rem)] font-text text-heading text-balance italic md:col-span-10 quick:mt-6 quick:text-body quick:font-semibold quick:not-italic">
+        <p className="col-span-12 mt-[clamp(3rem,7vw,6rem)] self-center font-text text-heading text-balance italic lg:col-span-6 quick:col-span-12 quick:mt-6 quick:text-body quick:font-semibold quick:not-italic">
           {workflow.closing}
         </p>
+        <div className="col-span-12 mt-8 sm:col-span-8 lg:col-span-5 lg:col-start-8 lg:mt-[clamp(3rem,7vw,6rem)] quick:hidden">
+          <BuildLoop labels={workflow.loop} />
+        </div>
       </div>
     </section>
   )

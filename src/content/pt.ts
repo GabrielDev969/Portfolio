@@ -330,6 +330,7 @@ export const pt: SiteContent = {
       'Merge',
     ],
     closing: 'A IA acelera. O critério é meu.',
+    loop: ['Eu escolho', 'A IA constrói', 'Fica pronto'],
   },
   skills: {
     stack: [
