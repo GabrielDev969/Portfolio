@@ -178,7 +178,7 @@ describe('content', () => {
       }
 
       it('opens every external link safely', () => {
-        if (isTodo(project.links) || project.links.kind === 'internal') return
+        if (isTodo(project.links) || project.links.kind !== 'public') return
         for (const link of project.links.links) assert.match(link.href, /^https:\/\//)
       })
     })

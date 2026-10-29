@@ -69,7 +69,12 @@ export type ProjectImage =
   | { kind: 'image'; id: ImageId; alt: string }
   | { kind: 'mockup'; mockup: MockupId; description: string }
 
-export type ProjectLinks = { kind: 'public'; links: Link[] } | { kind: 'internal' } | Todo
+export type ProjectLinks =
+  | { kind: 'public'; links: Link[] }
+  | { kind: 'internal' }
+  /** Not internal, but nothing to open for now (Zibby is paused). */
+  | { kind: 'none' }
+  | Todo
 
 export type Project = {
   id: string
@@ -120,6 +125,7 @@ export type SiteContent = {
     technicalDetails: string
     close: string
     internalNoLink: string
+    noPublicLink: string
     backToTop: string
     /** The heading over the stack, in a project and in the contact section. */
     stack: string

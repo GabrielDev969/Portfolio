@@ -109,6 +109,7 @@ export function renderCopy(locale: Locale): string {
     line(`  ${ui.details.outcome}: ${prose(td.outcome)}`)
     if (isTodo(p.links)) line(`  ${ui.details.links}: ${text(p.links)}`)
     else if (p.links.kind === 'internal') line(`  ${ui.internalNoLink}`)
+    else if (p.links.kind === 'none') line(`  ${ui.noPublicLink}`)
     else for (const l of p.links.links) line(`  [link] ${l.label}`)
     line(`  [button] ${ui.close}`, '')
   }

@@ -72,6 +72,7 @@ export const es: SiteContent = {
     technicalDetails: 'Detalles técnicos',
     close: 'Cerrar',
     internalNoLink: 'Sistema interno, sin enlace público',
+    noPublicLink: 'Sin enlace público',
     backToTop: 'Volver arriba',
     stack: 'Stack',
     sectionsNav: 'Secciones',
@@ -191,7 +192,8 @@ export const es: SiteContent = {
         description: 'Una tienda ficticia junto a su panel de administración.',
       },
       technicalDetails: {
-        problem: missing.problem(),
+        problem:
+          'Gestionar varias tiendas online desde un solo lugar, cada una con sus propios productos, ventas e integraciones.',
         role: [
           'Producto propio.',
           'Lo construí por fases con agentes de IA para programar, y cada fase siguió plan → revisión → implementación → pruebas → revisión del diff → merge.',
@@ -211,7 +213,7 @@ export const es: SiteContent = {
         decisions: [
           {
             what: 'Un monorepo pnpm con la API en NestJS y la tienda y el panel en Next.js, organizado como monolito modular.',
-            why: todo('why a modular monolith in one monorepo'),
+            why: 'Una sola persona lo construye y lo opera, así que todo sale en un deploy, con una base de datos y un solo lugar para rastrear un error. Los microservicios sumarían llamadas de red, deploys separados y fallas repartidas entre servicios, sin ganancia a este tamaño. Cada área (tiendas, productos, pedidos, pagos) queda en su propio módulo, con una frontera clara, así que una de ellas puede convertirse en un servicio aparte si algún día necesita escalar. Y en el monorepo, un cambio que cruza la API, la tienda y el panel sale en un solo commit.',
           },
           {
             what: 'Microsoft Clarity en la tienda, y el Píxel de Meta configurado por tienda.',
@@ -226,16 +228,13 @@ export const es: SiteContent = {
           'Pruebas automatizadas en todo el monorepo; cada fase las pasó antes de la revisión del diff.',
         deploy:
           'Desplegado en un VPS, con copias de seguridad de emergencia. Los datos de los clientes y las claves de API están cifrados: incluso ante una intrusión, solo pueden leerse con la clave de descifrado.',
-        outcome: [
-          'Lanzada en octubre de 2026.',
-          todo('one number, if you want it: orders, products or uptime'),
-        ],
+        outcome: 'Lanzada en octubre de 2026.',
       },
     },
     {
       ...hostly,
       logline:
-        'Un sistema para robots de servicio OrionStar y pantallas LED registradas: un panel de administración que programa campañas publicitarias y música, un backend en un VPS y una app en RobotOS que las reproduce y conversa con las personas. Los anuncios se transmiten en el robot y en las pantallas, también en eventos.',
+        'Una plataforma multiempresa para robots de servicio OrionStar: una app Android propia reemplaza la de fábrica y reproduce las campañas, la música y los mensajes de voz programados en un panel web. Los anuncios también van a pantallas LED registradas, también en eventos.',
       image: {
         kind: 'mockup',
         mockup: 'hostly-schedule',
@@ -243,39 +242,49 @@ export const es: SiteContent = {
           'Una pantalla de programación del robot con una playlist de campañas ficticia, en lugar del sistema real.',
       },
       technicalDetails: {
-        problem: missing.problem(),
-        role: missing.role(),
+        problem:
+          'La app de fábrica del robot hacía difícil cambiar los contenidos, no permitía programar campañas, fallaba en la pantalla grande y no generaba informes.',
+        role: 'Escribí la especificación y desarrollo todo el sistema, con agentes de IA trabajando en paralelo, uno por issue: la API, el panel, el worker de contenidos y la app Android del robot.',
         architecture: {
           ...hostly.technicalDetails.architecture,
           nodes: [
-            { id: 'admin', label: 'Panel de administración', kind: 'client' },
-            { id: 'app', label: 'App del robot', kind: 'client' },
-            { id: 'backend', label: 'Backend (VPS)', kind: 'service' },
-            { id: 'robot', label: 'RobotOS en OrionStar LuckiBot Plus', kind: 'device' },
+            { id: 'panel', label: 'Panel (Next.js)', kind: 'client' },
+            { id: 'app', label: 'App del robot (Kotlin)', kind: 'client' },
+            { id: 'api', label: 'API (NestJS)', kind: 'service' },
+            { id: 'robot', label: 'RobotOS en LuckiBot Plus', kind: 'device' },
+            { id: 'worker', label: 'Worker de contenidos (FFmpeg)', kind: 'service' },
+            { id: 'db', label: 'PostgreSQL', kind: 'data' },
             { id: 'screen', label: 'Pantalla LED registrada', kind: 'device' },
+            { id: 'storage', label: 'Almacenamiento S3', kind: 'data' },
           ],
           edges: [
-            { from: 'admin', to: 'backend', label: 'campañas, música' },
-            { from: 'app', to: 'backend' },
-            { from: 'app', to: 'robot', label: 'capa de abstracción' },
-            { from: 'backend', to: 'screen', label: 'anuncios' },
+            { from: 'panel', to: 'api' },
+            { from: 'app', to: 'api', label: 'WebSocket' },
+            { from: 'app', to: 'robot', label: 'RobotGateway' },
+            { from: 'api', to: 'worker', label: 'cola' },
+            { from: 'api', to: 'db' },
+            { from: 'api', to: 'screen', label: 'anuncios' },
+            { from: 'worker', to: 'storage' },
           ],
         },
         decisions: [
           {
-            what: 'La app del robot accede a RobotOS (OrionStar LuckiBot Plus) a través de una capa de abstracción, para poder migrar a AgentOS más adelante.',
+            what: 'La app del robot accede a RobotOS a través de una capa propia, el RobotGateway, que también tiene una versión falsa para el emulador.',
+            why: 'La app funciona y se prueba sin el robot real, y si OrionStar libera AgentOS para el LuckiBot Plus, solo cambia esa capa.',
           },
           {
-            what: 'Un backend en un VPS y un panel de administración para programar campañas publicitarias y música.',
-            why: todo('why this split'),
+            what: 'La nube decide y el robot ejecuta: cada cambio en el panel recompila un manifiesto versionado, y el robot sigue el último que recibió.',
+            why: 'Sin internet, el robot sigue su agenda, reproduce los contenidos de la caché y guarda los eventos para enviarlos cuando vuelva la red.',
           },
           {
-            what: 'Pensado para convertirse en un SaaS para varias empresas más adelante.',
-            why: todo('what that changed in the design today'),
+            what: 'Multiempresa desde el inicio: operadora, clientes, sitios y robots, con roles y una marca por cliente que el robot hereda del cliente o de la operadora.',
+            why: 'Cada cliente, como un centro comercial, usa el panel con su propia marca y ve solo sus propios robots y campañas. El alcance por organización se aplica en el centro de la API y en la base de datos, y no ruta por ruta, así que la misma base puede convertirse en un SaaS.',
           },
         ],
-        testing: missing.testing(),
-        deploy: 'El backend está alojado en un VPS.',
+        testing:
+          'Pruebas unitarias y de punta a punta en la API, el panel y el worker, pruebas de contrato del RobotGateway y las verificaciones de la app Android, todo en CI con cada cambio. La API niega por defecto, con un barrido que falla si alguna ruta queda sin guarda; el inicio de sesión tiene autenticación de doble factor, y la auditoría es una cadena firmada con HMAC.',
+        deploy:
+          'La API, el panel, el worker, PostgreSQL y Redis corren con Docker Compose en un VPS, detrás de HTTPS automático. Los contenidos están en un almacenamiento S3 privado, servidos solo con URL firmadas; el deploy solo pasa por VPN, y una copia de seguridad diaria cifrada sale del servidor.',
         outcome:
           'En uso: se conecta al robot y a las pantallas LED registradas y transmite anuncios en ambos, también en eventos.',
       },

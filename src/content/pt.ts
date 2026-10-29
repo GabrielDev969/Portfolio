@@ -70,6 +70,7 @@ export const pt: SiteContent = {
     technicalDetails: 'Detalhes técnicos',
     close: 'Fechar',
     internalNoLink: 'Sistema interno, sem link público',
+    noPublicLink: 'Sem link público',
     backToTop: 'Voltar ao topo',
     stack: 'Stack',
     sectionsNav: 'Seções',
@@ -189,7 +190,8 @@ export const pt: SiteContent = {
         description: 'Uma vitrine fictícia ao lado do seu painel administrativo.',
       },
       technicalDetails: {
-        problem: missing.problem(),
+        problem:
+          'Gerenciar várias lojas online num só lugar, cada uma com seus próprios produtos, vendas e integrações.',
         role: [
           'Produto próprio.',
           'Construí em fases com agentes de IA para programar, e cada fase seguiu plano → revisão → implementação → testes → revisão do diff → merge.',
@@ -209,7 +211,7 @@ export const pt: SiteContent = {
         decisions: [
           {
             what: 'Um monorepo pnpm com a API em NestJS e a vitrine e o painel em Next.js, organizado como monólito modular.',
-            why: todo('why a modular monolith in one monorepo'),
+            why: 'Uma pessoa só constrói e opera, então tudo sai num deploy, com um banco e um lugar só para rastrear um erro. Microsserviços trariam chamadas de rede, deploys separados e falhas espalhadas entre serviços, sem ganho nesse tamanho. Cada área (lojas, produtos, pedidos, pagamentos) fica no próprio módulo, com fronteira clara, então uma delas pode virar um serviço separado se um dia precisar escalar. E no monorepo uma mudança que atravessa a API, a vitrine e o painel sai num único commit.',
           },
           {
             what: 'Microsoft Clarity na vitrine, e o Pixel da Meta configurado por loja.',
@@ -224,16 +226,13 @@ export const pt: SiteContent = {
           'Testes automatizados em todo o monorepo; cada fase passou por eles antes da revisão do diff.',
         deploy:
           'Deploy em uma VPS, com backups de emergência. Os dados dos clientes e as chaves de API ficam criptografados: mesmo numa invasão, só podem ser lidos com a chave de descriptografia.',
-        outcome: [
-          'Lançada em outubro de 2026.',
-          todo('one number, if you want it: orders, products or uptime'),
-        ],
+        outcome: 'Lançada em outubro de 2026.',
       },
     },
     {
       ...hostly,
       logline:
-        'Um sistema para robôs de atendimento OrionStar e telões de LED cadastrados: um painel administrativo que agenda campanhas de anúncios e músicas, um backend em uma VPS e um app no RobotOS que reproduz tudo e conversa com as pessoas. Os anúncios são transmitidos no robô e nos telões, inclusive em eventos.',
+        'Uma plataforma multiempresa para robôs de atendimento OrionStar: um app Android próprio substitui o de fábrica e toca as campanhas, músicas e falas agendadas num painel web. Os anúncios também vão para telões de LED cadastrados, inclusive em eventos.',
       image: {
         kind: 'mockup',
         mockup: 'hostly-schedule',
@@ -241,39 +240,49 @@ export const pt: SiteContent = {
           'Uma tela de agenda do robô com uma playlist de campanhas fictícia, no lugar do sistema real.',
       },
       technicalDetails: {
-        problem: missing.problem(),
-        role: missing.role(),
+        problem:
+          'O app de fábrica do robô dificultava trocar a mídia, não deixava agendar campanhas, falhava na tela grande e não gerava relatório.',
+        role: 'Escrevi a especificação e desenvolvo o sistema inteiro, com agentes de IA trabalhando em paralelo, um por issue: a API, o painel, o worker de mídia e o app Android do robô.',
         architecture: {
           ...hostly.technicalDetails.architecture,
           nodes: [
-            { id: 'admin', label: 'Painel administrativo', kind: 'client' },
-            { id: 'app', label: 'App do robô', kind: 'client' },
-            { id: 'backend', label: 'Backend (VPS)', kind: 'service' },
-            { id: 'robot', label: 'RobotOS no OrionStar LuckiBot Plus', kind: 'device' },
+            { id: 'panel', label: 'Painel (Next.js)', kind: 'client' },
+            { id: 'app', label: 'App do robô (Kotlin)', kind: 'client' },
+            { id: 'api', label: 'API (NestJS)', kind: 'service' },
+            { id: 'robot', label: 'RobotOS no LuckiBot Plus', kind: 'device' },
+            { id: 'worker', label: 'Worker de mídia (FFmpeg)', kind: 'service' },
+            { id: 'db', label: 'PostgreSQL', kind: 'data' },
             { id: 'screen', label: 'Telão de LED cadastrado', kind: 'device' },
+            { id: 'storage', label: 'Storage S3', kind: 'data' },
           ],
           edges: [
-            { from: 'admin', to: 'backend', label: 'campanhas, músicas' },
-            { from: 'app', to: 'backend' },
-            { from: 'app', to: 'robot', label: 'camada de abstração' },
-            { from: 'backend', to: 'screen', label: 'anúncios' },
+            { from: 'panel', to: 'api' },
+            { from: 'app', to: 'api', label: 'WebSocket' },
+            { from: 'app', to: 'robot', label: 'RobotGateway' },
+            { from: 'api', to: 'worker', label: 'fila' },
+            { from: 'api', to: 'db' },
+            { from: 'api', to: 'screen', label: 'anúncios' },
+            { from: 'worker', to: 'storage' },
           ],
         },
         decisions: [
           {
-            what: 'O app do robô acessa o RobotOS (OrionStar LuckiBot Plus) por uma camada de abstração, para poder migrar para o AgentOS depois.',
+            what: 'O app do robô acessa o RobotOS por uma camada própria, o RobotGateway, que também tem uma versão falsa para o emulador.',
+            why: 'O app roda e é testado sem o robô de verdade, e se a OrionStar liberar o AgentOS para o LuckiBot Plus, só essa camada muda.',
           },
           {
-            what: 'Um backend em uma VPS e um painel administrativo para agendar campanhas de anúncios e músicas.',
-            why: todo('why this split'),
+            what: 'A nuvem decide e o robô executa: cada mudança no painel recompila um manifesto versionado, e o robô segue o último que recebeu.',
+            why: 'Sem internet, o robô continua seguindo a agenda, toca a mídia do cache e guarda os eventos para mandar quando a rede voltar.',
           },
           {
-            what: 'Pensado para virar um SaaS para várias empresas no futuro.',
-            why: todo('what that changed in the design today'),
+            what: 'Multiempresa desde o início: operadora, clientes, locais e robôs, com papéis e marca por cliente, que o robô herda do cliente ou da operadora.',
+            why: 'Cada cliente, como um shopping, usa o painel com a própria marca e vê só os próprios robôs e campanhas. O escopo por organização é aplicado no centro da API e no banco, e não rota por rota, então a mesma base pode virar um SaaS.',
           },
         ],
-        testing: missing.testing(),
-        deploy: 'O backend fica hospedado em uma VPS.',
+        testing:
+          'Testes de unidade e e2e na API, no painel e no worker, testes de contrato do RobotGateway e as verificações do app Android, tudo no CI a cada mudança. A API nega por padrão, com uma varredura que falha se alguma rota ficar sem guarda; o login tem autenticação em dois fatores, e a auditoria é uma cadeia assinada com HMAC.',
+        deploy:
+          'API, painel, worker, PostgreSQL e Redis rodam com Docker Compose numa VPS, atrás de HTTPS automático. A mídia fica num storage S3 privado, servida só por URL assinada; o deploy só passa por VPN, e um backup diário criptografado sai do servidor.',
         outcome:
           'Em uso: conecta ao robô e aos telões de LED cadastrados e transmite anúncios nos dois, inclusive em eventos.',
       },
