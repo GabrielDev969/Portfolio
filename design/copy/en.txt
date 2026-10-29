@@ -160,6 +160,7 @@ Stack: Python, Django
 5. I run the tests
 6. Merge
 AI speeds things up. The judgment is mine.
+[animation] I choose → The AI builds → It's ready
 
 == Contact ==
 

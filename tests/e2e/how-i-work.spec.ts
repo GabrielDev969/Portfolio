@@ -44,6 +44,52 @@ test('Quick view lists the steps without drawings', async ({ browser }) => {
   await page.goto('en/')
   await expect(page.locator('.step-drawing').first()).toBeHidden()
   await expect(page.locator('#how-i-work ol.steps > li')).toHaveCount(6)
+  await expect(page.locator('.build-loop')).toBeHidden()
+  await context.close()
+})
+
+// Freezes every animation in the build loop at one moment of its 9 s cycle.
+const loopAt = (page: Page, ms: number) =>
+  page.evaluate((ms) => {
+    for (const a of document.getAnimations()) {
+      const target = (a.effect as KeyframeEffect).target as Element | null
+      if (target?.closest('.build-loop')) {
+        a.pause()
+        a.currentTime = ms
+      }
+    }
+  }, ms)
+
+test('the build loop lights one label per beat', async ({ page }) => {
+  await page.goto('en/')
+  await expect(page.locator('.bl-labels li')).toHaveText([
+    'I choose',
+    'The AI builds',
+    "It's ready",
+  ])
+  for (const [ms, lit] of [
+    [1000, 0],
+    [4500, 1],
+    [7500, 2],
+  ] as const) {
+    await loopAt(page, ms)
+    const underlined = await page
+      .locator('.bl-labels li')
+      .evaluateAll((items) =>
+        items.map((li) => getComputedStyle(li).textDecorationColor !== 'rgba(0, 0, 0, 0)'),
+      )
+    expect(underlined, `${ms} ms`).toEqual([0, 1, 2].map((i) => i === lit))
+  }
+})
+
+test('with reduced motion, the build loop holds its last beat', async ({ browser }) => {
+  const context = await browser.newContext({ reducedMotion: 'reduce' })
+  const page = await context.newPage()
+  await page.goto('en/')
+  await expect(page.locator('.bl-choose')).toBeHidden()
+  await expect(page.locator('.bl-code')).toBeHidden()
+  await expect(page.locator('.bl-done')).toHaveCSS('opacity', '1')
+  await expect(page.locator('.bl-check')).toHaveCSS('stroke-dashoffset', '0px')
   await context.close()
 })
 

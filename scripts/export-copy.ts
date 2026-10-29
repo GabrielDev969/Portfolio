@@ -118,6 +118,7 @@ export function renderCopy(locale: Locale): string {
   section(sections.howIWork.title)
   c.workflow.steps.forEach((step, i) => line(`${i + 1}. ${step}`))
   line(c.workflow.closing)
+  line(`[animation] ${c.workflow.loop.join(' → ')}`)
 
   section(sections.contact.title)
   line(c.contact.basedIn)

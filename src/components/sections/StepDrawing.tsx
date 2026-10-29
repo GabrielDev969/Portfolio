@@ -1,5 +1,6 @@
 // The six workflow drawings, one per step, in a 240 × 150 box. Every stroke has pathLength 1,
-// so StepsDraw can trace any of them with the same dash values.
+// so StepsDraw can trace any of them with the same dash values. A circle starts at its top
+// point (cx, cy − r), and lines stop at a circle's edge instead of running through it.
 const drawings: string[][] = [
   // 1 · I plan: a sheet with a checklist
   [
@@ -17,7 +18,7 @@ const drawings: string[][] = [
     'M76 48h36',
     'M76 66h30',
     'M76 84h34',
-    'M150 70a24 24 0 1 0 0.1 0',
+    'M150 46a24 24 0 1 0 0.1 0',
     'M167 88l26 26',
   ],
   // 3 · The AI implements: a code window filling with lines
@@ -55,12 +56,16 @@ const drawings: string[][] = [
   ],
   // 6 · Merge: a feature branch with two commits joins the main line
   [
-    'M36 104h168',
-    'M64 104c18 0 18-44 40-44h32c22 0 22 44 40 44',
-    'M64 104a6 6 0 1 0 0.1 0',
-    'M110 60a6 6 0 1 0 0.1 0',
-    'M136 60a6 6 0 1 0 0.1 0',
-    'M176 104a8 8 0 1 0 0.1 0',
+    'M36 104h22',
+    'M70 104h98',
+    'M184 104h20',
+    'M70 104c18 0 16-44 34-44',
+    'M116 60h14',
+    'M142 60c18 0 16 44 26 44',
+    'M64 98a6 6 0 1 0 0.1 0',
+    'M110 54a6 6 0 1 0 0.1 0',
+    'M136 54a6 6 0 1 0 0.1 0',
+    'M176 96a8 8 0 1 0 0.1 0',
   ],
 ]
 

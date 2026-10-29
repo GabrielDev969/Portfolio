@@ -413,6 +413,7 @@ export const en: SiteContent = {
       'Merge',
     ],
     closing: 'AI speeds things up. The judgment is mine.',
+    loop: ['I choose', 'The AI builds', "It's ready"],
   },
   skills: {
     stack: [
