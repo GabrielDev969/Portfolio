@@ -1,5 +1,4 @@
-import { missing } from './missing'
-import { todo, type SiteContent } from './schema'
+import type { SiteContent } from './schema'
 
 export const en: SiteContent = {
   locale: 'en',
@@ -371,7 +370,7 @@ export const en: SiteContent = {
       title: 'BookOwl',
       logline:
         'An open source library management system in Python and Django, built for a real church library.',
-      stack: ['Python', 'Django'],
+      stack: ['Python', 'Django', 'PostgreSQL', 'pandas', 'Railway'],
       internal: false,
       image: {
         kind: 'image',
@@ -383,23 +382,42 @@ export const en: SiteContent = {
         links: [{ label: 'Source on GitHub', href: 'https://github.com/GabrielDev969/BookOwl' }],
       },
       technicalDetails: {
-        problem: missing.problem(),
-        role: missing.role(),
+        problem:
+          'A church library that did not know which books it had or where they were, who had borrowed each one, when it was due back, or whether and when it came back.',
+        role: 'I built it end to end on my own, for the church member who runs the library: the data model, the screens, the spreadsheet import and the deploy.',
         architecture: {
           nodes: [
+            { id: 'browser', label: 'Library screens (browser)', kind: 'client' },
             { id: 'app', label: 'Django app (Python)', kind: 'service' },
-            { id: 'db', label: todo('the BookOwl database'), kind: 'data' },
+            { id: 'db', label: 'PostgreSQL (Supabase)', kind: 'data' },
+            { id: 'telegram', label: 'Telegram (feedback)', kind: 'external' },
           ],
-          edges: [{ from: 'app', to: 'db' }],
+          edges: [
+            { from: 'browser', to: 'app' },
+            { from: 'app', to: 'db' },
+            { from: 'app', to: 'telegram', label: 'feedback' },
+          ],
           confirmed: true,
         },
         decisions: [
-          { what: 'Python and Django.', why: todo('why Python and Django') },
-          { what: 'Open source, on GitHub.', why: todo('why open source') },
+          {
+            what: 'Each loan follows its own states: awaiting pickup, active, overdue, returned or cancelled, and every change also updates the status of its books.',
+            why: 'At any moment the library knows which books are on the shelf, who has each one, the date it is due back and the date it actually came back.',
+          },
+          {
+            what: 'The existing catalog comes in from a CSV or Excel spreadsheet, read with pandas and checked row by row before anything is saved.',
+            why: 'Nobody had to type the books in one by one, and a wrong row shows its error on screen instead of going into the database.',
+          },
+          {
+            what: 'Every book, reader and loan belongs to a library, and each account sees only its own.',
+            why: 'The same install can serve other churches, small institutions or a personal collection, which is also why it is open source.',
+          },
         ],
-        testing: missing.testing(),
-        deploy: todo('how BookOwl is deployed'),
-        outcome: missing.outcome(),
+        testing: 'Checked by hand; the repository has no automated tests yet.',
+        deploy:
+          'Runs on Railway with Gunicorn, applies the database migrations on every release and serves static files with WhiteNoise. The data lives in PostgreSQL on Supabase; in development it falls back to SQLite.',
+        outcome:
+          'It went into use at the church library at version 1.4.2: the library could see which books it had, who had each one and when it was due back.',
       },
     },
   ],
@@ -417,24 +435,58 @@ export const en: SiteContent = {
   },
   skills: {
     stack: [
-      { label: 'Frontend', items: ['Next.js', 'React', 'TypeScript', 'JavaScript', 'Angular'] },
+      {
+        label: 'Frontend & mobile',
+        items: ['Next.js', 'React', 'TypeScript', 'JavaScript', 'Angular', 'Kotlin (Android)'],
+      },
       {
         label: 'Backend',
-        items: ['Node.js', 'NestJS', 'Express', 'RabbitMQ', 'REST APIs', 'Spring Boot', 'Django'],
+        items: [
+          'Node.js',
+          'NestJS',
+          'Express',
+          'REST APIs',
+          'Swagger',
+          'WebSocket',
+          'RabbitMQ',
+          'BullMQ',
+          'Spring Boot',
+          'Django',
+        ],
       },
       {
         label: 'Data',
-        items: ['PostgreSQL', 'Prisma', 'MySQL', 'MongoDB', 'Redis', 'Firebird', 'RedTrack'],
+        items: [
+          'PostgreSQL',
+          'Prisma',
+          'MySQL',
+          'MongoDB',
+          'Redis',
+          'Firebird',
+          'RedTrack',
+          'Meta API',
+          'Stripe',
+        ],
       },
       {
         label: 'DevOps & automation',
-        items: ['Docker', 'AWS', 'Git', 'n8n', 'Jenkins', 'Prometheus', 'Grafana'],
+        items: ['Docker', 'AWS', 'Git', 'Jenkins', 'VPS', 'Prometheus', 'Grafana', 'n8n'],
       },
-      { label: 'Architecture', items: ['Clean Architecture', 'SOLID', 'TDD'] },
+      {
+        label: 'Architecture',
+        items: [
+          'Clean Architecture',
+          'SOLID',
+          'TDD',
+          'Modular monolith',
+          'Multi-tenant',
+          'Microservices',
+        ],
+      },
     ],
     languages: {
       label: 'Languages',
-      items: ['Portuguese (native)', 'Spanish (studying)', 'English (studying)'],
+      items: ['Portuguese (native)', 'Spanish (basic, studying)', 'English (basic, studying)'],
     },
   },
   contact: {

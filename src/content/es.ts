@@ -1,6 +1,5 @@
 import { en } from './en'
-import { missing } from './missing'
-import { todo, type Milestone, type Project, type SiteContent } from './schema'
+import type { Milestone, Project, SiteContent } from './schema'
 
 // Latin American Spanish, translated from en.ts and waiting for Gabriel's review.
 // Relocation is Spanish-only: PT and EN never mention it.
@@ -303,22 +302,37 @@ export const es: SiteContent = {
         links: [{ label: 'Código en GitHub', href: 'https://github.com/GabrielDev969/BookOwl' }],
       },
       technicalDetails: {
-        problem: missing.problem(),
-        role: missing.role(),
+        problem:
+          'La biblioteca de una iglesia no sabía qué libros tenía ni dónde estaban, quién se había llevado cada uno, cuándo debía devolverlo, ni si lo devolvió y cuándo.',
+        role: 'Lo construí solo, de punta a punta, para la hermana de la iglesia que cuida la biblioteca: el modelo de datos, las pantallas, la importación de planillas y el deploy.',
         architecture: {
           ...bookowl.technicalDetails.architecture,
           nodes: [
+            { id: 'browser', label: 'Pantallas de la biblioteca (navegador)', kind: 'client' },
             { id: 'app', label: 'App Django (Python)', kind: 'service' },
-            { id: 'db', label: todo('the BookOwl database'), kind: 'data' },
+            { id: 'db', label: 'PostgreSQL (Supabase)', kind: 'data' },
+            { id: 'telegram', label: 'Telegram (feedback)', kind: 'external' },
           ],
         },
         decisions: [
-          { what: 'Python y Django.', why: todo('why Python and Django') },
-          { what: 'Open source, en GitHub.', why: todo('why open source') },
+          {
+            what: 'Cada préstamo sigue sus propios estados: esperando retiro, activo, atrasado, devuelto o cancelado, y cada cambio también actualiza el estado de sus libros.',
+            why: 'En cualquier momento la biblioteca sabe qué libros están en el estante, quién tiene cada uno, la fecha prevista de devolución y la fecha en que realmente volvió.',
+          },
+          {
+            what: 'El catálogo que ya existía entra por una planilla CSV o Excel, leída con pandas y revisada fila por fila antes de guardar nada.',
+            why: 'Nadie tuvo que registrar los libros uno por uno, y una fila con error muestra el problema en pantalla en lugar de llegar a la base de datos.',
+          },
+          {
+            what: 'Cada libro, lector y préstamo pertenece a una biblioteca, y cada cuenta ve solo la suya.',
+            why: 'La misma instalación puede servir a otras iglesias, pequeñas instituciones o una colección personal, y por eso también es open source.',
+          },
         ],
-        testing: missing.testing(),
-        deploy: todo('how BookOwl is deployed'),
-        outcome: missing.outcome(),
+        testing: 'Probado a mano; el repositorio todavía no tiene pruebas automatizadas.',
+        deploy:
+          'Corre en Railway con Gunicorn, aplica las migraciones de la base de datos en cada release y sirve los archivos estáticos con WhiteNoise. Los datos están en PostgreSQL en Supabase; en desarrollo usa SQLite.',
+        outcome:
+          'Entró en uso en la biblioteca de la iglesia en la versión 1.4.2: la biblioteca pudo ver qué libros tenía, quién tenía cada uno y cuándo debía devolverlo.',
       },
     },
   ],
@@ -336,18 +350,33 @@ export const es: SiteContent = {
   },
   skills: {
     stack: [
-      { label: 'Frontend', items: en.skills.stack[0]!.items },
+      { label: 'Frontend y móvil', items: en.skills.stack[0]!.items },
       {
         label: 'Backend',
-        items: ['Node.js', 'NestJS', 'Express', 'RabbitMQ', 'APIs REST', 'Spring Boot', 'Django'],
+        items: en.skills.stack[1]!.items.map((item) => (item === 'REST APIs' ? 'APIs REST' : item)),
       },
-      { label: 'Datos', items: en.skills.stack[2]!.items },
+      {
+        label: 'Datos',
+        items: en.skills.stack[2]!.items.map((item) =>
+          item === 'Meta API' ? 'API de Meta' : item,
+        ),
+      },
       { label: 'DevOps y automatización', items: en.skills.stack[3]!.items },
-      { label: 'Arquitectura', items: en.skills.stack[4]!.items },
+      {
+        label: 'Arquitectura',
+        items: [
+          'Clean Architecture',
+          'SOLID',
+          'TDD',
+          'Monolito modular',
+          'Multi-tenant',
+          'Microservicios',
+        ],
+      },
     ],
     languages: {
       label: 'Idiomas',
-      items: ['Portugués (nativo)', 'Español (estudiando)', 'Inglés (estudiando)'],
+      items: ['Portugués (nativo)', 'Español (básico, en estudio)', 'Inglés (básico, en estudio)'],
     },
   },
   contact: {

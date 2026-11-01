@@ -138,17 +138,20 @@ Stack: Kotlin, RobotOS, NestJS, Next.js, PostgreSQL, Redis, BullMQ, FFmpeg, Dock
 -- BookOwl --
 Un sistema open source de gestión de bibliotecas en Python y Django, hecho para la biblioteca real de una iglesia.
 [image alt] La pantalla de inicio de BookOwl: el logo del búho sobre un mensaje de bienvenida.
-Stack: Python, Django
+Stack: Python, Django, PostgreSQL, pandas, Railway
 [button] Detalles técnicos
-  El problema: [TODO(gabriel): the problem this project solved]
-  Mi rol: [TODO(gabriel): what you owned in this project]
+  El problema: La biblioteca de una iglesia no sabía qué libros tenía ni dónde estaban, quién se había llevado cada uno, cuándo debía devolverlo, ni si lo devolvió y cuándo.
+  Mi rol: Lo construí solo, de punta a punta, para la hermana de la iglesia que cuida la biblioteca: el modelo de datos, las pantallas, la importación de planillas y el deploy.
   Arquitectura:
-    App Django (Python) → [TODO(gabriel): the BookOwl database]
+    Pantallas de la biblioteca (navegador) → App Django (Python)
+    App Django (Python) → PostgreSQL (Supabase)
+    App Django (Python) → Telegram (feedback) (feedback)
   Decisiones clave:
-    - Python y Django. [TODO(gabriel): why Python and Django]
-    - Open source, en GitHub. [TODO(gabriel): why open source]
-  Pruebas y despliegue: [TODO(gabriel): how it is tested] [TODO(gabriel): how BookOwl is deployed]
-  Resultado: [TODO(gabriel): the outcome, ideally with a number]
+    - Cada préstamo sigue sus propios estados: esperando retiro, activo, atrasado, devuelto o cancelado, y cada cambio también actualiza el estado de sus libros. En cualquier momento la biblioteca sabe qué libros están en el estante, quién tiene cada uno, la fecha prevista de devolución y la fecha en que realmente volvió.
+    - El catálogo que ya existía entra por una planilla CSV o Excel, leída con pandas y revisada fila por fila antes de guardar nada. Nadie tuvo que registrar los libros uno por uno, y una fila con error muestra el problema en pantalla en lugar de llegar a la base de datos.
+    - Cada libro, lector y préstamo pertenece a una biblioteca, y cada cuenta ve solo la suya. La misma instalación puede servir a otras iglesias, pequeñas instituciones o una colección personal, y por eso también es open source.
+  Pruebas y despliegue: Probado a mano; el repositorio todavía no tiene pruebas automatizadas. Corre en Railway con Gunicorn, aplica las migraciones de la base de datos en cada release y sirve los archivos estáticos con WhiteNoise. Los datos están en PostgreSQL en Supabase; en desarrollo usa SQLite.
+  Resultado: Entró en uso en la biblioteca de la iglesia en la versión 1.4.2: la biblioteca pudo ver qué libros tenía, quién tenía cada uno y cuándo debía devolverlo.
   [link] Código en GitHub
   [button] Cerrar
 
@@ -174,11 +177,11 @@ LinkedIn · GitHub · YouTube · TikTok
 [link] Descargar CV
 
 Stack
-Frontend: Next.js, React, TypeScript, JavaScript, Angular
-Backend: Node.js, NestJS, Express, RabbitMQ, APIs REST, Spring Boot, Django
-Datos: PostgreSQL, Prisma, MySQL, MongoDB, Redis, Firebird, RedTrack
-DevOps y automatización: Docker, AWS, Git, n8n, Jenkins, Prometheus, Grafana
-Arquitectura: Clean Architecture, SOLID, TDD
-Idiomas: Portugués (nativo), Español (estudiando), Inglés (estudiando)
+Frontend y móvil: Next.js, React, TypeScript, JavaScript, Angular, Kotlin (Android)
+Backend: Node.js, NestJS, Express, APIs REST, Swagger, WebSocket, RabbitMQ, BullMQ, Spring Boot, Django
+Datos: PostgreSQL, Prisma, MySQL, MongoDB, Redis, Firebird, RedTrack, API de Meta, Stripe
+DevOps y automatización: Docker, AWS, Git, Jenkins, VPS, Prometheus, Grafana, n8n
+Arquitectura: Clean Architecture, SOLID, TDD, Monolito modular, Multi-tenant, Microservicios
+Idiomas: Portugués (nativo), Español (básico, en estudio), Inglés (básico, en estudio)
 
 [link] Volver arriba
