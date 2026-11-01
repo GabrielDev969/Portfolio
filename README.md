@@ -96,16 +96,6 @@ Everything below is a `todo()` in the content or a missing file. None of it show
 
 <!-- todos:start -->
 
-8 open items.
-
-- **Project: BookOwl**
-  - the problem this project solved
-  - what you owned in this project
-  - the BookOwl database
-  - why Python and Django
-  - why open source
-  - how it is tested
-  - how BookOwl is deployed
-  - the outcome, ideally with a number
+Nothing is missing.
 
 <!-- todos:end -->
