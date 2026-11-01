@@ -137,20 +137,20 @@ Stack: Kotlin, RobotOS, NestJS, Next.js, PostgreSQL, Redis, BullMQ, FFmpeg, Dock
 -- BookOwl --
 An open source library management system in Python and Django, built for a real church library.
 [image alt] The BookOwl home screen: the owl logo over a welcome message.
-Stack: Python, Django, PostgreSQL, pandas, Railway
+Stack: Python, Django, PostgreSQL, pandas
 [button] Technical details
   The problem: A church library that did not know which books it had or where they were, who had borrowed each one, when it was due back, or whether and when it came back.
-  My role: I built it end to end on my own, for the church member who runs the library: the data model, the screens, the spreadsheet import and the deploy.
+  My role: I built it end to end on my own, for the church secretary who looks after the library: the data model, the screens, the spreadsheet import and the deploy.
   Architecture:
     Library screens (browser) → Django app (Python)
-    Django app (Python) → PostgreSQL (Supabase)
+    Django app (Python) → PostgreSQL
     Django app (Python) → Telegram (feedback) (feedback)
   Key decisions:
     - Each loan follows its own states: awaiting pickup, active, overdue, returned or cancelled, and every change also updates the status of its books. At any moment the library knows which books are on the shelf, who has each one, the date it is due back and the date it actually came back.
     - The existing catalog comes in from a CSV or Excel spreadsheet, read with pandas and checked row by row before anything is saved. Nobody had to type the books in one by one, and a wrong row shows its error on screen instead of going into the database.
     - Every book, reader and loan belongs to a library, and each account sees only its own. The same install can serve other churches, small institutions or a personal collection, which is also why it is open source.
-  Testing and deploy: Checked by hand; the repository has no automated tests yet. Runs on Railway with Gunicorn, applies the database migrations on every release and serves static files with WhiteNoise. The data lives in PostgreSQL on Supabase; in development it falls back to SQLite.
-  Outcome: It went into use at the church library at version 1.4.2: the library could see which books it had, who had each one and when it was due back.
+  Testing and deploy: Checked by hand; the repository has no automated tests yet. Runs on an internal server at the church, with Gunicorn serving the Django app and WhiteNoise its static files. In development it falls back to SQLite.
+  Outcome: In use at the church library, at version 1.4.2: the secretary sees which books it has, who has each one and when it is due back.
   [link] Source on GitHub
   [button] Close
 

@@ -370,7 +370,7 @@ export const en: SiteContent = {
       title: 'BookOwl',
       logline:
         'An open source library management system in Python and Django, built for a real church library.',
-      stack: ['Python', 'Django', 'PostgreSQL', 'pandas', 'Railway'],
+      stack: ['Python', 'Django', 'PostgreSQL', 'pandas'],
       internal: false,
       image: {
         kind: 'image',
@@ -384,12 +384,12 @@ export const en: SiteContent = {
       technicalDetails: {
         problem:
           'A church library that did not know which books it had or where they were, who had borrowed each one, when it was due back, or whether and when it came back.',
-        role: 'I built it end to end on my own, for the church member who runs the library: the data model, the screens, the spreadsheet import and the deploy.',
+        role: 'I built it end to end on my own, for the church secretary who looks after the library: the data model, the screens, the spreadsheet import and the deploy.',
         architecture: {
           nodes: [
             { id: 'browser', label: 'Library screens (browser)', kind: 'client' },
             { id: 'app', label: 'Django app (Python)', kind: 'service' },
-            { id: 'db', label: 'PostgreSQL (Supabase)', kind: 'data' },
+            { id: 'db', label: 'PostgreSQL', kind: 'data' },
             { id: 'telegram', label: 'Telegram (feedback)', kind: 'external' },
           ],
           edges: [
@@ -415,9 +415,9 @@ export const en: SiteContent = {
         ],
         testing: 'Checked by hand; the repository has no automated tests yet.',
         deploy:
-          'Runs on Railway with Gunicorn, applies the database migrations on every release and serves static files with WhiteNoise. The data lives in PostgreSQL on Supabase; in development it falls back to SQLite.',
+          'Runs on an internal server at the church, with Gunicorn serving the Django app and WhiteNoise its static files. In development it falls back to SQLite.',
         outcome:
-          'It went into use at the church library at version 1.4.2: the library could see which books it had, who had each one and when it was due back.',
+          'In use at the church library, at version 1.4.2: the secretary sees which books it has, who has each one and when it is due back.',
       },
     },
   ],

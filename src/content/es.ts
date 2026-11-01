@@ -304,13 +304,13 @@ export const es: SiteContent = {
       technicalDetails: {
         problem:
           'La biblioteca de una iglesia no sabía qué libros tenía ni dónde estaban, quién se había llevado cada uno, cuándo debía devolverlo, ni si lo devolvió y cuándo.',
-        role: 'Lo construí solo, de punta a punta, para la hermana de la iglesia que cuida la biblioteca: el modelo de datos, las pantallas, la importación de planillas y el deploy.',
+        role: 'Lo construí solo, de punta a punta, para la secretaria de la iglesia que cuida la biblioteca: el modelo de datos, las pantallas, la importación de planillas y el deploy.',
         architecture: {
           ...bookowl.technicalDetails.architecture,
           nodes: [
             { id: 'browser', label: 'Pantallas de la biblioteca (navegador)', kind: 'client' },
             { id: 'app', label: 'App Django (Python)', kind: 'service' },
-            { id: 'db', label: 'PostgreSQL (Supabase)', kind: 'data' },
+            { id: 'db', label: 'PostgreSQL', kind: 'data' },
             { id: 'telegram', label: 'Telegram (feedback)', kind: 'external' },
           ],
         },
@@ -330,9 +330,9 @@ export const es: SiteContent = {
         ],
         testing: 'Probado a mano; el repositorio todavía no tiene pruebas automatizadas.',
         deploy:
-          'Corre en Railway con Gunicorn, aplica las migraciones de la base de datos en cada release y sirve los archivos estáticos con WhiteNoise. Los datos están en PostgreSQL en Supabase; en desarrollo usa SQLite.',
+          'Corre en un servidor interno de la iglesia, con Gunicorn sirviendo la app Django y WhiteNoise sus archivos estáticos. En desarrollo usa SQLite.',
         outcome:
-          'Entró en uso en la biblioteca de la iglesia en la versión 1.4.2: la biblioteca pudo ver qué libros tenía, quién tenía cada uno y cuándo debía devolverlo.',
+          'En uso en la biblioteca de la iglesia, en la versión 1.4.2: la secretaria ve qué libros tiene la biblioteca, quién tiene cada uno y cuándo debe devolverlo.',
       },
     },
   ],

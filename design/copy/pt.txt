@@ -137,20 +137,20 @@ Stack: Kotlin, RobotOS, NestJS, Next.js, PostgreSQL, Redis, BullMQ, FFmpeg, Dock
 -- BookOwl --
 Um sistema open source de gestão de bibliotecas em Python e Django, feito para a biblioteca de uma igreja de verdade.
 [image alt] A tela inicial do BookOwl: o logo da coruja sobre uma mensagem de boas-vindas.
-Stack: Python, Django, PostgreSQL, pandas, Railway
+Stack: Python, Django, PostgreSQL, pandas
 [button] Detalhes técnicos
   O problema: A biblioteca de uma igreja não sabia quais livros tinha nem onde estavam, quem tinha pegado cada um, quando devia devolver, nem se e quando devolveu.
-  Meu papel: Construí sozinho, do começo ao fim, para a irmã da igreja que cuida da biblioteca: o modelo de dados, as telas, a importação de planilhas e o deploy.
+  Meu papel: Construí sozinho, do começo ao fim, para a secretária da igreja que cuida da biblioteca: o modelo de dados, as telas, a importação de planilhas e o deploy.
   Arquitetura:
     Telas da biblioteca (navegador) → App Django (Python)
-    App Django (Python) → PostgreSQL (Supabase)
+    App Django (Python) → PostgreSQL
     App Django (Python) → Telegram (feedback) (feedback)
   Decisões principais:
     - Cada empréstimo segue seus próprios estados: aguardando retirada, ativo, atrasado, devolvido ou cancelado, e cada mudança também atualiza o status dos livros. A qualquer momento a biblioteca sabe quais livros estão na estante, quem está com cada um, a data prevista de devolução e a data em que ele realmente voltou.
     - O acervo que já existia entra por uma planilha CSV ou Excel, lida com pandas e conferida linha por linha antes de qualquer coisa ser salva. Ninguém precisou cadastrar os livros um por um, e uma linha errada mostra o erro na tela em vez de ir para o banco.
     - Cada livro, leitor e empréstimo pertence a uma biblioteca, e cada conta vê só a sua. A mesma instalação pode atender outras igrejas, pequenas instituições ou uma coleção pessoal, e é também por isso que ele é open source.
-  Testes e deploy: Testado à mão; o repositório ainda não tem testes automatizados. Roda no Railway com Gunicorn, aplica as migrações do banco a cada release e serve os arquivos estáticos com WhiteNoise. Os dados ficam em PostgreSQL no Supabase; em desenvolvimento, cai para o SQLite.
-  Resultado: Entrou em uso na biblioteca da igreja na versão 1.4.2: a biblioteca passou a ver quais livros tinha, quem estava com cada um e quando devia devolver.
+  Testes e deploy: Testado à mão; o repositório ainda não tem testes automatizados. Roda em um servidor interno da igreja, com o Gunicorn servindo o app Django e o WhiteNoise os arquivos estáticos. Em desenvolvimento, cai para o SQLite.
+  Resultado: Em uso na biblioteca da igreja, na versão 1.4.2: a secretária vê quais livros a biblioteca tem, quem está com cada um e quando deve devolver.
   [link] Código no GitHub
   [button] Fechar
 

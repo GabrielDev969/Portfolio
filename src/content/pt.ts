@@ -302,13 +302,13 @@ export const pt: SiteContent = {
       technicalDetails: {
         problem:
           'A biblioteca de uma igreja não sabia quais livros tinha nem onde estavam, quem tinha pegado cada um, quando devia devolver, nem se e quando devolveu.',
-        role: 'Construí sozinho, do começo ao fim, para a irmã da igreja que cuida da biblioteca: o modelo de dados, as telas, a importação de planilhas e o deploy.',
+        role: 'Construí sozinho, do começo ao fim, para a secretária da igreja que cuida da biblioteca: o modelo de dados, as telas, a importação de planilhas e o deploy.',
         architecture: {
           ...bookowl.technicalDetails.architecture,
           nodes: [
             { id: 'browser', label: 'Telas da biblioteca (navegador)', kind: 'client' },
             { id: 'app', label: 'App Django (Python)', kind: 'service' },
-            { id: 'db', label: 'PostgreSQL (Supabase)', kind: 'data' },
+            { id: 'db', label: 'PostgreSQL', kind: 'data' },
             { id: 'telegram', label: 'Telegram (feedback)', kind: 'external' },
           ],
         },
@@ -328,9 +328,9 @@ export const pt: SiteContent = {
         ],
         testing: 'Testado à mão; o repositório ainda não tem testes automatizados.',
         deploy:
-          'Roda no Railway com Gunicorn, aplica as migrações do banco a cada release e serve os arquivos estáticos com WhiteNoise. Os dados ficam em PostgreSQL no Supabase; em desenvolvimento, cai para o SQLite.',
+          'Roda em um servidor interno da igreja, com o Gunicorn servindo o app Django e o WhiteNoise os arquivos estáticos. Em desenvolvimento, cai para o SQLite.',
         outcome:
-          'Entrou em uso na biblioteca da igreja na versão 1.4.2: a biblioteca passou a ver quais livros tinha, quem estava com cada um e quando devia devolver.',
+          'Em uso na biblioteca da igreja, na versão 1.4.2: a secretária vê quais livros a biblioteca tem, quem está com cada um e quando deve devolver.',
       },
     },
   ],
