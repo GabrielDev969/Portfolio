@@ -8,7 +8,7 @@ import { MotionProvider } from '@/motion/MotionProvider'
 import { PrintAsQuickView } from '@/motion/PrintAsQuickView'
 import { SmoothScroll } from '@/motion/SmoothScroll'
 import { motionCssVars } from '@/motion/tokens'
-import { display, text } from '../fonts'
+import { display, mono, text } from '../fonts'
 import { headScript } from './head-script'
 
 export const dynamicParams = false
@@ -67,7 +67,7 @@ export default async function LocaleLayout({ children, params }: Props) {
     // The head script sets data-js and data-view before React hydrates.
     <html
       lang={languageTags[locale]}
-      className={`${display.variable} ${text.variable}`}
+      className={`${display.variable} ${text.variable} ${mono.variable}`}
       style={motionCssVars as CSSProperties}
       suppressHydrationWarning
     >

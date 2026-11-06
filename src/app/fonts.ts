@@ -1,4 +1,4 @@
-import { Big_Shoulders, Newsreader } from 'next/font/google'
+import { Big_Shoulders, Newsreader, Spline_Sans_Mono } from 'next/font/google'
 
 // Latin only: every letter of PT, EN and ES is in it (tests/unit/fonts.test.ts checks the
 // content). latin-ext was preloaded too, about 280 KB the page never used.
@@ -21,4 +21,14 @@ export const text = Newsreader({
   axes: ['opsz'],
   display: 'swap',
   variable: '--font-newsreader',
+})
+
+// Mono: the swarm's own voice, never content (design/COMMIT-SHEET.md §3). One weight; optional,
+// so a slow network keeps the system mono and nothing shifts.
+export const mono = Spline_Sans_Mono({
+  subsets: ['latin'],
+  weight: '500',
+  display: 'optional',
+  variable: '--font-spline-mono',
+  fallback: ['ui-monospace', 'Menlo', 'monospace'],
 })
