@@ -5,9 +5,9 @@ import { dur, ease, scrub, stagger } from '@/motion/tokens'
 
 /**
  * Family C on one project, never pinned: as it crosses the screen the image pushes in
- * (1.12 → 1) while the stack lines rise one after another, scrubbed to the scroll. The
- * logline is family A, rising once behind its mask when the project's top passes 70%. With
- * reduced motion the image and the stack fade in once, and the logline is simply there.
+ * (1.12 → 1) while the stack lines rise one after another, scrubbed to the scroll. What I
+ * built is family A, rising once behind its mask when the project's top passes 70%. With
+ * reduced motion the image and the stack fade in once, and the text is simply there.
  */
 export function ProjectPushIn({ children }: { children: ReactNode }) {
   const scope = useRef<HTMLDivElement>(null)
@@ -39,11 +39,11 @@ export function ProjectPushIn({ children }: { children: ReactNode }) {
           0.35,
         )
 
-      const split = SplitText.create(root.querySelector('.project-logline'), {
+      const split = SplitText.create(root.querySelector('.project-built > dd'), {
         type: 'lines',
         mask: 'lines',
         // Lines only, so the text reads the same split or not; the default would put an
-        // aria-label on the <p>, which a paragraph may not carry.
+        // aria-label on the <dd>, which it may not carry.
         aria: 'none',
         autoSplit: true,
         onSplit: (self) =>
