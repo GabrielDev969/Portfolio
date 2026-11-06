@@ -13,7 +13,9 @@ const buildFacts = async (page: Page) =>
   (await (await page.request.get('build-facts.json')).json()) as BuildFacts
 
 const started = (page: Page) => page.locator('.swarm-dock').waitFor({ state: 'attached' })
-const visibleCursors = (page: Page) => page.locator('.swarm-cursor:not([hidden])').count()
+/** Agents at work: on screen and not on their way out. */
+const visibleCursors = (page: Page) =>
+  page.locator('.swarm-cursor:not([hidden]):not(.swarm-leaving)').count()
 
 /** The words of main, normalized, as a reader (or innerText) gets them. */
 const mainText = (page: Page) =>
@@ -132,6 +134,64 @@ test('content is all there at first paint and while a section is being built', a
   expect(await visibleCursors(page)).toBeGreaterThanOrEqual(3)
   expect(await withheld(page, 'main')).toEqual([])
   expect(await mainText(page)).toBe(reference)
+})
+
+// Text streams in as if typed: what is not typed yet waits under a veil, dimmer but readable.
+test('text is typed in, and untyped text stays at AA under its veil', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('en/')
+  await started(page)
+  await page.locator('#zibby').scrollIntoViewIfNeeded()
+  await expect(page.locator('#zibby')).toHaveAttribute('data-swarm-unit', 'building', {
+    timeout: 8000,
+  })
+  await expect(page.locator('.swarm-veil').first()).toBeAttached()
+  // The ground, the body ink, and the ink seen through a veil, as the screen would show them.
+  const ratio = await page.evaluate(() => {
+    const veil = document.querySelector('.swarm-veil')!
+    const ctx = document.createElement('canvas').getContext('2d')!
+    const paint = (...colors: string[]) => {
+      ctx.clearRect(0, 0, 1, 1)
+      for (const c of colors) {
+        ctx.fillStyle = c
+        ctx.fillRect(0, 0, 1, 1)
+      }
+      return [...ctx.getImageData(0, 0, 1, 1).data].slice(0, 3)
+    }
+    const body = getComputedStyle(document.body)
+    const lum = ([r, g, b]: number[]) =>
+      [r!, g!, b!]
+        .map((v) => v / 255)
+        .map((c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4))
+        .reduce((sum, c, i) => sum + c * [0.2126, 0.7152, 0.0722][i]!, 0)
+    const ground = lum(paint(body.backgroundColor))
+    const veiled = lum(
+      paint(body.backgroundColor, body.color, getComputedStyle(veil).backgroundColor),
+    )
+    return (Math.max(ground, veiled) + 0.05) / (Math.min(ground, veiled) + 0.05)
+  })
+  expect(ratio).toBeGreaterThanOrEqual(4.5)
+  // Typed through to the end: no veil is left once the section is approved.
+  await expect(page.locator('#zibby')).toHaveAttribute('data-swarm-unit', 'built', {
+    timeout: 8000,
+  })
+  await expect(page.locator('.swarm-veil')).toHaveCount(0)
+})
+
+test('the image is dragged into its slot and lands exactly there', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('en/')
+  await started(page)
+  const image = page.locator('#sistema-wave .project-image')
+  const slot = await image.evaluate((el) => el.getBoundingClientRect().left + scrollX)
+  await page.locator('#sistema-wave').scrollIntoViewIfNeeded()
+  await expect(page.locator('.swarm-ghost').first()).toBeAttached({ timeout: 8000 })
+  expect(await image.evaluate((el) => (el as HTMLElement).style.translate)).not.toBe('')
+  await expect(page.locator('#sistema-wave')).toHaveAttribute('data-swarm-unit', 'built', {
+    timeout: 8000,
+  })
+  expect(await image.evaluate((el) => (el as HTMLElement).style.translate)).toBe('')
+  expect(await image.evaluate((el) => el.getBoundingClientRect().left + scrollX)).toBe(slot)
 })
 
 test('Skip build finishes everything at once', async ({ page }) => {
