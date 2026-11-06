@@ -321,7 +321,9 @@ export const pt: SiteContent = {
     approved: 'aprovado',
     units: {
       sections: 'seções',
+      word: 'palavra',
       words: 'palavras',
+      item: 'item',
       items: 'itens',
       boxes: 'caixas',
       arrows: 'setas',

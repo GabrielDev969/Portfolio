@@ -583,7 +583,8 @@ export function startSwarm(
     // Veils first, all of them, then the reveal: the words appear only as they are typed.
     const parts = els.map((el) => ({ ends: wordEnds(el), veils: veil(el) }))
     for (const el of els) reveal(el)
-    say(c, `${words(els)} ${labels.units.words}`)
+    const n = words(els)
+    say(c, `${n} ${n === 1 ? labels.units.word : labels.units.words}`)
     let t = 0
     for (const { ends, veils } of parts) {
       if (ends.length === 0) {
@@ -749,7 +750,7 @@ export function startSwarm(
     items: (p, c) => {
       const items = p.group ?? []
       reveal(p.el, true)
-      say(c, `${items.length} ${labels.units.items}`)
+      say(c, `${items.length} ${items.length === 1 ? labels.units.item : labels.units.items}`)
       const step = Math.min(90, 700 / Math.max(items.length, 1)) * pace * tempo
       items.forEach((item, i) =>
         at(i * step, () => {

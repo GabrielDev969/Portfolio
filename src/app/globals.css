@@ -1321,6 +1321,8 @@
 }
 
 .swarm-cursor {
+  /* Over every mark: a veil laid after the cursor came in must not cut its label. */
+  z-index: 1;
   will-change: transform;
 
   > svg {

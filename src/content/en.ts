@@ -432,7 +432,9 @@ export const en: SiteContent = {
     approved: 'approved',
     units: {
       sections: 'sections',
+      word: 'word',
       words: 'words',
+      item: 'item',
       items: 'items',
       boxes: 'boxes',
       arrows: 'arrows',

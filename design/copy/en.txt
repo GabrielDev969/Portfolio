@@ -152,4 +152,4 @@ Dock: Booting swarm… / Building / Ready · deployed
   Active N / Total 16
 [button] Skip build
 Gabriel: approved
-Units: sections, words, items, boxes, arrows, drawings, links
+Units: sections, word, words, item, items, boxes, arrows, drawings, links

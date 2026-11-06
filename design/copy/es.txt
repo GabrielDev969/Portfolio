@@ -154,4 +154,4 @@ Dock: Iniciando el enjambre… / Construyendo / Listo · publicado
   Activos N / Total 16
 [button] Saltar la construcción
 Gabriel: aprobado
-Units: secciones, palabras, elementos, cajas, flechas, dibujos, enlaces
+Units: secciones, palabra, palabras, elemento, elementos, cajas, flechas, dibujos, enlaces

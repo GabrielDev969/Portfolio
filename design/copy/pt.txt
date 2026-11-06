@@ -152,4 +152,4 @@ Dock: Iniciando o enxame… / Construindo / Pronto · publicado
   Ativos N / Total 16
 [button] Pular a construção
 Gabriel: aprovado
-Units: seções, palavras, itens, caixas, setas, desenhos, links
+Units: seções, palavra, palavras, item, itens, caixas, setas, desenhos, links

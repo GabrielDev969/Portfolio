@@ -184,10 +184,12 @@ export type SiteContent = {
     /** Once built: the dock's button, and the footer's, to watch the build again. */
     replay: string
     approved: string
-    /** Units after a real count: "62 words", "9 items". */
+    /** Units after a real count: "62 words", "9 items"; "1 word", "1 item" for one. */
     units: {
       sections: string
+      word: string
       words: string
+      item: string
       items: string
       boxes: string
       arrows: string

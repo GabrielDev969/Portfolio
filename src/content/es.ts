@@ -323,7 +323,9 @@ export const es: SiteContent = {
     approved: 'aprobado',
     units: {
       sections: 'secciones',
+      word: 'palabra',
       words: 'palabras',
+      item: 'elemento',
       items: 'elementos',
       boxes: 'cajas',
       arrows: 'flechas',
