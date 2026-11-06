@@ -181,7 +181,30 @@ Commitment tier: **restrained ground, one accent, and a set of agent colors conf
 - **Nothing is pinned and scroll is never hijacked.** Lenis only smooths the wheel; touch, keyboard, find-in-page, anchors and the scrollbar behave natively.
 - **CLS stays 0.** Overlays sit on boxes that already have their final size; streaming text reveals text that is already laid out.
 - **Reduced motion, no JS, Quick view and print** get the finished page with no cursors. The swarm UI is `aria-hidden`, and the dock exposes nothing a screen reader needs.
-- **What it replaces:** the three families of the light build (mask rise, draw, push-in) give way to the build beats above. The hero name keeps its CSS rise at first paint.
+- **What it replaces (as built in PR 3):**
+  - **Mask rise is gone** from the section titles and from "What I built": it hid words for a second, which the swarm may never do. The Typography agent's selection takes its place. The hero name keeps its CSS rise at first paint, since it is the page's one entrance and never covers a fact.
+  - **Draw stays** on the six workflow drawings, traced as each step arrives, and the Diagram agent visits them. The architecture diagrams are traced by the Diagram agent over a copy of each stroke, so the diagram itself stays whole.
+  - **Push-in stays** on the project images only (scale, scrubbed). The Mockup agent paints across each image as it arrives. The stack lines no longer rise.
+  - **Reduced motion** has nothing left to fade: the page is simply finished.
+- **The boot, as built:**
+  - The cursors come out from under the logo and drop into the hero along a free column: straight down, or down the right-hand gutter and across. They park only where no word, button or link is, and show their label only once they are there.
+  - Where a phone's hero leaves no free ground, a cursor bursts out along the top bar and away.
+  - Gabriel approves the hero from a free spot, and the crew goes back up the way it came. An e2e test samples every frame of the first three seconds at four widths and fails if any mark touches the hero's text.
+- **The dock, as built:**
+  - It holds the status, Active N / Total 16, build progress, the JS size, the commit hash, "GitHub Pages", the last agent's line, and Skip build.
+  - It has a fixed size, and every slot a fixed width in `ch`, so a changing number never moves it (CLS stays 0, tested).
+  - On phones it keeps two lines (status and progress, then the count); the JS size, commit and host stay on wider screens.
+- **The numbers, as built:**
+  - `scripts/build-facts.ts` runs after `next build`. It writes `src/content/build-facts.json` and `out/build-facts.json`, which the page fetches after first paint. It holds:
+    - the commit;
+    - the deploy target;
+    - the first-paint JS per locale, measured in `out/`;
+    - unit tests per file, by running them;
+    - e2e tests per spec, by listing them;
+    - each section's component, read from the page;
+    - the contrast of each pairing, from the palette.
+  - Sizes, word counts, item counts, link checks and font sizes are measured on the page itself.
+  - Without the file (`pnpm dev`), no agent shows a number.
 
 ## 7. Reflex check
 

@@ -39,8 +39,8 @@ Motion families (see COMMIT-SHEET §5): **A** mask rise · **B** draw · **C** p
 - **Sees:** the title "Experience" on its hairline, then a dated timeline of five entries in date order (Systems Analyst at Fator, the B.Sc. at UNIFACS, Full Stack Developer at Group Wave, the IA Robots contract, the UNIPDS postgraduate degree). Each entry shows its start year at heading size with the end ("–2025", "–present") under it, the title, the organization, a one-line summary where there is one, and the place in `--ink-2`.
   - **From 1024 px:** the five entries sit side by side on a horizontal hairline, a dot where each meets the line.
   - **Below 1024 px:** a vertical list on a hairline down the left, a dot per entry.
-- **Moves:** the title rises (family A). The entries are simply there: a timeline is read, not revealed. **Nothing is pinned and nothing scrolls sideways.**
-- **Reduced:** the title fades in.
+- **Moves:** the swarm builds it (boxes on the entries, Data ticks the years, Copy runs along the summaries, Layout drags two entries in, Typography selects the title). The entries are always there: a timeline is read, not revealed. **Nothing is pinned and nothing scrolls sideways.**
+- **Reduced:** everything is simply there.
 - **Quick view:** one entry per line: "2021–2025 Systems Analyst, Fator Sistemas & Consultorias. …".
 - **No-JS:** the same as the full view.
 
@@ -65,11 +65,11 @@ Motion families (see COMMIT-SHEET §5): **A** mask rise · **B** draw · **C** p
 
   The mockups are inline SVG on one 1200 × 502 canvas, in the site's own type and tones, drawn in the page's language and marked `aria-hidden`; each frame carries a text description. The 4:3 phone crop keeps 670 of the 1200 units: Wave and Campaign BI keep the left edge, where their titles are; Zibby and Hostly keep the middle. BookOwl on phones is letterboxed on the tone step instead of cropped, so its welcome text stays whole.
 
-- **Moves:** family C, a scrubbed timeline per project as it crosses the viewport, with no pin: the image pushes in (`scale 1.12 → 1`) while the stack lines rise one by one. "What I built" uses family A (SplitText lines behind masks) when the project's top crosses 70%. PR 3 (`feat/agent-swarm`) replaces both with the build beats.
+- **Moves:** family C, a scrubbed timeline per project as it crosses the viewport, with no pin: the image pushes in (`scale 1.12 → 1`). The swarm builds each project: boxes, the Mockup agent's brush across the image, Copy along the problem and what I built, the Diagram agent tracing the architecture, Layout dragging the stack panel in, Typography selecting the title, and, in turn, Data, A11y, Tests, Perf and Security (on public links).
 - **A part with no facts yet** is left out with its label in production. `pnpm todos` lists every gap.
 - **Facts:** each project's words live in `src/content/{pt,en,es}.ts`; `design/copy/<locale>.txt` (`pnpm copy`) shows them in the order a reader meets them.
 - **Internal systems** (Sistema Wave, Campaign BI, Hostly) show architecture only: no real names, numbers, screenshots or data.
-- **Reduced:** no push-in. The image fades in, the stack appears at once, and the text is simply there.
+- **Reduced:** no push-in, no swarm: everything is simply there.
 - **Quick view:** each project is a compact block with the title, the same four parts with a small diagram (22rem), and the stack as a sentence. No images, no stack panel.
 - **No-JS:** the same as the full view, without the movement. Every part is in the server HTML.
 
@@ -77,7 +77,7 @@ Motion families (see COMMIT-SHEET §5): **A** mask rise · **B** draw · **C** p
 
 - **Sees:** the title "How I work", then six numbered steps in workflow order, each a small line drawing on the tone step with its caption: 1 I plan (a checklist), 2 I review the plan (the sheet under a magnifying glass), 3 The AI implements (a code window), 4 I review the diff (two panes, a line removed and a line added), 5 I run the tests (three passing checks), 6 Merge (a branch joining the main line). One column on phones, two from 768 px, three from 1024 px. Then the closing line at heading size in italic: "AI speeds things up. The judgment is mine."
 - **Moves:** family B: as each step arrives, its drawing is traced once (`stroke-dashoffset 1 → 0`, 0.9 s, its strokes in order). Nothing is scrubbed or pinned; the drawings are complete in the markup until this runs.
-- **Reduced:** the steps fade in, drawings complete.
+- **Reduced:** the steps and their drawings are simply there, complete.
 - **Quick view:** the numbered list and the closing line, without drawings.
 - **No-JS:** the drawings are complete.
 
@@ -87,10 +87,33 @@ Motion families (see COMMIT-SHEET §5): **A** mask rise · **B** draw · **C** p
   - **Left (columns 1–6):** "Based in Salvador, Brazil, working remotely." (and, in Spanish only, the relocation line), "**Available for new projects**", then **Write to me**, the one red button of the section (`mailto:`), with the e-mail beside it, then LinkedIn, GitHub, YouTube, TikTok and Download CV as plain links.
   - **Right (columns 8–12):** Gabriel's photo, then "Stack": each area (Frontend, Backend, Data, DevOps & automation, Architecture) on the left and its tools on the right, and the languages he speaks.
   - **Last:** a small "Back to top" link in `--ink-2`.
-- **Moves:** the title rises (family A). Back to top is a plain `#top` anchor, which Lenis scrolls smoothly.
-- **Reduced:** the title fades in; Back to top jumps.
+- **Moves:** the swarm builds it (Security checks the profile links, Tests clicks Write to me and Download CV, Deploy reports GitHub Pages), Gabriel approves it, and the cursors spin out in a vortex beside it; the dock reads "Ready · deployed". Back to top is a plain `#top` anchor, which Lenis scrolls smoothly.
+- **Reduced:** no swarm; Back to top jumps.
 - **Quick view:** one column; no photo.
 - **No-JS:** the same; Back to top is a plain anchor.
+
+---
+
+## The swarm, over every section (intensity 3; the boot and the ending 4)
+
+- **Sees:** fifteen agents and Gabriel, each a colored cursor with its role name, working on the section the reader has reached.
+  - Outline boxes with their real size badges.
+  - A caret and underline along the text.
+  - A card dragged the last 16–22 px into its slot.
+  - An architecture diagram traced stroke by stroke.
+  - A brush across a project image.
+  - A selection over the heading.
+  - A ripple on its buttons and links.
+  - Pills with real numbers (contrast, JS size, e2e count, link check, font size, word count).
+  - Gabriel's check beside the heading.
+  - The dock at the bottom.
+- **Units:** the hero (at boot), Experience, each of the five projects, How I work, Contact. Each builds once, in about 1.5 s, when its top passes 82% of the screen; one at a time, the next waiting its turn. A unit the reader has already scrolled past waits until it is back in view.
+- **Crews:** up to 5 agents per unit plus Gabriel (3 on phones). At most 8 cursors on screen (6 on phones).
+- **Boot:** see COMMIT-SHEET §6. The dock reads "Booting swarm…" for up to 800 ms, then the count; the boot plays once per session.
+- **End:** when Contact is approved, the cursors gather into a vortex on free ground beside it and spin out; the dock reads "Ready · deployed".
+- **Skip build:** every unit approved at once, no one left on screen.
+- **Pauses** while the tab is hidden: its clock stops.
+- **Reduced, Quick view, print, no-JS:** no swarm, no dock: the finished page. Switching to Quick view removes a running swarm and undoes every mark.
 
 ---
 
