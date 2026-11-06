@@ -3,7 +3,7 @@
 [![CI](https://github.com/GabrielDev969/Portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/GabrielDev969/Portfolio/actions/workflows/ci.yml)
 [![Deploy](https://github.com/GabrielDev969/Portfolio/actions/workflows/deploy.yml/badge.svg)](https://github.com/GabrielDev969/Portfolio/actions/workflows/deploy.yml)
 
-The portfolio of Gabriel Santos, Full Stack Developer (Next.js, React, Node.js, NestJS, TypeScript, PostgreSQL), in Salvador, Brazil, working remotely. One bright page with four sections (Experience, Projects, How I work, Contact), each project with its problem, what was built, its architecture and its result, all inline. For anyone who just wants the facts, **Quick view** turns the motion off.
+The portfolio of Gabriel Santos, Full Stack Developer (Next.js, React, Node.js, NestJS, TypeScript, PostgreSQL), in Salvador, Brazil, working remotely. One dark page with four sections (Experience, Projects, How I work, Contact), each project with its problem, what was built, its architecture and its result, all inline. For anyone who just wants the facts, **Quick view** turns the motion off.
 
 **Live:** https://gabrieldev969.github.io/Portfolio/ · Portuguese, English and Spanish
 

@@ -76,33 +76,36 @@ There are two moments of intensity 4, at the two ends of the page. Everything be
 
 ## 2. Color
 
-Commitment tier: **restrained ground, one accent, and a set of agent colors confined to the swarm.** PR 2 fills in the values and the measured contrast; a unit test fails the build if any pairing drops below its floor.
+Commitment tier: **restrained ground, one accent, and a set of agent colors confined to the swarm.** Values set in PR 2 (`feat/dark-theme`); `tests/unit/contrast.test.ts` reads them from `globals.css` and fails the build if any pairing drops below its floor.
 
-| Token                   | Role                                                                                          |
-| ----------------------- | --------------------------------------------------------------------------------------------- |
-| `--screen` (ground)     | A near-black ground, slightly cool, not pure black                                            |
-| `--screen-2` (one step) | Panels, image frames, the dock. A tone step, no shadows                                       |
-| `--ink`                 | All running text and display type. Light, not pure white                                      |
-| `--ink-2`               | Metadata only (years, places, labels). Muted, still ≥ 4.5:1 on both grounds                   |
-| `--velvet` (accent)     | The contact action only, re-tuned for the dark ground                                         |
-| `--agent-1…16`          | One per agent: cursor, label pill, outline box. Never on content, never on the contact action |
+| Token                   | OKLCH                                    | Hex                   | Role                                                            |
+| ----------------------- | ---------------------------------------- | --------------------- | --------------------------------------------------------------- |
+| `--screen` (ground)     | `oklch(0.17 0.012 255)`                  | `#0c1015`             | A near-black ground, slightly cool, not pure black              |
+| `--screen-2` (one step) | `oklch(0.215 0.014 255)`                 | `#151a20`             | Panels, image frames, the dock. A tone step, no shadows         |
+| `--ink`                 | `oklch(0.94 0.008 240)`                  | `#e7ecf0`             | All running text and display type. Light, not pure white        |
+| `--ink-2`               | `oklch(0.74 0.015 245)`                  | `#a3acb4`             | Metadata only (years, places, labels)                           |
+| `--velvet` (accent)     | `oklch(0.68 0.19 25)`                    | `#f75d59`             | The contact action only: a coral red, its label in ground color |
+| `--agent-1…16`          | L 0.74 / 0.82, hues 22.5° apart from 10° | `#fc7c94` … `#fda4d2` | One per agent: cursor, label pill, outline box. Swarm UI only   |
 
-- **Contrast floors:**
-  - ink and ink-2 on both grounds ≥ 4.5:1 (ink well above);
-  - each agent color ≥ 3:1 against the ground, so cursors and outlines read;
-  - label text on each colored pill ≥ 4.5:1;
-  - the 16 agent colors distinguishable from each other: a minimum OKLCH distance between any two, checked in the same test.
-- **Accent budget: one use.** The contact action is still the only accent on the page. The agent colors live only in the swarm layer, which is `aria-hidden` and gone in Quick view, in print and with reduced motion.
-- **Print goes light.** Paper gets Quick view on a white ground with dark ink, as before.
-- **Why dark now:** Gabriel's call (2026-11-05). Also, sixteen colored cursors and outline boxes only read as a crowd at work on a dark ground. On the old silver-white ground, half the palette would wash out below 3:1. §6 says what keeps it from the dark-portfolio reflex.
+- **Contrast** (computed from the OKLCH values):
+  - ink on screen 16.1:1, on screen-2 14.7:1
+  - ink-2 on screen 8.3:1, on screen-2 7.6:1
+  - screen on velvet (the Contact label) 6.1:1, and velvet against the ground 6.1:1 (≥ 3:1 for a UI shape)
+  - screen on ink (the Download CV label) 16.1:1
+  - every agent color against the ground 7.7–11.6:1 (7.0:1 at least on screen-2), and the dark label on every pill the same 7.7–11.6:1
+- **Distinguishable:** the sixteen agents alternate two lightness steps around the hue circle, so any two are at least 0.075 apart in OKLab (about four times a just-noticeable difference), and none is closer than 0.08 to the contact accent. Each agent also carries its role name, so color is never the only cue.
+- **Accent budget: one use.** The contact action is still the only accent on the page. **Download CV**, the other primary button, is solid ink with ground-colored text; both share one size and shape. The agent colors live only in the swarm layer, which is `aria-hidden` and gone in Quick view, in print and with reduced motion.
+- **The mockups are re-toned for the dark ground:** the screens they show are dark too, and the panels that were solid ink (Zibby's order list, Hostly's tablet) are now the tone step outlined with a hairline, so no light block outshines the text beside it.
+- **Print goes light.** Paper gets Quick view on white with the 2026-10-28 ink (`oklch(0.22 0.025 255)`) and red, which print well and cost no toner for a dark ground.
+- **Why dark now:** Gabriel's call (2026-11-05). And sixteen colored cursors and outline boxes only read as a crowd at work on a dark ground; on the old silver-white ground, half of any such palette washes out below 3:1. §7 says what keeps it from the dark-portfolio reflex.
 
 ## 3. Type
 
-| Role    | Family                                                                                                | Why                                                                                                                                        |
-| ------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Display | **Big Shoulders** (variable `wght` 100–900 and `opsz`; the latin subset, which already holds ã, ç, ñ) | Kept. A tall condensed grotesque, without the Bebas/Anton/Oswald reflex; "Gabriel Santos" can be huge and still sit in two lines at 390 px |
-| Text    | **Newsreader** (variable `wght` and `opsz`, real italics)                                             | Kept. A reading serif with optical sizes; its italic still does the work of labels                                                         |
-| Swarm   | **One mono face**, self-hosted subset, `font-display: optional` (chosen in PR 2)                      | Only for the swarm UI: cursor labels, size badges, the dock, logs. It is the voice of the tools, so it never sets content                  |
+| Role    | Family                                                                                                | Why                                                                                                                                                               |
+| ------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Display | **Big Shoulders** (variable `wght` 100–900 and `opsz`; the latin subset, which already holds ã, ç, ñ) | Kept. A tall condensed grotesque, without the Bebas/Anton/Oswald reflex; "Gabriel Santos" can be huge and still sit in two lines at 390 px                        |
+| Text    | **Newsreader** (variable `wght` and `opsz`, real italics)                                             | Kept. A reading serif with optical sizes; its italic still does the work of labels                                                                                |
+| Swarm   | **Spline Sans Mono** 500, latin subset, self-hosted by `next/font`, `font-display: optional`          | Only for the swarm UI: cursor labels, size badges, the dock, logs. Soft, open shapes rather than the JetBrains/Fira reflex; one weight keeps it to one small file |
 
 - **No strong reason to change the display and text faces**, so they stay. The contrast axis is unchanged: a condensed grotesque against a humanist serif.
 - **The mono face never sets content.** Names, headings, copy, the stack, buttons and links stay in Big Shoulders and Newsreader. With `font-display: optional`, a slow network gets a system mono for the swarm and no layout shift.
