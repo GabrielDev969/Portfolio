@@ -136,6 +136,21 @@ describe('content', () => {
     assert.deepEqual(leftovers, [])
   })
 
+  // Nothing invented (design/COMMIT-SHEET.md): every counter and metric tile repeats a number the
+  // content already states, and the callout is a sentence of `about`, word for word.
+  it('every counter and metric is a number the content already states', () => {
+    for (const locale of locales) {
+      const c = getContent(locale)
+      const prose = JSON.stringify([c.person.about, c.experience, c.projects.map((p) => p.summary)])
+      const tiles = [...c.person.stats, ...c.projects.flatMap((p) => p.metrics ?? [])]
+      for (const { value } of tiles) {
+        const number = value.match(/\d+/)![0]
+        assert.ok(new RegExp(`(?<!\\d)${number}(?!\\d)`).test(prose), `${locale}: ${value}`)
+      }
+      assert.ok(c.person.about.includes(c.person.approach.replace(/\.$/, '')), `${locale} approach`)
+    }
+  })
+
   it('only Spanish mentions relocation', () => {
     assert.ok(getContent('es').person.relocation)
     assert.equal(getContent('pt').person.relocation, undefined)

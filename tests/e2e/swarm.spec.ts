@@ -20,7 +20,14 @@ const atWork = (page: Page) =>
 
 /** The words of main, normalized, as innerText gets them (opacity does not hide words). */
 const mainText = (page: Page) =>
-  page.locator('main').evaluate((m) => (m as HTMLElement).innerText.replace(/\s+/g, ' ').trim())
+  page.locator('main').evaluate((m) => {
+    // The controls that exist only with JavaScript (Copy, Build it again) are left out.
+    let text = (m as HTMLElement).innerText
+    for (const c of m.querySelectorAll<HTMLElement>('.email-copy, .replay'))
+      // Only when shown: a hidden one's innerText is its raw text, which a mockup may share.
+      if (c.checkVisibility()) text = text.replace(c.innerText, '')
+    return text.replace(/\s+/g, ' ').trim()
+  })
 
 /** The page as it is without JavaScript: the content every visitor gets. */
 async function noJsText(browser: Browser) {

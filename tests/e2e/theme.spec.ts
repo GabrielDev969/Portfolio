@@ -42,7 +42,13 @@ test('running text is never set in mono', async ({ page }) => {
   await page.goto('en/')
   const mono = await page.locator('main').evaluate((main) =>
     [...main.querySelectorAll('h1, h2, h3, p, dd')]
-      .filter((el) => !el.closest('[aria-hidden="true"], .tag, .pill, .chip, .stat, .chips'))
+      // Dates and link notes are data, set as labels.
+      .filter(
+        (el) =>
+          !el.closest(
+            '[aria-hidden="true"], .tag, .pill, .chip, .stat, .chips, .timeline-years, .project-links, .metric, .pipeline, .email-box',
+          ),
+      )
       .filter((el) => !el.matches('.tag, .pill, .stat-label'))
       .filter((el) => /mono/i.test(getComputedStyle(el).fontFamily))
       .map((el) => `${el.tagName.toLowerCase()} "${(el.textContent ?? '').trim().slice(0, 30)}"`),
