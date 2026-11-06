@@ -49,18 +49,17 @@ export type Architecture = {
   confirmed: boolean
 }
 
-/** `why` is left out when `what` already gives the reason in one sentence. */
-export type Decision = { what: Text; why?: Text }
-
-export type Details = {
-  problem: Prose
-  role: Prose
-  architecture: Architecture
-  /** Two or three entries; enforced by tests/unit/content.test.ts. */
-  decisions: Decision[]
-  testing: Prose
-  deploy: Prose
-  outcome: Prose
+/**
+ * A project in at most 70 words of prose (problem + built + result), enforced by
+ * tests/unit/content.test.ts (design/COMMIT-SHEET.md §4).
+ */
+export type Summary = {
+  /** One sentence. */
+  problem: Text
+  /** One or two sentences: what was built, Gabriel's role, and the one key decision with its reason. */
+  built: Prose
+  /** One sentence, with a number when there is one. */
+  result: Text
 }
 
 export type MockupId = 'wave-board' | 'campaign-chart' | 'zibby-store' | 'hostly-schedule'
@@ -81,13 +80,13 @@ export type Project = {
   title: string
   /** Company or client the project was built for; absent for personal projects. */
   organization?: string
-  logline: string
+  summary: Summary
+  architecture: Architecture
   stack: Text[]
   /** Internal systems show architecture only: fictional images, no links, no real data. */
   internal: boolean
   image: ProjectImage
   links: ProjectLinks
-  technicalDetails: Details
 }
 
 /** A labelled list: a stack area and its tools, or the languages Gabriel speaks. */
@@ -122,8 +121,6 @@ export type SiteContent = {
     contact: string
     downloadCv: string
     seeProjects: string
-    technicalDetails: string
-    close: string
     internalNoLink: string
     noPublicLink: string
     backToTop: string
@@ -131,14 +128,12 @@ export type SiteContent = {
     stack: string
     sectionsNav: string
     languageNav: string
-    details: {
+    /** The labels of a project's inline parts, in the order they appear. */
+    project: {
       problem: string
-      role: string
+      built: string
       architecture: string
-      decisions: string
-      testingAndDeploy: string
-      outcome: string
-      links: string
+      result: string
     }
   }
   sections: {

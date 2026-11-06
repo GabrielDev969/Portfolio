@@ -35,19 +35,8 @@ for (const locale of locales) {
     })
   }
 
-  test(`axe passes with a behind-the-scenes drawer open · ${locale}`, async ({ page }) => {
-    const { ui } = getContent(locale)
-    await page.goto(`${locale}/`)
-    await page.locator('#zibby').getByRole('button', { name: ui.technicalDetails }).click()
-    await expect(page.getByRole('dialog')).toBeVisible()
-    const { violations } = await new AxeBuilder({ page }).include('dialog[open]').analyze()
-    const blocking = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical')
-    expect(blocking.map((v) => `${v.id}: ${v.help}`)).toEqual([])
-  })
-
   if (locale !== 'en') {
     test(`no English sentence is left on the page · ${locale}`, async ({ context, page }) => {
-      // Quick view lays every behind-the-scenes panel inline, so their text is on the page too.
       await startInViewMode(context, 'quick')
       await page.goto(`${locale}/`)
       const text = await page.locator('body').innerText()

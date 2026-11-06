@@ -3,8 +3,8 @@ import { resolveText } from '@/lib/text'
 
 type Props = { id: string; architecture: Architecture }
 
-// Drawn in viewBox units: 400 wide, so the 15-unit text reads at about 18 px in the drawer
-// and 13 px on a phone. Rows are layers of the data flow, top to bottom.
+// Drawn in viewBox units: 400 wide, so the 15-unit text reads at about 13 px inline (24rem)
+// and on a phone. Rows are layers of the data flow, top to bottom.
 const width = 400
 const font = 15
 const line = 19
@@ -15,7 +15,7 @@ const colGap = 14
 const maxBox = 210
 // Newsreader averages about half an em per character at this size.
 const charWidth = font * 0.5
-// Arrow labels sit on their line, over a plate of the drawer's colour.
+// Arrow labels sit on their line, over a plate of the page's ground.
 const labelFont = 13
 const labelChar = labelFont * 0.48
 
@@ -98,7 +98,7 @@ export function ArchitectureDiagram({ id, architecture }: Props) {
       <svg
         aria-hidden="true"
         viewBox={`0 0 ${width} ${height}`}
-        className="block h-auto w-full max-w-[480px] font-text"
+        className="block h-auto w-full font-text"
       >
         <defs>
           <marker
@@ -140,7 +140,7 @@ export function ArchitectureDiagram({ id, architecture }: Props) {
                     y={(y1 + y2) / 2 - labelFont * 0.75}
                     width={edge.label.length * labelChar + 8}
                     height={labelFont * 1.4}
-                    className="fill-screen-2"
+                    className="diagram-plate fill-screen"
                   />
                   <text
                     x={(x1 + x2) / 2}

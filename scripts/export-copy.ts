@@ -87,31 +87,26 @@ export function renderCopy(locale: Locale): string {
 
   section(sections.projects.title)
   for (const p of c.projects) {
-    const td = p.technicalDetails
-    line(`-- ${p.title}${p.organization ? ` (${p.organization})` : ''} --`, p.logline)
+    line(`-- ${p.title}${p.organization ? ` (${p.organization})` : ''} --`)
     line(p.image.kind === 'image' ? `[image alt] ${p.image.alt}` : `[image] ${p.image.description}`)
     if (p.image.kind === 'mockup') {
       const drawn = [...new Set(words(mockupCopy[locale][mockupKey[p.image.mockup]]))]
       line(`[mockup words] ${drawn.join(' · ')}`)
     }
-    line(`${ui.stack}: ${p.stack.map(text).join(', ')}`)
-    line(`[button] ${ui.technicalDetails}`)
-    line(`  ${ui.details.problem}: ${prose(td.problem)}`)
-    line(`  ${ui.details.role}: ${prose(td.role)}`)
-    line(`  ${ui.details.architecture}:`)
-    const label = new Map(td.architecture.nodes.map((n) => [n.id, text(n.label)]))
-    for (const e of td.architecture.edges) {
-      line(`    ${label.get(e.from)} → ${label.get(e.to)}${e.label ? ` (${e.label})` : ''}`)
+    line(`${ui.project.problem}: ${prose(p.summary.problem)}`)
+    line(`${ui.project.built}: ${prose(p.summary.built)}`)
+    line(`${ui.project.architecture}:`)
+    const label = new Map(p.architecture.nodes.map((n) => [n.id, text(n.label)]))
+    for (const e of p.architecture.edges) {
+      line(`  ${label.get(e.from)} → ${label.get(e.to)}${e.label ? ` (${e.label})` : ''}`)
     }
-    line(`  ${ui.details.decisions}:`)
-    for (const d of td.decisions) line(`    - ${text(d.what)}${d.why ? ` ${text(d.why)}` : ''}`)
-    line(`  ${ui.details.testingAndDeploy}: ${prose(td.testing)} ${prose(td.deploy)}`)
-    line(`  ${ui.details.outcome}: ${prose(td.outcome)}`)
-    if (isTodo(p.links)) line(`  ${ui.details.links}: ${text(p.links)}`)
-    else if (p.links.kind === 'internal') line(`  ${ui.internalNoLink}`)
-    else if (p.links.kind === 'none') line(`  ${ui.noPublicLink}`)
-    else for (const l of p.links.links) line(`  [link] ${l.label}`)
-    line(`  [button] ${ui.close}`, '')
+    line(`${ui.project.result}: ${prose(p.summary.result)}`)
+    line(`${ui.stack}: ${p.stack.map(text).join(', ')}`)
+    if (isTodo(p.links)) line(`[links] ${text(p.links)}`)
+    else if (p.links.kind === 'internal') line(ui.internalNoLink)
+    else if (p.links.kind === 'none') line(ui.noPublicLink)
+    else for (const l of p.links.links) line(`[link] ${l.label}`)
+    line('')
   }
   out.pop()
 

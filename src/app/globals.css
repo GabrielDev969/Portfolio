@@ -268,10 +268,12 @@
    say) always win over them, the way utilities are meant to. */
 @layer components {
   /* ---- Projects ----
-   Phones and tablets stack the parts in order: image (full bleed), title, stack, actions.
-   From 1024 px the grid break (design/COMMIT-SHEET.md §4): the image bleeds off the left edge
-   to column 8, the title sits on the ground in 9–12, and the stack panel overlaps the image's
-   bottom-right corner across columns 8–10. */
+   Phones and tablets stack the parts in reading order: image (full bleed), title, problem, what
+   I built, architecture, result, stack, links. From 1024 px the grid break
+   (design/COMMIT-SHEET.md §5): the image bleeds off the left edge to column 8 with the title,
+   problem and what I built beside it in 9–12; the stack panel overlaps the image's bottom-right
+   corner across columns 8–10; the architecture sits under the image and the result and links
+   under the text. */
   .projects {
     display: grid;
     row-gap: clamp(6rem, 14vw, 12rem);
@@ -283,7 +285,9 @@
     row-gap: 1.5rem;
     align-items: start;
 
-    > * {
+    /* :where keeps this at the weight of one class, so each part's grid area below wins. */
+    > *,
+    :where(.project-part) {
       grid-column: 1 / -1;
     }
   }
@@ -297,6 +301,27 @@
     width: 100%;
     height: 100%;
     transform-origin: 50% 50%;
+  }
+
+  /* Each part is a grid item of the project, so the list itself takes no box. */
+  .project-summary {
+    display: contents;
+  }
+
+  .project-part {
+    max-width: 62ch;
+
+    > dt {
+      margin-bottom: 0.25rem;
+      font-size: var(--text-small);
+      font-style: italic;
+      color: var(--color-ink-2);
+    }
+  }
+
+  /* Small and inline: about 13 px text in the boxes. */
+  .project-architecture .diagram svg {
+    max-width: 24rem;
   }
 
   .project-stack {
@@ -320,132 +345,61 @@
     }
   }
 
-  .project-actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.75rem 1.5rem;
-  }
-
   @media (min-width: 1024px) {
+    /* The last row takes whatever height the architecture needs beyond the rows beside it, so
+       the result and links stay right under the stack panel. */
     .project {
+      grid-template-rows: repeat(6, auto) 1fr;
       row-gap: 0;
     }
 
+    /* Rows 1–3 hold the title, problem and what I built; the image spans them and sits on
+       their last line. */
     .project-image {
-      grid-area: 1 / 1 / 2 / 9;
+      grid-area: 1 / 1 / 4 / 9;
       align-self: end;
       margin-inline: calc(-1 * var(--page-margin)) 0;
     }
 
-    /* Room under the logline for the stack panel, so the two never meet. */
     .project-head {
       grid-area: 1 / 9 / 2 / 13;
+    }
+
+    .project-problem {
+      grid-area: 2 / 9 / 3 / 13;
+      margin-top: 1.5rem;
+    }
+
+    /* Room under it for the stack panel, so the two never meet. */
+    .project-built {
+      grid-area: 3 / 9 / 4 / 13;
+      margin-top: 1.25rem;
       padding-bottom: calc(var(--stack-overlap) + 2rem);
     }
 
     .project-stack {
       position: relative;
-      grid-area: 2 / 8 / 3 / 11;
+      grid-area: 4 / 8 / 5 / 11;
       margin-top: calc(-1 * var(--stack-overlap));
     }
 
-    .project-actions {
-      grid-area: 3 / 8 / 4 / 13;
-      margin-top: 1.5rem;
+    .project-architecture {
+      grid-area: 4 / 1 / 8 / 8;
+      margin-top: 2.5rem;
+    }
+
+    .project-result {
+      grid-area: 5 / 9 / 6 / 13;
+      margin-top: 2rem;
+    }
+
+    .project-links {
+      grid-area: 6 / 9 / 7 / 13;
+      margin-top: 1rem;
     }
   }
 
-  /* ---- Technical details ---- */
-  .details-parts {
-    display: grid;
-    gap: 1.75rem;
-  }
-
-  .details-heading {
-    margin-bottom: 0.35rem;
-    font-size: var(--text-small);
-    font-style: italic;
-    color: var(--color-ink-2);
-  }
-
-  /* No JS: the native <details> opens the parts in place, under the button. */
-  .details-disclosure[open] > summary {
-    margin-bottom: 1.5rem;
-  }
-
-  .details-inline {
-    max-width: 62ch;
-  }
-
-  /* The drawer: a modal <dialog> on the right edge, full height, scrolling on its own. It opens
-   with a clip-path wipe from the right (CSS @starting-style, no JS); reduced motion fades. */
-  .details-drawer {
-    position: fixed;
-    inset: 0 0 0 auto;
-    width: min(36rem, 100vw);
-    max-width: none;
-    height: 100dvh;
-    max-height: none;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    background: var(--color-screen-2);
-    color: var(--color-ink);
-    clip-path: inset(0);
-    transition:
-      clip-path var(--dur-ui) var(--ease-out),
-      overlay var(--dur-ui) allow-discrete,
-      display var(--dur-ui) allow-discrete;
-
-    &:not([open]) {
-      clip-path: inset(0 0 0 100%);
-    }
-
-    &::backdrop {
-      background: oklch(0 0 0 / 0.45);
-      transition:
-        opacity var(--dur-ui) var(--ease-out),
-        overlay var(--dur-ui) allow-discrete,
-        display var(--dur-ui) allow-discrete;
-    }
-
-    &:not([open])::backdrop {
-      opacity: 0;
-    }
-  }
-
-  @starting-style {
-    .details-drawer[open] {
-      clip-path: inset(0 0 0 100%);
-    }
-
-    .details-drawer[open]::backdrop {
-      opacity: 0;
-    }
-  }
-
-  /* The page behind an open drawer does not scroll. */
-  :root:has(.details-drawer[open]) {
-    overflow: hidden;
-  }
-
-  .details-sheet {
-    min-height: 100%;
-    padding: 1.25rem clamp(1.25rem, 4vw, 2.5rem) 3rem;
-  }
-
-  .details-sheet-head {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 2rem;
-  }
-
-  /* Quick view: one column inside the grid, no bleed, no images, the parts inline. */
+  /* Quick view: one column inside the grid, no bleed, no images, the parts in reading order. */
   [data-view='quick'] {
     .projects {
       row-gap: 3rem;
@@ -453,57 +407,18 @@
     }
 
     .project {
+      grid-template-rows: none;
       row-gap: 0.75rem;
 
-      > * {
+      > *,
+      .project-part {
         grid-area: auto / 1 / auto / -1;
         margin: 0;
         padding: 0;
       }
     }
 
-    .project-head {
-      padding-bottom: 0;
-    }
-
-    .project-actions {
-      display: block;
-    }
-
-    .details-inline,
-    .details-disclosure {
-      margin-top: 0.75rem;
-      padding-left: 1rem;
-      border-left: 1px solid color-mix(in oklch, var(--color-ink) 25%, transparent);
-    }
-
-    /* Before hydration (or if the app's JS never arrives) the native <details> stands in for
-       the inline block: it takes the rule line, its summary is set as the label (utilities in
-       TechnicalDetails) and the parts show open, so nothing moves when React takes over.
-       Browsers without ::details-content keep the <details> closed. */
-    .details-disclosure {
-      /* The same box as .details-inline (62ch, rule line and indent included), so a line wraps
-         at the same word before and after hydration. */
-      max-width: 62ch;
-
-      &::details-content {
-        content-visibility: visible;
-        height: auto;
-      }
-
-      > .details-inline {
-        max-width: none;
-        margin: 0;
-        padding: 0;
-        border: 0;
-      }
-    }
-
-    .details-parts {
-      gap: 1rem;
-    }
-
-    .diagram svg {
+    .project-architecture .diagram svg {
       max-width: 22rem;
     }
   }
@@ -818,20 +733,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  /* The drawer fades instead of wiping. */
-  .details-drawer,
-  .details-drawer:not([open]) {
-    clip-path: none;
-  }
-  .details-drawer {
-    transition:
-      opacity var(--dur-ui) var(--ease-out),
-      overlay var(--dur-ui) allow-discrete,
-      display var(--dur-ui) allow-discrete;
-  }
-  .details-drawer:not([open]) {
-    opacity: 0;
-  }
   /* No movement: the name is simply there. */
   :root[data-js] .hero-name .rise-line > span {
     animation: none;
@@ -865,14 +766,5 @@
   .top-bar,
   a[href='#main'] {
     display: none !important;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  @starting-style {
-    .details-drawer[open] {
-      clip-path: none;
-      opacity: 0;
-    }
   }
 }

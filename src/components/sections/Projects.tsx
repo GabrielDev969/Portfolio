@@ -4,8 +4,8 @@ import { resolveText } from '@/lib/text'
 import { ProjectFrame } from '../ui/ProjectFrame'
 import { Picture } from '../ui/Picture'
 import { mockups } from '../mockups'
-import { TechnicalDetails } from '../ui/TechnicalDetails'
-import { TechnicalDetailsParts, ProjectLinks } from '../ui/TechnicalDetailsParts'
+import { ProjectLinks } from '../ui/ProjectLinks'
+import { ProjectSummary } from '../ui/ProjectSummary'
 import { SectionHeading } from '../ui/SectionHeading'
 import { ProjectPushIn } from './ProjectPushIn'
 
@@ -41,9 +41,10 @@ function ProjectImage({ project, locale }: { project: Project; locale: Locale })
 
 /**
  * Projects (design/STORYBOARD.md §3). Five projects with one shared treatment: the image bleeds
- * off the left edge, the title and logline sit on the ground beside it, and the stack is listed
- * on a panel that overlaps the image's right edge by one column. Technical details opens the
- * six-part panel. Quick view keeps the facts and drops the images.
+ * off the left edge, the title, problem and what I built sit on the ground beside it, the stack
+ * is listed on a panel that overlaps the image's right edge by one column, and the architecture
+ * and result follow. Every part is inline, with nothing to open. Quick view keeps the facts and
+ * drops the images.
  */
 export function Projects({ content }: Props) {
   const { sections, projects, ui } = content
@@ -75,10 +76,13 @@ export function Projects({ content }: Props) {
                   >
                     {project.title}
                   </h3>
-                  <p className="project-logline mt-3 measure">{project.logline}</p>
-                  <p className="mt-1 hidden quick:block">{stack.join(', ')}.</p>
                 </header>
 
+                <ProjectSummary project={project} ui={ui} />
+
+                <p className="project-stack-sentence hidden quick:block">
+                  <span className="italic">{ui.stack}:</span> {stack.join(', ')}.
+                </p>
                 <div className="project-stack quick:hidden">
                   <p className="text-small text-ink-2 italic">{ui.stack}</p>
                   <ul className="text-small font-medium">
@@ -90,18 +94,8 @@ export function Projects({ content }: Props) {
                   </ul>
                 </div>
 
-                <div className="project-actions">
-                  <TechnicalDetails
-                    id={project.id}
-                    label={ui.technicalDetails}
-                    title={project.title}
-                    close={ui.close}
-                  >
-                    <TechnicalDetailsParts project={project} ui={ui} />
-                  </TechnicalDetails>
-                  <div className="project-links">
-                    <ProjectLinks project={project} ui={ui} />
-                  </div>
+                <div className="project-links">
+                  <ProjectLinks project={project} ui={ui} />
                 </div>
               </article>
             </ProjectPushIn>
