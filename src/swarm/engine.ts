@@ -1,17 +1,20 @@
 import type { SiteContent } from '@/content/schema'
+import { builtStorageKey } from '@/lib/storage-keys'
 import { asset } from '@/lib/site'
+import { getLenis } from '@/motion/lenis'
 import { smoothScroll } from '@/motion/tokens'
 import { factsFile, type BuildFacts } from './facts'
 
 /**
- * The swarm (design/COMMIT-SHEET.md §6): fifteen agents and Gabriel build the page as it is
- * read. It is a simulation laid over content that is already complete: it outlines, underlines,
- * traces and points, and never hides a word. Loaded after first paint, only in the full view
- * with motion allowed; Quick view, reduced motion, print and no-JS get the finished page.
+ * The swarm (design/COMMIT-SHEET.md §6). The page opens empty (html[data-build], set by the
+ * head script) and fifteen agents and Gabriel build it in front of the reader, piece by piece,
+ * from the top bar to Contact, while the page scrolls down by itself. The reader never has to
+ * scroll; the moment they scroll, click or press a key, the build hands over and everything is
+ * there. The words are in the HTML and the accessibility tree from the first byte: the build
+ * only ever changes opacity, overlays and transforms, so nothing moves and nothing is lost.
  *
  * One overlay in page coordinates holds every cursor and mark; one requestAnimationFrame loop
- * moves them on its own clock, which stops while the tab is hidden. Cursors ease toward their
- * targets; nothing goes through React.
+ * moves them on its own clock, which stops while the tab is hidden. Nothing goes through React.
  */
 
 type Labels = SiteContent['swarm']
@@ -39,6 +42,26 @@ type Role = (typeof roles)[number]
 
 type Kind = 'hero' | 'experience' | 'project' | 'how' | 'contact'
 
+/** How a piece arrives. */
+type How =
+  | 'show' // the Architect outlines it, and it is there
+  | 'self' // its own box only (a rule, a hairline, a list's dot)
+  | 'heading' // swept in line by line, then selected
+  | 'type' // typed a word at a time behind a caret
+  | 'drag' // dragged in from out of its slot
+  | 'items' // its items light up one by one
+  | 'draw' // its drawing is traced stroke by stroke
+  | 'click' // it appears and is clicked
+
+type Unit = {
+  kind: Kind
+  el: HTMLElement
+  heading: Element | null
+  state: 'waiting' | 'building' | 'built'
+}
+
+type Piece = { el: Element; how: How; role: Role; unit: Unit; group?: Element[] }
+
 /** The e2e specs that test each kind of section, for the Tests agent's count. */
 const specs: Record<Kind, string[]> = {
   hero: ['hero.spec.ts'],
@@ -48,17 +71,6 @@ const specs: Record<Kind, string[]> = {
   contact: ['contact.spec.ts'],
 }
 
-/** Who works on each kind of section, most needed first; the budget takes the first few. */
-const crews: Record<Kind, Role[]> = {
-  hero: ['planner', 'perf', 'a11y', 'tests', 'i18n', 'motion'],
-  experience: ['layout', 'copy', 'architect', 'typography', 'data', 'i18n', 'tests'],
-  project: ['layout', 'copy', 'architect', 'typography', 'diagram'],
-  how: ['layout', 'copy', 'architect', 'typography', 'diagram', 'motion', 'tests'],
-  contact: ['layout', 'copy', 'architect', 'typography', 'security', 'tests', 'deploy', 'a11y'],
-}
-/** Projects share the rest in turn, so each of the five gets a different pair. */
-const projectExtras: Role[] = ['mockup', 'data', 'tests', 'a11y', 'perf']
-
 /** The text pairing each kind of section is mostly set in, for the A11y agent. */
 const pairing: Record<Kind, string> = {
   hero: 'ink/screen',
@@ -66,6 +78,15 @@ const pairing: Record<Kind, string> = {
   project: 'ink-2/screen',
   how: 'ink/screen',
   contact: 'screen/velvet',
+}
+
+/** The agents who only report, by kind of section: they come beside the heading with a number. */
+const reporters: Record<Kind, Role[]> = {
+  hero: ['planner', 'perf', 'a11y'],
+  experience: ['i18n', 'tests'],
+  project: ['tests', 'a11y'],
+  how: ['motion', 'tests'],
+  contact: ['security', 'deploy', 'perf'],
 }
 
 type Cursor = {
@@ -79,28 +100,10 @@ type Cursor = {
   on: boolean
   leaving: boolean
   quiet: boolean
-  busy: Unit | null
   text: string
-  /** How it came down into the hero, so it can go back up the same free way. */
-  way: { x: number; y: number }[]
-  /** The label's measured width; 0 until it has been shown with its current text. */
   labelWidth: number
-  /** On its way to a spot in the hero: the label waits until it gets there. */
-  arriving: boolean
-}
-
-type Unit = {
-  kind: Kind
-  el: HTMLElement
-  index: number
-  state: 'waiting' | 'queued' | 'building' | 'built'
-  marks: HTMLElement[]
-  undo: (() => void)[]
-  crew: Cursor[]
-  /** Engine time when its last job ends: Gabriel reviews after that. */
-  until: number
-  /** Text not typed yet, line by line, under a veil that keeps it readable. */
-  veils: Map<Element, { lines: Rect[]; divs: HTMLElement[] }>
+  /** Engine time it last worked: an idle agent leaves. */
+  used: number
 }
 
 type Effect = { start: number; dur: number; update: (p: number) => void; done?: () => void }
@@ -117,12 +120,6 @@ function pageRect(el: Element): Rect {
   return { x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height }
 }
 
-function overlaps(a: Rect, b: Rect, pad = 0) {
-  return (
-    a.x < b.x + b.w + pad && a.x + a.w + pad > b.x && a.y < b.y + b.h + pad && a.y + a.h + pad > b.y
-  )
-}
-
 /** The rectangles of an element's text, one per line (its text nodes only, not its boxes). */
 function lineRects(el: Element): Rect[] {
   const lines: Rect[] = []
@@ -133,7 +130,9 @@ function lineRects(el: Element): Rect[] {
     for (const r of range.getClientRects()) {
       if (r.width < 2 || r.height < 4) continue
       const y = r.top + scrollY
-      const line = lines.find((l) => Math.abs(l.y - y) < r.height / 2)
+      const line = lines.find(
+        (l) => Math.abs(l.y - y) < r.height / 2 && Math.abs(l.x + l.w - r.left - scrollX) < 400,
+      )
       if (line) {
         const right = Math.max(line.x + line.w, r.right + scrollX)
         line.x = Math.min(line.x, r.left + scrollX)
@@ -142,7 +141,7 @@ function lineRects(el: Element): Rect[] {
       } else lines.push({ x: r.left + scrollX, y, w: r.width, h: r.height })
     }
   }
-  return lines.sort((p, q) => p.y - q.y)
+  return lines.sort((p, q) => p.y - q.y || p.x - q.x)
 }
 
 /** Where each word of an element ends, in reading order: the typing caret's stops. */
@@ -165,6 +164,15 @@ function words(els: Element[]) {
   return els.reduce((n, el) => n + (el.textContent ?? '').split(/\s+/).filter(Boolean).length, 0)
 }
 
+/** The color behind an element: the first ancestor that paints a background. */
+function groundOf(el: Element) {
+  for (let node: Element | null = el; node; node = node.parentElement) {
+    const bg = getComputedStyle(node).backgroundColor
+    if (bg && bg !== 'transparent' && !/^rgba\(.*,\s*0\)$/.test(bg)) return bg
+  }
+  return getComputedStyle(document.body).backgroundColor
+}
+
 const arrow =
   '<svg viewBox="0 0 16 20" aria-hidden="true"><path d="M1 1v15.5l4.2-4 2.9 6.6 2.6-1.1-2.9-6.5H14z" style="fill: var(--c); stroke: var(--color-screen)" stroke-width="1.2" stroke-linejoin="round"/></svg>'
 const check =
@@ -174,8 +182,8 @@ export function startSwarm(labels: Labels, locale: string): () => void {
   const html = document.documentElement
   const phone = matchMedia('(max-width: 767px)').matches
   const maxActive = phone ? 6 : 8
-  // Seven at work and Gabriel make eight on a desktop; three and Gabriel on a phone.
-  const budget = phone ? 3 : 7
+  /** Phones go a little faster: there is less on screen at once. */
+  const pace = phone ? 0.85 : 1
   let facts: BuildFacts | null = null
   let stopped = false
   let done = false
@@ -198,12 +206,14 @@ export function startSwarm(labels: Labels, locale: string): () => void {
   dock.append(skip)
   document.body.append(dock)
   html.dataset.swarm = 'booting'
+  html.classList.add('swarm-on')
   const slot = (k: string) => dock.querySelector<HTMLElement>(`[data-k="${k}"]`)!
   const setSlot = (k: string, text: string) => {
     const el = slot(k)
     if (el.textContent !== text) el.textContent = text
   }
   setSlot('status', labels.booting)
+  setSlot('progress', '0%')
   const log = (who: Cursor, what: string) => setSlot('log', `${who.name} › ${what}`)
 
   // ---- Clock, tasks and effects ----
@@ -247,11 +257,9 @@ export function startSwarm(labels: Labels, locale: string): () => void {
       on: false,
       leaving: false,
       quiet: false,
-      busy: null,
       text: name,
-      way: [],
       labelWidth: 0,
-      arriving: false,
+      used: 0,
     }
   })
   const agent = (role: Role) => cursors.find((c) => c.role === role)!
@@ -266,45 +274,45 @@ export function startSwarm(labels: Labels, locale: string): () => void {
     }
     if (what) log(c, what)
   }
-  const go = (c: Cursor, x: number, y: number) => {
-    c.path = [{ x, y }]
-    c.leaving = false
-    wake()
-  }
-  /** Fly in from the nearer side of the screen, unless already on it. */
-  const enter = (c: Cursor, x: number, y: number) => {
-    c.quiet = false
-    c.arriving = false
-    if (!c.on) {
-      c.on = true
-      c.el.hidden = false
-      c.x = x - scrollX < innerWidth / 2 ? scrollX - 40 : scrollX + innerWidth + 40
-      c.y = y
-    }
-    go(c, x, y)
-  }
-  /** Back up the free column it came down, and away under the top bar: the hero's way out. */
-  const leaveUp = (c: Cursor) => {
-    if (!c.on) return
-    c.busy = null
-    c.leaving = true
-    const back = c.way.length ? [...c.way].reverse().slice(1) : [{ x: c.x, y: scrollY + 28 }]
-    c.way = []
-    c.path = [...back, { x: scrollX + innerWidth + 60, y: scrollY + 28 }]
-    wake()
-  }
   const leave = (c: Cursor) => {
-    if (!c.on) return
-    c.busy = null
+    if (!c.on || c.leaving) return
     c.leaving = true
     c.path = [
       { x: c.x - scrollX < innerWidth / 2 ? scrollX - 60 : scrollX + innerWidth + 60, y: c.y },
     ]
     wake()
   }
+  /** Fly in from the nearer side of the screen, unless already on it; never past the cap. */
+  const enter = (c: Cursor, x: number, y: number) => {
+    c.used = time
+    c.quiet = false
+    if (!c.on || c.leaving) {
+      // Coming back on counts too: one at work makes way first.
+      if (active() >= maxActive) {
+        const idle = cursors
+          .filter((o) => o.on && !o.leaving && o !== c && o.role !== 'gabriel')
+          .sort((a, b) => a.used - b.used)[0]
+        if (idle) leave(idle)
+      }
+      if (!c.on) {
+        c.x = x - scrollX < innerWidth / 2 ? scrollX - 40 : scrollX + innerWidth + 40
+        c.y = y
+      }
+      c.on = true
+      c.leaving = false
+      c.el.hidden = false
+    }
+    c.path = [{ x, y }]
+    wake()
+  }
+  const follow = (c: Cursor, x: number, y: number) => {
+    c.used = time
+    c.path = [{ x, y }]
+  }
 
-  // ---- Marks: boxes, lines, highlights, ripples, checks ----
-  const mark = (unit: Unit | null, className: string, role: Role, r: Rect) => {
+  // ---- Marks ----
+  const marks = new Set<HTMLElement>()
+  const mark = (className: string, role: Role, r: Rect) => {
     const el = document.createElement('div')
     el.className = className
     el.style.setProperty('--c', `var(--color-agent-${roles.indexOf(role) + 1})`)
@@ -314,38 +322,36 @@ export function startSwarm(labels: Labels, locale: string): () => void {
       height: `${r.h}px`,
     })
     root.append(el)
-    unit?.marks.push(el)
+    marks.add(el)
     return el
+  }
+  const drop = (el: HTMLElement) => {
+    el.remove()
+    marks.delete(el)
   }
   const fadeOut = (el: HTMLElement, dur = 300) =>
     animate(
       dur,
       (p) => (el.style.opacity = String(1 - p)),
-      () => el.remove(),
+      () => drop(el),
     )
-  /**
-   * Text not yet typed sits under a veil of the ground at 45%, which keeps body ink at 5.4:1:
-   * dimmer, still readable (design/COMMIT-SHEET.md §6). Only text in full ink is veiled;
-   * muted text would drop below AA.
-   */
-  const ink = getComputedStyle(document.body).color
-  const veil = (u: Unit, el: Element) => {
-    if (u.veils.has(el) || getComputedStyle(el).color !== ink) return
-    const lines = lineRects(el)
-    const divs = lines.map((l) =>
-      mark(u, 'swarm-veil', 'copy', { x: l.x - 1, y: l.y, w: l.w + 3, h: l.h }),
-    )
-    u.veils.set(el, { lines, divs })
+  const box = (r: Rect) => {
+    const b = mark('swarm-box', 'architect', { x: r.x - 4, y: r.y - 4, w: r.w + 8, h: r.h + 8 })
+    const t = document.createElement('span')
+    t.className = 'swarm-badge'
+    t.textContent = `${round(r.w)} × ${round(r.h)}`
+    b.append(t)
+    animate(260, (q) => {
+      const e = (1 - ease(q)) * 100
+      b.style.clipPath = `inset(-24px ${e}% ${e}% -2px)`
+    })
+    return b
   }
-  const unveil = (u: Unit, el: Element) => {
-    for (const d of u.veils.get(el)?.divs ?? []) d.remove()
-    u.veils.delete(el)
-  }
-  const ripple = (unit: Unit, role: Role, target: Element) => {
+  const ripple = (role: Role, target: Element) => {
     const r = pageRect(target)
     const cx = r.x + r.w / 2
     const cy = r.y + r.h / 2
-    const ring = mark(unit, 'swarm-ring', role, { x: cx, y: cy, w: 0, h: 0 })
+    const ring = mark('swarm-ring', role, { x: cx, y: cy, w: 0, h: 0 })
     animate(
       520,
       (p) => {
@@ -357,12 +363,11 @@ export function startSwarm(labels: Labels, locale: string): () => void {
           opacity: String(1 - p),
         })
       },
-      () => ring.remove(),
+      () => drop(ring),
     )
   }
   const approveMark = (x: number, y: number) => {
-    // Not one of the unit's marks: the check stays a moment after the others fade.
-    const el = mark(null, 'swarm-check', 'gabriel', { x: x - 10, y: y - 10, w: 20, h: 20 })
+    const el = mark('swarm-check', 'gabriel', { x: x - 10, y: y - 10, w: 20, h: 20 })
     el.innerHTML = check
     // Scale inside the transform: the separate `scale` property would scale the offset too.
     animate(
@@ -372,719 +377,528 @@ export function startSwarm(labels: Labels, locale: string): () => void {
     at(1100, () => fadeOut(el))
   }
 
-  // ---- Where cursors can rest without covering text ----
-  // Words by their lines (a paragraph's box spans the column, its text may not); controls,
-  // pictures and panels by their boxes. The hero name by its box: at boot its lines are still
-  // rising into place, so their own rectangles are not where they will be.
-  const textRects = (scope: Element) => [
-    ...all(scope, 'h2, h3, p, li, dt, dd').flatMap(lineRects),
-    ...all(scope, 'h1, a, button, img, svg, .project-stack').map(pageRect),
-  ]
+  // ---- Revealing the page's own pieces (opacity only; see globals.css) ----
+  const touched = new Set<Element>()
+  const reveal = (el: Element, self = false) => {
+    el.classList.add(self ? 'b-self' : 'b-on')
+    touched.add(el)
+    // Every element starts at opacity 0, containers too: the boxes around a piece show their
+    // own selves (their other children stay hidden until their turn).
+    for (let up = el.parentElement; up && up !== document.body; up = up.parentElement) {
+      if (up.matches('main, header.top-bar')) break
+      if (up.classList.contains('b-self') || up.classList.contains('b-on')) break
+      up.classList.add('b-self')
+      touched.add(up)
+    }
+  }
+  const moved = new Set<HTMLElement>()
   /**
-   * A free w × h spot inside the visible part of `scope`, scanning from the right, starting
-   * `from` of the way down (0–1) and wrapping round to the top.
+   * Covers an element's lines with its own background, so it can be revealed and then typed or
+   * swept in: the veils go in the same task as the reveal, so nothing flashes.
    */
-  const freeSpot = (
-    scope: Element,
-    w: number,
-    h: number,
-    taken: Rect[],
-    fromTop = false,
-    from = 0,
-  ) => {
-    const view = { x: scrollX, y: scrollY + 64, w: innerWidth, h: innerHeight - 64 - dockHeight() }
-    const area = pageRect(scope)
-    const avoid = [...textRects(scope), ...taken]
-    const top = Math.max(view.y, area.y) + 8
-    const bottom = Math.min(view.y + view.h, area.y + area.h) - h
-    if (bottom < top) return null
-    const rows: number[] = []
-    for (let y = top; y <= bottom; y += 20) rows.push(y)
-    const first = Math.floor(rows.length * from)
-    for (const y of [...rows.slice(first), ...rows.slice(0, first)]) {
-      for (let x = view.x + view.w - w - 12; x > view.x + 8; x -= 24) {
-        const spot = { x, y, w, h }
-        if (avoid.some((r) => overlaps(spot, r, 10))) continue
-        if (!fromTop) return { ...spot, way: [] }
-        // Boot cursors come down from under the top bar, straight or by the right-hand gutter
-        // and then across: either way must be free too.
-        const top = scrollY + 56
-        const gutter = scrollX + innerWidth - 22
-        const free = (r: Rect) => !avoid.some((a) => overlaps(r, a, 6))
-        if (free({ x, y: top, w: 22, h: y - top }))
-          return {
-            ...spot,
-            way: [
-              { x, y: scrollY + 30 },
-              { x, y },
-            ],
-          }
-        if (
-          free({ x: gutter, y: top, w: 22, h: y - top }) &&
-          free({ x, y, w: gutter + 22 - x, h: 22 })
-        )
-          return {
-            ...spot,
-            way: [
-              { x: gutter, y: scrollY + 30 },
-              { x: gutter, y },
-              { x, y },
-            ],
-          }
-      }
-    }
-    return null
-  }
-  const dockHeight = () => dock.getBoundingClientRect().height + 16
-
-  // ---- Units: the sections, and each project on its own ----
-  const units: Unit[] = []
-  const add = (kind: Kind, el: Element | null, index = 0) => {
-    if (el instanceof HTMLElement) {
-      units.push({
-        kind,
-        el,
-        index,
-        state: 'waiting',
-        marks: [],
-        undo: [],
-        crew: [],
-        until: 0,
-        veils: new Map(),
+  const veil = (el: Element) => {
+    const color = groundOf(el.parentElement ?? el)
+    return lineRects(el).map((line) => {
+      const v = mark('swarm-veil', 'copy', {
+        x: line.x - 2,
+        y: line.y - 1,
+        w: line.w + 6,
+        h: line.h + 2,
       })
-      el.dataset.swarmUnit = 'waiting'
-    }
+      v.style.background = color
+      return { line, v }
+    })
   }
-  add('hero', document.getElementById('top'))
-  add('experience', document.getElementById('experience'))
-  all<HTMLElement>(document, '#projects article').forEach((el, i) => add('project', el, i))
-  add('how', document.getElementById('how-i-work'))
-  add('contact', document.getElementById('contact'))
 
-  const parts = (u: Unit) => {
-    const q = <T extends Element = HTMLElement>(s: string) => all<T>(u.el, s)
-    switch (u.kind) {
-      case 'experience':
-        return {
-          headings: q('h2'),
-          blocks: q('.timeline-item'),
-          texts: q('.timeline-summary'),
-          cards: q('.timeline-item').filter((_, i) => i % 2 === 1),
-          items: q('.timeline-start'),
-        }
-      case 'project':
-        return {
-          headings: [
-            ...(u.index === 0 ? all<HTMLElement>(document, '#projects-title') : []),
-            ...q('h3'),
-          ],
-          blocks: q('.project-image, .project-head, .project-built, .project-architecture'),
-          texts: q('.project-part > dd').filter((dd) => !dd.querySelector('svg')),
-          cards: q('.project-image, .project-stack'),
-          items: q('.stack-line > span'),
-          links: q<HTMLAnchorElement>('a[href^="http"]'),
-          buttons: q('a[href^="http"]'),
-          diagram: u.el.querySelector<SVGSVGElement>('.diagram svg'),
-          image: u.el.querySelector<HTMLElement>('.project-image'),
-        }
-      case 'how':
-        return {
-          headings: q('h2'),
-          blocks: q('.step'),
-          texts: q('.page-grid > p'),
-          cards: q('.step').filter((_, i) => i === 1 || i === 4),
-          drawings: q('.step-drawing'),
-        }
-      case 'contact':
-        return {
-          headings: q('h2'),
-          blocks: q('.page-grid > div'),
-          texts: q('.page-grid > div:first-child > p'),
-          cards: q('.contact-photo'),
-          items: q('.skill-group dt'),
-          links: q<HTMLAnchorElement>('a[href^="http"]'),
-          buttons: q('a[href^="mailto"], a[download]'),
-        }
-      default:
-        return { headings: [] as HTMLElement[] }
+  // ---- The page, top to bottom: sections and their pieces ----
+  const units: Unit[] = []
+  const unit = (kind: Kind, el: Element | null, heading: Element | null) => {
+    if (!(el instanceof HTMLElement)) return null
+    const u: Unit = { kind, el, heading, state: 'waiting' }
+    el.dataset.swarmUnit = 'waiting'
+    units.push(u)
+    return u
+  }
+  const pieces: Piece[] = []
+  const add = (
+    u: Unit | null,
+    el: Element | null | undefined,
+    how: How,
+    role: Role,
+    group?: Element[],
+  ) => {
+    if (u && el) pieces.push({ el, how, role, unit: u, ...(group ? { group } : {}) })
+  }
+  const one = (scope: ParentNode, s: string) => scope.querySelector(s)
+
+  const bar = document.querySelector('header.top-bar')
+  const hero = unit('hero', document.getElementById('top'), document.getElementById('hero-name'))
+  if (hero) {
+    add(hero, bar?.firstElementChild, 'show', 'architect')
+    add(hero, document.getElementById('hero-name'), 'heading', 'typography')
+    for (const p of all(hero.el, ':scope > div:first-of-type > p')) add(hero, p, 'type', 'copy')
+    for (const a of all(hero.el, '[data-fact="contact"], [data-fact="cv"]'))
+      add(hero, a, 'click', 'layout')
+    add(hero, one(hero.el, ':scope > p'), 'type', 'copy')
+    add(hero, one(hero.el, ':scope > a'), 'show', 'architect')
+  }
+
+  const exp = document.getElementById('experience')
+  const expUnit = unit('experience', exp, exp && one(exp, 'h2'))
+  if (exp && expUnit) {
+    add(expUnit, one(exp, 'h2'), 'heading', 'typography')
+    add(expUnit, one(exp, '.timeline'), 'self', 'architect')
+    for (const li of all(exp, '.timeline-item')) {
+      add(expUnit, li, 'self', 'layout')
+      add(expUnit, one(li, '.timeline-years'), 'items', 'data', [one(li, '.timeline-years')!])
+      add(expUnit, one(li, '.timeline-body'), 'type', 'copy', all(li, '.timeline-body > *'))
     }
   }
 
+  const projectsTitle = document.getElementById('projects-title')
+  all<HTMLElement>(document, '#projects article').forEach((article, i) => {
+    const u = unit('project', article, one(article, 'h3'))
+    if (!u) return
+    if (i === 0) add(u, projectsTitle, 'heading', 'typography')
+    add(u, one(article, '.project-image'), 'drag', 'layout')
+    add(u, one(article, '.project-head'), 'type', 'copy', all(article, '.project-head > p'))
+    add(u, one(article, 'h3'), 'heading', 'typography')
+    for (const part of all(article, '.project-part')) {
+      add(u, one(part, 'dt'), 'show', 'architect')
+      const dd = one(part, 'dd')
+      if (dd?.querySelector('svg')) add(u, dd, 'draw', 'diagram')
+      else add(u, dd, 'type', 'copy')
+    }
+    const stack = one(article, '.project-stack')
+    add(u, stack, 'drag', 'layout')
+    if (stack) add(u, one(stack, 'ul'), 'items', 'data', all(stack, '.stack-line'))
+    add(u, one(article, '.project-links'), 'click', 'security')
+  })
+
+  const how = document.getElementById('how-i-work')
+  const howUnit = unit('how', how, how && one(how, 'h2'))
+  if (how && howUnit) {
+    add(howUnit, one(how, 'h2'), 'heading', 'typography')
+    for (const step of all(how, '.step')) {
+      add(howUnit, step, 'drag', 'layout')
+      add(howUnit, one(step, 'svg'), 'draw', 'diagram')
+    }
+    add(howUnit, one(how, '.page-grid > p'), 'type', 'copy')
+    add(howUnit, one(how, '.build-loop'), 'show', 'architect')
+  }
+
+  const contact = document.getElementById('contact')
+  const contactUnit = unit('contact', contact, contact && one(contact, 'h2'))
+  if (contact && contactUnit) {
+    add(contactUnit, one(contact, 'h2'), 'heading', 'typography')
+    const left = one(contact, '.page-grid > div:first-child')
+    if (left) {
+      for (const p of all(left, ':scope > p')) add(contactUnit, p, 'type', 'copy')
+      add(contactUnit, one(left, ':scope > div'), 'click', 'tests')
+      add(contactUnit, one(left, ':scope > ul'), 'click', 'security')
+    }
+    add(contactUnit, one(contact, '.contact-photo'), 'drag', 'layout')
+    add(contactUnit, one(contact, '.contact-about h3'), 'heading', 'typography')
+    for (const dl of all(contact, '.skill-list'))
+      add(contactUnit, dl, 'items', 'data', all(dl, '.skill-group'))
+    add(contactUnit, one(contact, '.page-grid > p:last-child'), 'show', 'architect')
+  }
+
+  // ---- Facts ----
   const fact = {
     js: () => (facts ? facts.js.kb[locale] : undefined),
     tests: (kind: Kind) =>
       facts ? specs[kind].reduce((n, s) => n + (facts!.tests.e2e[s] ?? 0), 0) : undefined,
     contrast: (kind: Kind) => (facts ? facts.contrast[pairing[kind]] : undefined),
   }
-
-  /** What an agent reports, from build-facts.json or the page; undefined when it cannot know. */
-  const codes = () =>
-    (facts?.locales ?? all(document, 'header.top-bar nav a').map((a) => a.textContent ?? ''))
-      .map((l) => l.toUpperCase())
-      .join(' · ')
   const output: Partial<Record<Role, (u: Unit) => string | undefined>> = {
-    planner: () =>
-      `${facts?.sections.length ?? all(document, '[data-section]').length} ${labels.units.sections}`,
+    planner: () => `${facts?.sections.length ?? units.length} ${labels.units.sections}`,
     perf: () => (fact.js() === undefined ? undefined : `JS ${fact.js()} KB`),
     a11y: (u) =>
       fact.contrast(u.kind) === undefined ? undefined : `AA ${fact.contrast(u.kind)}:1`,
     tests: (u) => (fact.tests(u.kind) === undefined ? undefined : `${fact.tests(u.kind)} e2e`),
-    i18n: () => codes(),
+    i18n: () => (facts?.locales ?? ['pt', 'en', 'es']).map((l) => l.toUpperCase()).join(' · '),
     motion: () => `lerp ${smoothScroll.lerp}`,
     deploy: () => facts?.deploy.target,
-  }
-  /** An agent that only reports: it comes beside the heading, says its number, and goes. */
-  const report = (u: Unit, p: Parts, c: Cursor, i: number) => {
-    const text = output[c.role]?.(u)
-    if (text === undefined) return 0
-    const spot = near(p, u, i)
-    enter(c, spot.x, spot.y)
-    say(c, text)
-    return 700
+    security: (u) => {
+      const links = all<HTMLAnchorElement>(u.el, 'a[href^="http"]')
+      if (links.length === 0) return undefined
+      const safe = links.every((a) => /noopener/.test(a.rel) && /noreferrer/.test(a.rel))
+      return `${links.length} ${labels.units.links}${safe ? ' · noopener' : ''}`
+    },
   }
 
-  // ---- What each agent does on a unit; each returns how long it takes (ms) ----
-  type Parts = ReturnType<typeof parts> & {
-    blocks?: HTMLElement[]
-    texts?: HTMLElement[]
-    cards?: HTMLElement[]
-    items?: HTMLElement[]
-    links?: HTMLAnchorElement[]
-    buttons?: HTMLElement[]
-    diagram?: SVGSVGElement | null
-    image?: HTMLElement | null
-    drawings?: HTMLElement[]
+  // ---- The page scrolls itself to follow the build ----
+  let focusY: number | null = null
+  const focus = (y: number) => {
+    focusY = y
   }
-  const near = (p: Parts, u: Unit, i: number) => {
-    const h = p.headings.at(-1) ?? u.el
-    const r = pageRect(h)
-    const line = lineRects(h).at(-1) ?? r
-    return { x: Math.min(line.x + line.w + 24, scrollX + innerWidth - 180), y: r.y + 8 + i * 30 }
+  const scrollStep = (dt: number) => {
+    if (focusY === null || done) return
+    const max = document.documentElement.scrollHeight - innerHeight
+    const want = Math.min(Math.max(focusY - innerHeight * 0.38, 0), max)
+    const k = 1 - (1 - 0.07) ** (dt / 16.7)
+    if (Math.abs(want - scrollY) > 0.5) scrollTo(0, scrollY + (want - scrollY) * k)
   }
 
-  const jobs: Record<Role, (u: Unit, p: Parts, c: Cursor, slot: number) => number> = {
-    planner: (u, p, c, i) => {
-      const files = facts?.sections.map((x) => x.file) ?? []
-      if (files.length) at(300, () => log(c, files.join(' · ')))
-      return report(u, p, c, i)
-    },
-    architect: (u, p, c) => {
-      const blocks = (p.blocks ?? []).slice(0, phone ? 3 : 5)
-      blocks.forEach((b, i) =>
-        at(i * 150, () => {
-          // A card Layout is about to drag in is outlined where it belongs.
-          const r = slots.get(b) ?? pageRect(b)
-          enter(c, r.x - 4, r.y - 4)
-          const size = `${round(r.w)} × ${round(r.h)}`
-          say(c, size)
-          const box = mark(u, 'swarm-box', 'architect', {
-            x: r.x - 4,
-            y: r.y - 4,
-            w: r.w + 8,
-            h: r.h + 8,
-          })
-          const badge = document.createElement('span')
-          badge.className = 'swarm-badge'
-          badge.textContent = size
-          box.append(badge)
-          animate(280, (q) => {
-            const e = (1 - ease(q)) * 100
-            box.style.clipPath = `inset(-24px ${e}% ${e}% -2px)`
-          })
-          at(160, () => go(c, r.x + r.w, r.y + r.h))
-        }),
-      )
-      return blocks.length * 150 + 300
-    },
-    copy: (u, p, c) => {
-      const texts = (p.texts ?? []).slice(0, phone ? 1 : 2)
-      say(c, `${words(texts)} ${labels.units.words}`)
-      let t = 0
-      for (const el of texts) {
-        const ends = wordEnds(el)
-        if (ends.length === 0) continue
-        // Streamed a word at a time, as an agent types: about 35 ms a word.
-        const dur = Math.min(Math.max(ends.length * 35, 450), 1300)
-        at(t, () => {
-          const veiled = u.veils.get(el)
-          const caret = mark(u, 'swarm-mark', 'copy', {
-            x: ends[0]!.x,
-            y: ends[0]!.y,
-            w: 2,
-            h: ends[0]!.h,
-          })
-          enter(c, ends[0]!.x, ends[0]!.y + ends[0]!.h)
-          animate(
-            dur,
-            (q) => {
-              const k = Math.max(1, Math.ceil(q * ends.length))
-              const end = ends[k - 1]!
-              caret.style.transform = `translate(${end.x + 1}px, ${end.y}px)`
-              caret.style.height = `${end.h}px`
-              c.path = [{ x: end.x + 4, y: end.y + end.h }]
-              veiled?.lines.forEach((line, i) => {
-                const div = veiled.divs[i]!
-                if (line.y + line.h / 2 < end.y) div.style.width = '0px'
-                else if (Math.abs(line.y - end.y) < line.h / 2) {
-                  const from = end.x + 2
-                  div.style.transform = `translate(${from}px, ${line.y}px)`
-                  div.style.width = `${Math.max(line.x + line.w + 2 - from, 0)}px`
-                }
-              })
-            },
-            () => {
-              caret.remove()
-              unveil(u, el)
-            },
-          )
-        })
-        t += dur + 80
+  // ---- How each piece arrives; each returns how long it takes (ms) ----
+  const typeIn = (els: Element[], c: Cursor) => {
+    // Veils first, all of them, then the reveal: the words appear only as they are typed.
+    const parts = els.map((el) => ({ ends: wordEnds(el), veils: veil(el) }))
+    for (const el of els) reveal(el)
+    say(c, `${words(els)} ${labels.units.words}`)
+    let t = 0
+    for (const { ends, veils } of parts) {
+      if (ends.length === 0) {
+        veils.forEach(({ v }) => drop(v))
+        continue
       }
-      return Math.max(t, 300) + 100
-    },
-    layout: (u, p, c) => {
-      const cards = (p.cards ?? []).slice(0, phone ? 1 : 2)
-      let t = 0
-      cards.forEach((card) => {
-        const [dx, dy] = offsets.get(card) ?? [0, 0]
-        const slot = slots.get(card)
-        const dur = Math.abs(dx) > 0 ? 650 : 460
-        at(t, () => {
-          const r = pageRect(card)
-          enter(c, r.x + Math.min(r.w / 2, 60), r.y + 14)
-          say(c, `${round(Math.hypot(dx, dy))} px`)
-          if (slot) {
-            const ghost = mark(u, 'swarm-ghost', 'layout', slot)
-            at(dur + 260, () => fadeOut(ghost, 200))
-          }
-        })
-        at(t + 220, () =>
-          animate(
-            dur,
-            (q) => {
-              const e = 1 - ease(q)
-              card.style.translate = `${dx * e}px ${dy * e}px`
-              const r = pageRect(card)
-              c.path = [{ x: r.x + Math.min(r.w / 2, 60), y: r.y + 14 }]
-            },
-            () => (card.style.translate = ''),
-          ),
+      // Streamed a word at a time, as an agent writes: about 22 ms a word, quicker when long.
+      const dur = Math.min(Math.max(ends.length * 22, 180), 900) * pace
+      at(t, () => {
+        const first = ends[0]!
+        const caret = mark('swarm-mark', 'copy', { x: first.x, y: first.y, w: 2, h: first.h })
+        enter(c, first.x, first.y + first.h)
+        animate(
+          dur,
+          (q) => {
+            const k = Math.max(1, Math.ceil(q * ends.length))
+            const end = ends[k - 1]!
+            caret.style.transform = `translate(${end.x + 1}px, ${end.y}px)`
+            caret.style.height = `${end.h}px`
+            follow(c, end.x + 4, end.y + end.h)
+            focus(end.y)
+            for (const { line, v } of veils) {
+              if (line.y + line.h / 2 < end.y) v.style.width = '0px'
+              else if (Math.abs(line.y - end.y) < line.h / 2) {
+                const from = end.x + 1
+                v.style.transform = `translate(${from}px, ${line.y - 1}px)`
+                v.style.width = `${Math.max(line.x + line.w + 4 - from, 0)}px`
+              }
+            }
+          },
+          () => {
+            drop(caret)
+            veils.forEach(({ v }) => drop(v))
+          },
         )
-        t += dur + 300
       })
-      return t
-    },
-    typography: (u, p, c) => {
-      const heads = p.headings.slice(-1)
-      const head = heads[0]
-      if (!head) return 0
-      const style = getComputedStyle(head)
-      say(c, `${round(parseFloat(style.fontSize))} px / ${style.fontWeight}`)
-      const lines = lineRects(head)
-      lines.forEach((line, i) =>
-        at(i * 180, () => {
-          const sel = mark(u, 'swarm-select', 'typography', { ...line, w: 0 })
-          enter(c, line.x, line.y + line.h)
-          animate(260, (q) => {
-            sel.style.width = `${line.w * ease(q)}px`
-            c.path = [{ x: line.x + line.w * ease(q), y: line.y + line.h }]
-          })
-          at(700, () => fadeOut(sel))
-        }),
-      )
-      return lines.length * 180 + 500
-    },
-    data: (u, p, c) => {
-      const items = (p.items ?? []).slice(0, 9)
-      say(c, `${(p.items ?? []).length} ${labels.units.items}`)
-      items.forEach((item, i) =>
-        at(i * 90, () => {
-          const r = pageRect(item)
-          enter(c, r.x - 4, r.y + r.h / 2)
-          unveil(u, item)
-          const tick = mark(u, 'swarm-tick', 'data', {
-            x: r.x - 16,
-            y: r.y + r.h / 2 - 5,
-            w: 10,
-            h: 10,
-          })
-          animate(160, (q) => (tick.style.opacity = String(q)))
-        }),
-      )
-      return items.length * 90 + 250
-    },
-    diagram: (u, p, c) => {
-      if (p.drawings?.length) {
-        say(c, `${p.drawings.length} ${labels.units.drawings}`)
-        p.drawings.forEach((d, i) =>
-          at(i * 140, () => {
-            const r = pageRect(d)
-            enter(c, r.x + r.w / 2, r.y + r.h / 2)
-          }),
-        )
-        return p.drawings.length * 140 + 200
-      }
-      const svg = p.diagram
-      if (!svg) return 0
-      const strokes = all<SVGGeometryElement>(svg, 'g > rect:not(.diagram-plate), g > line')
-      const boxes = all(svg, 'g > rect:not(.diagram-plate)').length
-      const arrows = all(svg, 'g > line[marker-end]').length
-      say(c, `${boxes} ${labels.units.boxes} · ${arrows} ${labels.units.arrows}`)
-      const step = Math.min(110, 1000 / Math.max(strokes.length, 1))
-      strokes.forEach((s, i) =>
-        at(i * step, () => {
-          // The trace is drawn over a copy: the diagram itself stays whole the whole time.
-          const trace = s.cloneNode() as SVGGeometryElement
-          trace.removeAttribute('class')
-          trace.removeAttribute('marker-end')
-          trace.setAttribute('class', 'swarm-trace')
-          trace.style.setProperty('--c', 'var(--color-agent-7)')
-          s.after(trace)
-          u.undo.push(() => trace.remove())
-          const length = s.getTotalLength()
-          trace.style.strokeDasharray = `${length}`
-          const matrix = s.getScreenCTM()
-          animate(
-            step * 1.6,
-            (q) => {
-              trace.style.strokeDashoffset = `${length * (1 - q)}`
-              if (!matrix) return
-              const pt = s.getPointAtLength(length * q).matrixTransform(matrix)
-              c.path = [{ x: pt.x + scrollX, y: pt.y + scrollY }]
-            },
-            () => fadeOut(trace as unknown as HTMLElement, 400),
-          )
-          if (i === 0 && matrix) {
-            const pt = s.getPointAtLength(0).matrixTransform(matrix)
-            enter(c, pt.x + scrollX, pt.y + scrollY)
-          }
-        }),
-      )
-      return strokes.length * step + 300
-    },
-    mockup: (u, p, c) => {
-      const frame = p.image
-      if (!frame) return 0
-      const svg = frame.querySelector('svg')
-      const img = frame.querySelector('img')
-      const size = svg
+      t += dur
+    }
+    return Math.max(t, 120)
+  }
+
+  /** The Mockup agent paints across an image once it is in place. */
+  const paint = (frame: HTMLElement) => {
+    const c = agent('mockup')
+    const svg = frame.querySelector('svg')
+    const img = frame.querySelector('img')
+    say(
+      c,
+      svg
         ? `${svg.viewBox.baseVal.width} × ${svg.viewBox.baseVal.height}`
         : img
           ? `${img.naturalWidth} × ${img.naturalHeight}`
-          : ''
-      say(c, size)
-      const full = pageRect(frame)
-      const x0 = Math.max(full.x, scrollX)
-      const r = { ...full, x: x0, w: Math.min(full.x + full.w, scrollX + innerWidth) - x0 }
-      const paint = mark(u, 'swarm-paint', 'mockup', { ...r, w: 0 })
-      enter(c, r.x, r.y + r.h / 2)
-      animate(
-        700,
-        (q) => {
-          paint.style.width = `${r.w * q}px`
-          c.path = [{ x: r.x + r.w * q, y: r.y + r.h * (0.5 + 0.3 * Math.sin(q * 9)) }]
-        },
-        () => fadeOut(paint, 400),
-      )
-      return 800
-    },
-    i18n: report,
-    a11y: report,
-    perf: report,
-    tests: (u, p, c, i) => {
-      const targets = (p.buttons ?? []).slice(0, 3)
-      if (targets.length === 0) return report(u, p, c, i)
-      const text = output.tests!(u)
-      if (text) say(c, text)
-      targets.forEach((b, k) =>
-        at(k * 260, () => {
-          const r = pageRect(b)
-          enter(c, r.x + r.w / 2, r.y + r.h / 2)
-          at(180, () => ripple(u, 'tests', b))
-        }),
-      )
-      return targets.length * 260 + 400
-    },
-    security: (u, p, c) => {
-      const links = p.links ?? []
-      if (links.length === 0) return 0
-      const safe = links.every((a) => /noopener/.test(a.rel) && /noreferrer/.test(a.rel))
-      say(c, `${links.length} ${labels.units.links}${safe ? ' · noopener' : ''}`)
-      links.slice(0, 4).forEach((a, k) =>
-        at(k * 200, () => {
-          const r = pageRect(a)
-          enter(c, r.x + r.w, r.y + r.h)
-        }),
-      )
-      return Math.min(links.length, 4) * 200 + 300
-    },
-    motion: (u, p, c, i) => {
-      const spot = near(p, u, i)
-      say(c, `lerp ${smoothScroll.lerp}`)
-      enter(c, spot.x, spot.y)
-      for (let k = 1; k <= 8; k++) {
-        at(200 + k * 70, () => {
-          const a = (k / 8) * Math.PI * 2
-          c.path = [{ x: spot.x + Math.cos(a) * 18, y: spot.y + Math.sin(a) * 12 }]
-        })
-      }
-      return 900
-    },
-    deploy: report,
-    gabriel: () => 0,
+          : undefined,
+    )
+    const full = pageRect(frame)
+    const x0 = Math.max(full.x, scrollX)
+    const r = { ...full, x: x0, w: Math.min(full.x + full.w, scrollX + innerWidth) - x0 }
+    const brush = mark('swarm-paint', 'mockup', { ...r, w: 0 })
+    enter(c, r.x, r.y + r.h / 2)
+    animate(
+      650 * pace,
+      (q) => {
+        brush.style.width = `${r.w * q}px`
+        follow(c, r.x + r.w * q, r.y + r.h * (0.5 + 0.3 * Math.sin(q * 9)))
+      },
+      () => fadeOut(brush, 400),
+    )
   }
 
-  /** Where Layout's cards belong, and how far out they start. */
-  const slots = new WeakMap<Element, Rect>()
-  const offsets = new WeakMap<Element, [number, number]>()
+  const arrive: Record<How, (p: Piece, c: Cursor) => number> = {
+    show: (p, c) => {
+      const r = pageRect(p.el)
+      enter(c, r.x, r.y)
+      say(c, `${round(r.w)} × ${round(r.h)}`)
+      const b = box(r)
+      reveal(p.el)
+      at(500, () => fadeOut(b))
+      return 260
+    },
+    self: (p, c) => {
+      const r = pageRect(p.el)
+      enter(c, r.x, r.y)
+      reveal(p.el, true)
+      if (p.role === 'architect') {
+        say(c, `${round(r.w)} × ${round(r.h)}`)
+        const b = box(r)
+        at(500, () => fadeOut(b))
+      }
+      return 160
+    },
+    heading: (p, c) => {
+      const el = p.el
+      const style = getComputedStyle(el)
+      say(c, `${round(parseFloat(style.fontSize))} px / ${style.fontWeight}`)
+      const veils = veil(el)
+      reveal(el)
+      const lines = veils.map((v) => v.line)
+      const dur = 320 * pace
+      if (lines[0]) enter(c, lines[0].x, lines[0].y + lines[0].h)
+      animate(
+        dur,
+        (q) => {
+          const e = ease(q)
+          for (const { line, v } of veils) {
+            const from = line.x + line.w * e
+            v.style.transform = `translate(${from}px, ${line.y - 1}px)`
+            v.style.width = `${Math.max(line.x + line.w + 4 - from, 0)}px`
+          }
+          const end = lines.at(-1)
+          if (end) follow(c, end.x + end.w * e, end.y + end.h)
+        },
+        () => {
+          veils.forEach(({ v }) => drop(v))
+          // Then the type is set: a selection passes over it.
+          for (const line of lines) {
+            const sel = mark('swarm-select', 'typography', { ...line, w: 0 })
+            animate(220, (q) => (sel.style.width = `${line.w * ease(q)}px`))
+            at(600, () => fadeOut(sel))
+          }
+        },
+      )
+      return dur + 120
+    },
+    type: (p, c) => typeIn(p.group?.length ? p.group : [p.el], c),
+    drag: (p, c) => {
+      const el = p.el as HTMLElement
+      const slot = pageRect(el)
+      const far = el.matches('.project-image, .contact-photo')
+      const dx = far ? (phone ? -28 : -64) : 0
+      const dy = far ? 44 : 22
+      el.style.translate = `${dx}px ${dy}px`
+      moved.add(el)
+      reveal(el)
+      const ghost = mark('swarm-ghost', 'layout', slot)
+      const b = box(slot)
+      const grab = (e: number) => ({
+        x: slot.x + dx * e + Math.min(slot.w / 2, 60),
+        y: slot.y + dy * e + 14,
+      })
+      enter(c, grab(1).x, grab(1).y)
+      say(c, `${round(Math.hypot(dx, dy))} px`)
+      const dur = (far ? 620 : 380) * pace
+      at(120, () =>
+        animate(
+          dur,
+          (q) => {
+            const e = 1 - ease(q)
+            el.style.translate = `${dx * e}px ${dy * e}px`
+            const g = grab(e)
+            follow(c, g.x, g.y)
+          },
+          () => {
+            el.style.translate = ''
+            moved.delete(el)
+            fadeOut(ghost, 200)
+            fadeOut(b, 300)
+            if (el.matches('.project-image')) paint(el)
+          },
+        ),
+      )
+      return dur + 160
+    },
+    items: (p, c) => {
+      const items = p.group ?? []
+      reveal(p.el, true)
+      say(c, `${items.length} ${labels.units.items}`)
+      const step = Math.min(90, 700 / Math.max(items.length, 1)) * pace
+      items.forEach((item, i) =>
+        at(i * step, () => {
+          const r = pageRect(item)
+          enter(c, r.x - 4, r.y + Math.min(r.h, 30) / 2)
+          focus(r.y)
+          reveal(item)
+          const tick = mark('swarm-tick', 'data', { x: r.x - 16, y: r.y + 8, w: 10, h: 10 })
+          animate(160, (q) => (tick.style.opacity = String(q)))
+          at(700, () => fadeOut(tick))
+        }),
+      )
+      return items.length * step + 120
+    },
+    draw: (p, c) => {
+      const svg = p.el instanceof SVGSVGElement ? p.el : p.el.querySelector('svg')
+      if (!svg) {
+        reveal(p.el)
+        return 120
+      }
+      const strokes = all<SVGGeometryElement>(
+        svg,
+        'rect:not(.diagram-plate), line, path, circle, polyline',
+      ).filter((s) => !s.closest('defs'))
+      const texts = all<SVGElement>(svg, 'text, .diagram-plate')
+      const lengths = strokes.map((s) =>
+        s.hasAttribute('pathLength') ? Number(s.getAttribute('pathLength')) : s.getTotalLength(),
+      )
+      // Hidden strokes first, then the reveal, so the drawing is traced from nothing.
+      strokes.forEach((s, i) => {
+        s.style.strokeDasharray = `${lengths[i]}`
+        s.style.strokeDashoffset = `${lengths[i]}`
+        s.style.fillOpacity = '0'
+      })
+      for (const t of texts) t.style.opacity = '0'
+      reveal(p.el)
+      const boxes = all(svg, 'g > rect:not(.diagram-plate)').length
+      const arrows = all(svg, 'g > line[marker-end]').length
+      say(
+        c,
+        boxes
+          ? `${boxes} ${labels.units.boxes} · ${arrows} ${labels.units.arrows}`
+          : `${strokes.length} ${labels.units.items}`,
+      )
+      const r0 = pageRect(svg)
+      enter(c, r0.x + 10, r0.y + 10)
+      focus(r0.y)
+      const step = Math.min(90, 900 / Math.max(strokes.length, 1)) * pace
+      strokes.forEach((s, i) =>
+        at(i * step, () => {
+          const length = lengths[i]!
+          const total = s.getTotalLength()
+          const matrix = s.getScreenCTM()
+          animate(
+            step * 1.8,
+            (q) => {
+              s.style.strokeDashoffset = `${length * (1 - q)}`
+              if (!matrix) return
+              const pt = s.getPointAtLength(total * q).matrixTransform(matrix)
+              follow(c, pt.x + scrollX, pt.y + scrollY)
+            },
+            () => {
+              s.style.strokeDasharray = ''
+              s.style.strokeDashoffset = ''
+              s.style.fillOpacity = ''
+            },
+          )
+        }),
+      )
+      at(strokes.length * step * 0.6, () => texts.forEach((t) => (t.style.opacity = '')))
+      return strokes.length * step + 200
+    },
+    click: (p, c) => {
+      reveal(p.el)
+      const targets = p.el.matches('a, button') ? [p.el] : all(p.el, 'a, button')
+      targets.slice(0, 3).forEach((t, k) =>
+        at(k * 160 * pace, () => {
+          const r = pageRect(t)
+          enter(c, r.x + r.w / 2, r.y + r.h / 2)
+          at(120, () => ripple(c.role, t))
+        }),
+      )
+      const text = output[c.role]?.(p.unit)
+      if (text) say(c, text)
+      return Math.max(targets.length, 1) * 160 * pace + 120
+    },
+  }
 
-  // ---- Building a unit ----
-  const queue: Unit[] = []
+  // ---- The run: one piece after another; Gabriel approves each section ----
+  let index = 0
   let current: Unit | null = null
 
-  const crewFor = (u: Unit): Role[] => {
-    let list = crews[u.kind]
-    if (u.kind === 'project') {
-      const extras = [0, 1].map((k) => projectExtras[(u.index * 2 + k) % projectExtras.length]!)
-      if (u.index % 2 === 0 && !extras.includes('mockup')) extras[1] = 'mockup'
-      if (u.el.querySelector('a[href^="http"]')) extras[1] = 'security'
-      list = [...list, ...extras]
-    }
-    return list.slice(0, budget)
-  }
-
-  const setState = (u: Unit, state: Unit['state']) => {
-    u.state = state
-    u.el.dataset.swarmUnit = state
-  }
-
-  const build = (u: Unit) => {
+  const startUnit = (u: Unit) => {
     current = u
-    setState(u, 'building')
-    html.dataset.swarm = 'building'
-    setSlot('status', labels.building)
-    const p = parts(u) as Parts
-    const crew = crewFor(u)
-    // Layout's cards start out of their slots and are dragged in: an image from further away,
-    // a panel the last few pixels. CSS translate, so nothing around them moves.
-    if (crew.includes('layout')) {
-      ;(p.cards ?? []).slice(0, phone ? 1 : 2).forEach((card, i) => {
-        const far = card.matches('.project-image, .contact-photo')
-        const offset: [number, number] = far ? [phone ? -28 : -56, 40] : [0, 16 + i * 6]
-        slots.set(card, pageRect(card))
-        offsets.set(card, offset)
-        card.style.translate = `${offset[0]}px ${offset[1]}px`
-        u.undo.push(() => (card.style.translate = ''))
-      })
-    }
-    // What Copy will type, and what Data will fill, waits under its veil.
-    if (crew.includes('copy')) for (const el of (p.texts ?? []).slice(0, phone ? 1 : 2)) veil(u, el)
-    if (crew.includes('data')) for (const el of (p.items ?? []).slice(0, 9)) veil(u, el)
-    let slot = 0
-    const starts: Partial<Record<Role, number>> = {
-      architect: 0,
-      layout: 150,
-      copy: 260,
-      diagram: 380,
-      data: 450,
-      typography: 650,
-      mockup: 1050,
-    }
-    u.until = time + 900
-    for (const role of crew) {
-      const c = agent(role)
-      if (c.busy && c.busy !== u) continue
-      // On screen or already claimed, leaving ones included; one place is kept for Gabriel.
-      const taken = cursors.filter((x) => x.busy || (x.on && !x.leaving)).length
-      if (!c.on && taken >= maxActive - 1) continue
-      c.busy = u
-      u.crew.push(c)
-      const start = starts[role] ?? 500 + slot * 140
-      const mySlot = starts[role] === undefined ? slot++ : 0
-      at(start, () => {
-        if (u.state !== 'building') return
-        const took = jobs[role](u, p, c, mySlot)
-        u.until = Math.max(u.until, time + took)
-        if (took === 0) leave(c)
-      })
-    }
-    // Text no agent came for is simply there.
-    const working = new Set(u.crew.map((c) => c.role))
-    if (!working.has('copy')) for (const el of p.texts ?? []) unveil(u, el)
-    if (!working.has('data')) for (const el of p.items ?? []) unveil(u, el)
-    const g = agent('gabriel')
-    const review = () => {
-      if (u.state !== 'building') return
-      if (time < u.until) return at(u.until - time + 60, review)
-      const head = p.headings.at(-1)
-      let x: number
-      let y: number
-      if (head) {
-        const line = lineRects(head).at(-1) ?? pageRect(head)
-        x = Math.min(line.x + line.w + 18, scrollX + innerWidth - 120)
-        y = line.y + line.h / 2
-      } else {
-        const spot = freeSpot(u.el, 150, 40, [])
-        x = spot ? spot.x + 10 : scrollX + innerWidth - 140
-        y = spot ? spot.y + 10 : scrollY + 90
-      }
-      enter(g, x + 4, y + 4)
-      say(g, labels.approved)
-      at(260, () => {
-        if (u.state !== 'building') return
-        approveMark(x, y)
-        finish(u)
-      })
-    }
-    at(1000, review)
+    u.state = 'building'
+    u.el.dataset.swarmUnit = 'building'
+    // The agents who only report come beside the heading for a moment.
+    reporters[u.kind].slice(0, phone ? 1 : 2).forEach((role, i) =>
+      at(250 + i * 200, () => {
+        const text = output[role]?.(u)
+        if (text === undefined || done) return
+        const c = agent(role)
+        const anchor = pageRect(u.heading ?? u.el)
+        const line = u.heading ? (lineRects(u.heading).at(-1) ?? anchor) : anchor
+        enter(c, Math.min(line.x + line.w + 28, scrollX + innerWidth - 200), anchor.y + 6 + i * 30)
+        say(c, text)
+        if (role === 'planner' && facts) log(c, facts.sections.map((s) => s.file).join(' · '))
+        at(1800, () => leave(c))
+      }),
+    )
   }
 
-  /** Approve a unit: its marks fade, its crew moves on, the next unit starts. */
-  const finish = (u: Unit, instant = false) => {
-    setState(u, 'built')
-    for (const el of [...u.veils.keys()]) unveil(u, el)
-    for (const el of u.marks) {
-      if (instant) el.remove()
-      else at(400, () => fadeOut(el))
+  const approve = (u: Unit) => {
+    const g = agent('gabriel')
+    let x: number
+    let y: number
+    if (u.heading) {
+      const line = lineRects(u.heading).at(-1) ?? pageRect(u.heading)
+      x = Math.min(line.x + line.w + 18, scrollX + innerWidth - 120)
+      y = line.y + line.h / 2
+    } else {
+      x = scrollX + innerWidth - 160
+      y = pageRect(u.el).y + 40
     }
-    if (instant) for (const undo of u.undo) undo()
-    else at(900, () => u.undo.forEach((undo) => undo()))
-    // The crew is free at once: the next section may claim them before they fly off.
-    const away = u.kind === 'hero' ? leaveUp : leave
-    for (const c of u.crew) {
-      if (c.busy === u) c.busy = null
-      if (c.busy === null) away(c)
-    }
-    at(instant ? 0 : 400, () => agent('gabriel').busy === null && away(agent('gabriel')))
-    u.crew = []
-    if (current === u) current = null
-    if (u.kind === 'contact' && !instant) at(700, vortex)
-    next()
+    enter(g, x + 4, y + 4)
+    say(g, labels.approved)
+    at(260, () => {
+      approveMark(x, y)
+      u.state = 'built'
+      u.el.dataset.swarmUnit = 'built'
+      // Anything the plan did not name is there too.
+      reveal(u.el)
+    })
+    at(900, () => leave(g))
   }
 
   const next = () => {
-    if (current || done) return
-    while (queue.length) {
-      const u = queue.shift()!
-      if (u.state !== 'queued') continue
-      const r = u.el.getBoundingClientRect()
-      if (r.bottom < 0 || r.top > innerHeight) {
-        setState(u, 'waiting')
-        continue
-      }
-      build(u)
+    if (done || stopped) return
+    const piece = pieces[index]
+    if (!piece) {
+      if (current) approve(current)
+      current = null
+      at(900, vortex)
       return
     }
-    if (!done) {
-      html.dataset.swarm = 'idle'
-      setSlot('status', labels.building)
+    if (piece.unit !== current) {
+      if (current) approve(current)
+      startUnit(piece.unit)
     }
-  }
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        const u = units.find((x) => x.el === entry.target)
-        if (!u || !entry.isIntersecting || u.state !== 'waiting' || u.kind === 'hero') continue
-        setState(u, 'queued')
-        queue.push(u)
-      }
-      next()
-    },
-    { rootMargin: '0px 0px -18% 0px' },
-  )
-
-  // ---- Boot: the cursors burst out of the logo, and the hero is approved where it stands ----
-  const boot = () => {
-    const hero = units.find((u) => u.kind === 'hero')
-    const logo = document.querySelector('header.top-bar a')
-    const from = logo ? pageRect(logo) : { x: 24, y: scrollY + 20, w: 40, h: 16 }
-    const crew = crewFor(hero ?? units[0]!).map(agent)
-    const first = sessionStorage.getItem('swarm:booted') === null
-    try {
-      sessionStorage.setItem('swarm:booted', '1')
-    } catch {
-      // Storage can be blocked; the boot then plays again next time.
-    }
-    const taken: Rect[] = []
-    crew.forEach((c, i) => {
-      c.busy = hero ?? null
-      if (hero) hero.crew.push(c)
-      c.quiet = true
-      c.el.hidden = false
-      const text = hero ? output[c.role]?.(hero) : undefined
-      say(c, text)
-      const w = c.label.offsetWidth + 40
-      const spot = hero
-        ? freeSpot(hero.el, Math.max(w, 120), 44, taken, true, 0.1 + i * 0.16)
-        : null
-      if (spot) taken.push(spot)
-      c.on = true
-      c.el.hidden = false
-      c.x = from.x + from.w / 2
-      c.y = scrollY + 28
-      const delay = first ? i * 60 : 0
-      at(delay, () => {
-        if (!spot) {
-          // No free ground (a phone): burst out under the bar and away, covering nothing.
-          c.path = [{ x: scrollX + innerWidth + 60, y: scrollY + 28 }]
-          c.leaving = true
-          return
-        }
-        c.path = [...spot.way]
-        c.way = [{ x: c.x, y: c.y }, ...spot.way]
-        // In the hero an agent only reports where it stands, once it stands there: nothing
-        // there may be covered, not even by a label on the way.
-        c.arriving = true
-        if (c.role === 'planner' && facts)
-          at(first ? 560 : 0, () => log(c, facts!.sections.map((x) => x.file).join(' · ')))
-      })
-    })
-    if (hero) {
-      setState(hero, 'building')
-      current = hero
-      at(first ? 800 : 200, () => {
-        setSlot('status', labels.building)
-        html.dataset.swarm = 'building'
-      })
-      at(first ? 1700 : 900, () => {
-        if (hero.state !== 'building') return
-        const g = agent('gabriel')
-        const spot = freeSpot(hero.el, 150, 44, taken, true, 0.85)
-        if (spot) {
-          g.on = true
-          g.el.hidden = false
-          g.x = from.x + from.w / 2
-          g.y = scrollY + 28
-          g.path = [...spot.way]
-          g.way = [{ x: g.x, y: g.y }, ...spot.way]
-          g.arriving = true
-          say(g, labels.approved)
-          at(600, () => approveMark(spot.x + 30, spot.y + 4))
-        }
-        at(spot ? 700 : 0, () => finish(hero))
-      })
-    }
-    for (const u of units) if (u.kind !== 'hero') observer.observe(u.el)
+    index++
+    setSlot('progress', `${Math.round((index / pieces.length) * 100)}%`)
+    focus(pageRect(piece.el).y)
+    const took = arrive[piece.how](piece, agent(piece.role))
+    // The next piece starts while this one is still landing: a crowd at work, not a queue.
+    at(Math.max(took * 0.62, 110), next)
   }
 
   // ---- The end: the cursors gather into a vortex beside Contact and spin out ----
   const vortex = () => {
     if (done) return
-    const contact = units.find((u) => u.kind === 'contact')!
+    focusY = null
     for (const c of cursors)
       if (!c.on && active() < maxActive)
         enter(c, scrollX + innerWidth + 40, scrollY + innerHeight / 2)
-    const spot = freeSpot(contact.el, 180, 180, [])
-    const cx = spot ? spot.x + 90 : scrollX + innerWidth * 0.75
-    const cy = spot ? spot.y + 90 : scrollY + innerHeight * 0.5
+    // On the freest ground in view: the candidate that sits on the fewest words.
+    const words = all(document, 'main :is(h1, h2, h3, p, li, dt, dd, a, img)').map(pageRect)
+    const [cx, cy] = [
+      [0.25, 0.62],
+      [0.78, 0.3],
+      [0.5, 0.5],
+      [0.25, 0.3],
+      [0.78, 0.7],
+    ]
+      .map(([fx, fy]) => [scrollX + innerWidth * fx!, scrollY + innerHeight * fy!] as const)
+      .map(([x, y]) => ({
+        x,
+        y,
+        hits: words.filter(
+          (r) => r.x < x + 90 && r.x + r.w > x - 90 && r.y < y + 90 && r.y + r.h > y - 90,
+        ).length,
+      }))
+      .sort((p, q) => p.hits - q.hits)
+      .map((c) => [c.x, c.y] as const)[0]!
     const crew = cursors.filter((c) => c.on)
-    for (const c of crew) {
-      c.quiet = true
-      c.busy = null
-    }
-    const deploy = agent('deploy')
-    if (facts && deploy.on) log(deploy, `${facts.deploy.target} · ${facts.commit.hash}`)
+    for (const c of crew) c.quiet = true
+    if (facts) log(agent('deploy'), `${facts.deploy.target} · ${facts.commit.hash}`)
     animate(
       1900,
       (q) => {
@@ -1111,53 +925,65 @@ export function startSwarm(labels: Labels, locale: string): () => void {
     )
   }
 
+  /** Everything there, the page handed back to the reader. */
   const complete = () => {
+    if (done) return
     done = true
-    observer.disconnect()
+    focusY = null
     html.dataset.swarm = 'done'
+    delete html.dataset.build
+    for (const u of units) {
+      u.state = 'built'
+      u.el.dataset.swarmUnit = 'built'
+    }
     setSlot('status', labels.ready)
     setSlot('progress', '100%')
     if (facts) setSlot('log', `${facts.deploy.target} · ${facts.commit.hash}`)
+    try {
+      sessionStorage.setItem(builtStorageKey, '1')
+    } catch {
+      // Storage can be blocked; the page then builds again on the next visit.
+    }
+    getLenis()?.start()
     if (document.activeElement === skip) document.getElementById('main')?.focus()
-    skip.hidden = true
+    // Invisible but in place: the dock keeps its size, so nothing in it moves.
+    skip.style.visibility = 'hidden'
+    unlisten()
   }
 
-  /** Skip build: every section approved at once, no one left on screen. */
+  /** Skip build, or the reader taking the page: everything at once, no one left on screen. */
   const skipAll = () => {
-    done = true
+    if (done) return
     tasks.length = 0
     for (const e of effects.splice(0)) e.done?.()
-    for (const u of units) if (u.state !== 'built') finish(u, true)
-    for (const el of [
-      ...root.querySelectorAll<HTMLElement>(
-        '.swarm-box, .swarm-mark, .swarm-select, .swarm-tick, .swarm-paint, .swarm-ring, .swarm-check',
-      ),
-    ])
-      el.remove()
+    for (const el of [...marks]) drop(el)
+    for (const el of moved) el.style.translate = ''
+    moved.clear()
     for (const c of cursors) {
       c.on = false
       c.el.hidden = true
-      c.busy = null
     }
-    queue.length = 0
-    current = null
-    observer.disconnect()
     complete()
     render()
   }
   skip.addEventListener('click', skipAll)
+  /** The reader scrolls, clicks or types: the page is theirs, all of it, at once. */
+  const takeOver = (event: Event) => {
+    if (event.target instanceof Node && dock.contains(event.target)) return
+    skipAll()
+  }
+  const unlisten = () => {
+    removeEventListener('wheel', takeOver)
+    removeEventListener('touchstart', takeOver)
+    removeEventListener('keydown', takeOver)
+    removeEventListener('pointerdown', takeOver)
+  }
+  addEventListener('wheel', takeOver, { passive: true })
+  addEventListener('touchstart', takeOver, { passive: true })
+  addEventListener('keydown', takeOver)
+  addEventListener('pointerdown', takeOver)
 
   // ---- The loop ----
-  const progress = () => {
-    const contact = document.getElementById('contact')
-    if (!contact || done) return
-    const end = contact.getBoundingClientRect().top + scrollY - innerHeight * 0.6
-    setSlot(
-      'progress',
-      `${Math.round(Math.min(Math.max(scrollY / Math.max(end, 1), 0), 1) * 100)}%`,
-    )
-  }
-
   const render = () => {
     let n = 0
     for (const c of cursors) {
@@ -1165,11 +991,11 @@ export function startSwarm(labels: Labels, locale: string): () => void {
       if (!c.leaving) n++
       c.el.classList.toggle('swarm-leaving', c.leaving)
       c.el.style.transform = `translate3d(${c.x}px, ${c.y}px, 0)`
-      const showLabel = !c.quiet && !c.leaving && !c.arriving
+      const showLabel = !c.quiet && !c.leaving
       c.label.hidden = !showLabel
-      // Near the right edge the label hangs to the left of the arrow, so it is never cut off.
       if (showLabel && c.labelWidth === 0) c.labelWidth = c.label.offsetWidth
       const width = c.labelWidth + 16
+      // Near the right edge the label hangs to the left of the arrow, so it is never cut off.
       c.el.classList.toggle(
         'swarm-flip',
         c.x - scrollX + 12 + width > innerWidth && c.x - scrollX - width > 0,
@@ -1184,6 +1010,8 @@ export function startSwarm(labels: Labels, locale: string): () => void {
     const dt = Math.min(now - (last || now), 50)
     last = now
     time += dt
+    // Lenis smooths the reader's wheel; while the page drives itself it stands aside.
+    if (!done) getLenis()?.stop()
     for (let i = 0; i < tasks.length;) {
       if (tasks[i]!.at <= time) tasks.splice(i, 1)[0]!.run()
       else i++
@@ -1197,8 +1025,12 @@ export function startSwarm(labels: Labels, locale: string): () => void {
         e.done?.()
       } else i++
     }
+    scrollStep(dt)
+    // An agent with nothing to do for a while goes.
+    for (const c of cursors)
+      if (c.on && !c.leaving && !c.quiet && c.role !== 'gabriel' && time - c.used > 1600) leave(c)
     let moving = false
-    const k = 1 - (1 - 0.2) ** (dt / 16.7)
+    const k = 1 - (1 - 0.22) ** (dt / 16.7)
     for (const c of cursors) {
       if (!c.on) continue
       const target = c.path[0]
@@ -1207,10 +1039,6 @@ export function startSwarm(labels: Labels, locale: string): () => void {
       c.y += (target.y - c.y) * k
       if (Math.abs(target.x - c.x) < 1.5 && Math.abs(target.y - c.y) < 1.5) {
         c.path.shift()
-        if (c.path.length === 0 && c.arriving) {
-          c.arriving = false
-          c.quiet = false
-        }
         if (c.path.length === 0 && c.leaving) {
           c.on = false
           c.leaving = false
@@ -1220,7 +1048,8 @@ export function startSwarm(labels: Labels, locale: string): () => void {
     }
     render()
     // Keep going while anything moves or waits; otherwise sleep until something wakes the loop.
-    if (moving || tasks.length || effects.length) frame = requestAnimationFrame(step)
+    if (moving || tasks.length || effects.length || (!done && focusY !== null))
+      frame = requestAnimationFrame(step)
   }
 
   function wake() {
@@ -1231,7 +1060,6 @@ export function startSwarm(labels: Labels, locale: string): () => void {
   }
 
   // ---- The page around it ----
-  const onScroll = () => progress()
   const onVisibility = () => {
     paused = document.hidden
     if (paused) {
@@ -1243,24 +1071,48 @@ export function startSwarm(labels: Labels, locale: string): () => void {
       wake()
     }
   }
-  let resizeTimer = 0
-  const onResize = () => {
-    clearTimeout(resizeTimer)
-    resizeTimer = window.setTimeout(() => {
-      fitRoot()
-      // Marks were laid out for the old width: approve what is in progress as it stands.
-      if (current && current.kind !== 'hero') finish(current, true)
-    }, 150)
-  }
   const resizeObserver = new ResizeObserver(fitRoot)
   resizeObserver.observe(document.body)
-  addEventListener('scroll', onScroll, { passive: true })
+  let width = innerWidth
+  const onResize = () => {
+    // Every mark was laid out for the old width: hand the page over as it stands. (A phone's
+    // bar showing or hiding changes only the height, and does not count.)
+    if (innerWidth !== width && !done) skipAll()
+    width = innerWidth
+  }
   addEventListener('resize', onResize)
   document.addEventListener('visibilitychange', onVisibility)
-  html.classList.add('swarm-on')
   if (paused) html.dataset.swarmPaused = ''
 
-  progress()
+  // ---- Boot: the cursors burst out of the logo into the empty page ----
+  const boot = () => {
+    const logo = document.querySelector('header.top-bar a')
+    const from = logo ? pageRect(logo) : { x: 24, y: scrollY + 20, w: 40, h: 16 }
+    const burst: Role[] = phone
+      ? ['planner', 'architect', 'typography', 'copy']
+      : ['planner', 'architect', 'typography', 'copy', 'layout', 'data']
+    burst.forEach((role, i) => {
+      const c = agent(role)
+      c.on = true
+      c.el.hidden = false
+      c.x = from.x + from.w / 2
+      c.y = from.y + from.h / 2
+      c.used = time
+      c.quiet = true
+      const a = -0.5 + (i / burst.length) * 1.4
+      at(i * 50, () => {
+        c.path = [
+          {
+            x: Math.min(c.x + Math.cos(a) * (140 + i * 50), scrollX + innerWidth - 40),
+            y: scrollY + 110 + Math.max(Math.sin(a), -0.2) * 120 + i * 36,
+          },
+        ]
+      })
+      at(520 + i * 40, () => (c.quiet = false))
+    })
+    at(450, next)
+  }
+
   render()
   void fetch(asset(factsFile))
     .then((r) => (r.ok ? (r.json() as Promise<BuildFacts>) : null))
@@ -1273,8 +1125,9 @@ export function startSwarm(labels: Labels, locale: string): () => void {
         setSlot('commit', f.commit.hash)
         setSlot('host', f.deploy.target)
       }
-      boot()
     })
+  scrollTo(0, 0)
+  boot()
   // The boot reads "Booting swarm…" for up to 800 ms, then the count.
   setTimeout(() => {
     if (!stopped && html.dataset.swarm === 'booting') {
@@ -1286,19 +1139,20 @@ export function startSwarm(labels: Labels, locale: string): () => void {
   return () => {
     stopped = true
     cancelAnimationFrame(frame)
-    observer.disconnect()
     resizeObserver.disconnect()
-    removeEventListener('scroll', onScroll)
     removeEventListener('resize', onResize)
+    unlisten()
     document.removeEventListener('visibilitychange', onVisibility)
-    for (const u of units) {
-      for (const undo of u.undo) undo()
-      delete u.el.dataset.swarmUnit
-    }
+    for (const el of moved) el.style.translate = ''
+    for (const el of touched) el.classList.remove('b-on', 'b-self')
+    for (const u of units) delete u.el.dataset.swarmUnit
     root.remove()
     dock.remove()
     html.classList.remove('swarm-on')
     delete html.dataset.swarm
     delete html.dataset.swarmPaused
+    // Stopped before the end (Quick view, print, reduced motion): the page is simply there.
+    delete html.dataset.build
+    getLenis()?.start()
   }
 }

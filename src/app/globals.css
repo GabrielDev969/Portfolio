@@ -769,6 +769,18 @@
   }
 }
 
+/* ---- The page opens empty and the swarm builds it (html[data-build], head script) ----
+   Opacity only: the words stay in the HTML and the accessibility tree, and no box moves. The
+   swarm reveals a piece with .b-on (it and everything in it) or .b-self (only its own box,
+   such as a hairline or a list's rule). Without the attribute everything is simply there. */
+[data-build] :is(header.top-bar, main) :where(*) {
+  opacity: 0;
+}
+
+[data-build] :is(header.top-bar, main) :is(.b-on, .b-on *, .b-self) {
+  opacity: 1;
+}
+
 /* ---- The swarm (design/COMMIT-SHEET.md §6) ----
    One overlay in page coordinates over the finished page: cursors, outline boxes with their
    size badges, underlines, highlights, ripples and checks. Decorative and aria-hidden; it never
@@ -814,9 +826,9 @@
   left: 12px;
 }
 
+/* A transform, not left/right: moving a label must never count as a layout shift. */
 .swarm-flip .swarm-label {
-  right: 4px;
-  left: auto;
+  transform: translateX(calc(-100% - 16px));
 }
 
 .swarm-box {
