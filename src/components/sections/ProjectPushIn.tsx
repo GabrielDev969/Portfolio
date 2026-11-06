@@ -1,61 +1,34 @@
 'use client'
 import { useRef, type ReactNode } from 'react'
 import { useScrollScene } from '@/motion/hooks/useScrollScene'
-import { dur, ease, scrub, stagger } from '@/motion/tokens'
+import { ease, scrub } from '@/motion/tokens'
 
 /**
  * Family C on one project, never pinned: as it crosses the screen the image pushes in
- * (1.12 → 1) while the stack lines rise one after another, scrubbed to the scroll. What I
- * built is family A, rising once behind its mask when the project's top passes 70%. With
- * reduced motion the image and the stack fade in once, and the text is simply there.
+ * (1.12 → 1), scrubbed to the scroll, while the swarm's Mockup agent paints it in. Nothing with
+ * words moves: the text is always simply there. With reduced motion there is nothing to do.
  */
 export function ProjectPushIn({ children }: { children: ReactNode }) {
   const scope = useRef<HTMLDivElement>(null)
 
   useScrollScene(
-    ({ motion }, { gsap, SplitText }) => {
-      const root = scope.current!
-      const image = root.querySelector<HTMLElement>('.project-image-inner')!
-      const stack = gsap.utils.toArray<HTMLElement>('.stack-line > span', root)
-
-      if (!motion) {
-        gsap.from([image, ...stack], {
-          opacity: 0,
-          duration: dur.fade,
-          ease: ease.out,
-          scrollTrigger: { trigger: root, start: 'top 80%', once: true },
-        })
-        return
-      }
-
-      gsap
-        .timeline({
-          scrollTrigger: { trigger: root, start: 'top bottom', end: 'center center', scrub },
-        })
-        .fromTo(image, { scale: 1.12 }, { scale: 1, ease: ease.push, duration: 1 }, 0)
-        .from(
-          stack,
-          { yPercent: 100, ease: ease.push, duration: 0.4, stagger: stagger.items },
-          0.35,
-        )
-
-      const split = SplitText.create(root.querySelector('.project-built > dd'), {
-        type: 'lines',
-        mask: 'lines',
-        // Lines only, so the text reads the same split or not; the default would put an
-        // aria-label on the <dd>, which it may not carry.
-        aria: 'none',
-        autoSplit: true,
-        onSplit: (self) =>
-          gsap.from(self.lines, {
-            yPercent: 110,
-            duration: dur.reveal,
-            ease: ease.expo,
-            stagger: stagger.lines,
-            scrollTrigger: { trigger: root, start: 'top 70%', once: true },
-          }),
-      })
-      return () => split.revert()
+    ({ motion }, { gsap }) => {
+      if (!motion) return
+      const image = scope.current!.querySelector<HTMLElement>('.project-image-inner')!
+      gsap.fromTo(
+        image,
+        { scale: 1.12 },
+        {
+          scale: 1,
+          ease: ease.push,
+          scrollTrigger: {
+            trigger: scope.current,
+            start: 'top bottom',
+            end: 'center center',
+            scrub,
+          },
+        },
+      )
     },
     { scope },
   )
