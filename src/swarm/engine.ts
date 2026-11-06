@@ -51,13 +51,13 @@ const specs: Record<Kind, string[]> = {
 /** Who works on each kind of section, most needed first; the budget takes the first few. */
 const crews: Record<Kind, Role[]> = {
   hero: ['planner', 'perf', 'a11y', 'tests', 'i18n', 'motion'],
-  experience: ['architect', 'typography', 'copy', 'data', 'layout', 'i18n', 'tests'],
-  project: ['architect', 'typography', 'copy', 'diagram'],
-  how: ['architect', 'typography', 'diagram', 'copy', 'motion', 'tests'],
-  contact: ['architect', 'typography', 'copy', 'security', 'tests', 'deploy', 'a11y'],
+  experience: ['layout', 'copy', 'architect', 'typography', 'data', 'i18n', 'tests'],
+  project: ['layout', 'copy', 'architect', 'typography', 'diagram'],
+  how: ['layout', 'copy', 'architect', 'typography', 'diagram', 'motion', 'tests'],
+  contact: ['layout', 'copy', 'architect', 'typography', 'security', 'tests', 'deploy', 'a11y'],
 }
 /** Projects share the rest in turn, so each of the five gets a different pair. */
-const projectExtras: Role[] = ['mockup', 'layout', 'data', 'a11y', 'tests', 'perf']
+const projectExtras: Role[] = ['mockup', 'data', 'tests', 'a11y', 'perf']
 
 /** The text pairing each kind of section is mostly set in, for the A11y agent. */
 const pairing: Record<Kind, string> = {
@@ -97,6 +97,10 @@ type Unit = {
   marks: HTMLElement[]
   undo: (() => void)[]
   crew: Cursor[]
+  /** Engine time when its last job ends: Gabriel reviews after that. */
+  until: number
+  /** Text not typed yet, line by line, under a veil that keeps it readable. */
+  veils: Map<Element, { lines: Rect[]; divs: HTMLElement[] }>
 }
 
 type Effect = { start: number; dur: number; update: (p: number) => void; done?: () => void }
@@ -141,6 +145,22 @@ function lineRects(el: Element): Rect[] {
   return lines.sort((p, q) => p.y - q.y)
 }
 
+/** Where each word of an element ends, in reading order: the typing caret's stops. */
+function wordEnds(el: Element) {
+  const out: { x: number; y: number; h: number }[] = []
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
+  const range = document.createRange()
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    for (const m of (node.textContent ?? '').matchAll(/\S+/g)) {
+      range.setStart(node, m.index)
+      range.setEnd(node, m.index + m[0].length)
+      const r = [...range.getClientRects()].at(-1)
+      if (r) out.push({ x: r.right + scrollX, y: r.top + scrollY, h: r.height })
+    }
+  }
+  return out
+}
+
 function words(els: Element[]) {
   return els.reduce((n, el) => n + (el.textContent ?? '').split(/\s+/).filter(Boolean).length, 0)
 }
@@ -154,7 +174,8 @@ export function startSwarm(labels: Labels, locale: string): () => void {
   const html = document.documentElement
   const phone = matchMedia('(max-width: 767px)').matches
   const maxActive = phone ? 6 : 8
-  const budget = phone ? 3 : 5
+  // Seven at work and Gabriel make eight on a desktop; three and Gabriel on a phone.
+  const budget = phone ? 3 : 7
   let facts: BuildFacts | null = null
   let stopped = false
   let done = false
@@ -234,7 +255,8 @@ export function startSwarm(labels: Labels, locale: string): () => void {
     }
   })
   const agent = (role: Role) => cursors.find((c) => c.role === role)!
-  const active = () => cursors.filter((c) => c.on).length
+  /** At work: on screen and not on its way out. */
+  const active = () => cursors.filter((c) => c.on && !c.leaving).length
 
   const say = (c: Cursor, what?: string) => {
     c.text = what ? `${c.name} · ${what}` : c.name
@@ -301,6 +323,24 @@ export function startSwarm(labels: Labels, locale: string): () => void {
       (p) => (el.style.opacity = String(1 - p)),
       () => el.remove(),
     )
+  /**
+   * Text not yet typed sits under a veil of the ground at 45%, which keeps body ink at 5.4:1:
+   * dimmer, still readable (design/COMMIT-SHEET.md §6). Only text in full ink is veiled;
+   * muted text would drop below AA.
+   */
+  const ink = getComputedStyle(document.body).color
+  const veil = (u: Unit, el: Element) => {
+    if (u.veils.has(el) || getComputedStyle(el).color !== ink) return
+    const lines = lineRects(el)
+    const divs = lines.map((l) =>
+      mark(u, 'swarm-veil', 'copy', { x: l.x - 1, y: l.y, w: l.w + 3, h: l.h }),
+    )
+    u.veils.set(el, { lines, divs })
+  }
+  const unveil = (u: Unit, el: Element) => {
+    for (const d of u.veils.get(el)?.divs ?? []) d.remove()
+    u.veils.delete(el)
+  }
   const ripple = (unit: Unit, role: Role, target: Element) => {
     const r = pageRect(target)
     const cx = r.x + r.w / 2
@@ -401,7 +441,17 @@ export function startSwarm(labels: Labels, locale: string): () => void {
   const units: Unit[] = []
   const add = (kind: Kind, el: Element | null, index = 0) => {
     if (el instanceof HTMLElement) {
-      units.push({ kind, el, index, state: 'waiting', marks: [], undo: [], crew: [] })
+      units.push({
+        kind,
+        el,
+        index,
+        state: 'waiting',
+        marks: [],
+        undo: [],
+        crew: [],
+        until: 0,
+        veils: new Map(),
+      })
       el.dataset.swarmUnit = 'waiting'
     }
   }
@@ -430,8 +480,8 @@ export function startSwarm(labels: Labels, locale: string): () => void {
           ],
           blocks: q('.project-image, .project-head, .project-built, .project-architecture'),
           texts: q('.project-part > dd').filter((dd) => !dd.querySelector('svg')),
-          cards: q('.project-stack'),
-          items: q('.stack-line'),
+          cards: q('.project-image, .project-stack'),
+          items: q('.stack-line > span'),
           links: q<HTMLAnchorElement>('a[href^="http"]'),
           buttons: q('a[href^="http"]'),
           diagram: u.el.querySelector<SVGSVGElement>('.diagram svg'),
@@ -522,7 +572,8 @@ export function startSwarm(labels: Labels, locale: string): () => void {
       const blocks = (p.blocks ?? []).slice(0, phone ? 3 : 5)
       blocks.forEach((b, i) =>
         at(i * 150, () => {
-          const r = pageRect(b)
+          // A card Layout is about to drag in is outlined where it belongs.
+          const r = slots.get(b) ?? pageRect(b)
           enter(c, r.x - 4, r.y - 4)
           const size = `${round(r.w)} × ${round(r.h)}`
           say(c, size)
@@ -550,56 +601,76 @@ export function startSwarm(labels: Labels, locale: string): () => void {
       say(c, `${words(texts)} ${labels.units.words}`)
       let t = 0
       for (const el of texts) {
-        for (const line of lineRects(el).slice(0, phone ? 2 : 3)) {
-          const dur = Math.min(Math.max(line.w * 0.8, 140), 360)
-          at(t, () => {
-            const under = mark(u, 'swarm-mark', 'copy', {
-              x: line.x,
-              y: line.y + line.h - 2,
-              w: 0,
-              h: 2,
-            })
-            const caret = mark(u, 'swarm-mark', 'copy', { x: line.x, y: line.y, w: 2, h: line.h })
-            enter(c, line.x, line.y + line.h)
-            animate(
-              dur,
-              (q) => {
-                const w = line.w * q
-                under.style.width = `${w}px`
-                caret.style.transform = `translate(${line.x + w}px, ${line.y}px)`
-                c.path = [{ x: line.x + w, y: line.y + line.h }]
-              },
-              () => caret.remove(),
-            )
+        const ends = wordEnds(el)
+        if (ends.length === 0) continue
+        // Streamed a word at a time, as an agent types: about 35 ms a word.
+        const dur = Math.min(Math.max(ends.length * 35, 450), 1300)
+        at(t, () => {
+          const veiled = u.veils.get(el)
+          const caret = mark(u, 'swarm-mark', 'copy', {
+            x: ends[0]!.x,
+            y: ends[0]!.y,
+            w: 2,
+            h: ends[0]!.h,
           })
-          t += dur
-        }
+          enter(c, ends[0]!.x, ends[0]!.y + ends[0]!.h)
+          animate(
+            dur,
+            (q) => {
+              const k = Math.max(1, Math.ceil(q * ends.length))
+              const end = ends[k - 1]!
+              caret.style.transform = `translate(${end.x + 1}px, ${end.y}px)`
+              caret.style.height = `${end.h}px`
+              c.path = [{ x: end.x + 4, y: end.y + end.h }]
+              veiled?.lines.forEach((line, i) => {
+                const div = veiled.divs[i]!
+                if (line.y + line.h / 2 < end.y) div.style.width = '0px'
+                else if (Math.abs(line.y - end.y) < line.h / 2) {
+                  const from = end.x + 2
+                  div.style.transform = `translate(${from}px, ${line.y}px)`
+                  div.style.width = `${Math.max(line.x + line.w + 2 - from, 0)}px`
+                }
+              })
+            },
+            () => {
+              caret.remove()
+              unveil(u, el)
+            },
+          )
+        })
+        t += dur + 80
       }
       return Math.max(t, 300) + 100
     },
     layout: (u, p, c) => {
       const cards = (p.cards ?? []).slice(0, phone ? 1 : 2)
       let t = 0
-      cards.forEach((card, i) => {
-        const offset = 16 + i * 6
+      cards.forEach((card) => {
+        const [dx, dy] = offsets.get(card) ?? [0, 0]
+        const slot = slots.get(card)
+        const dur = Math.abs(dx) > 0 ? 650 : 460
         at(t, () => {
           const r = pageRect(card)
-          enter(c, r.x + r.w / 2, r.y + 12)
-          say(c, `${offset} px`)
+          enter(c, r.x + Math.min(r.w / 2, 60), r.y + 14)
+          say(c, `${round(Math.hypot(dx, dy))} px`)
+          if (slot) {
+            const ghost = mark(u, 'swarm-ghost', 'layout', slot)
+            at(dur + 260, () => fadeOut(ghost, 200))
+          }
         })
-        at(t + 200, () =>
+        at(t + 220, () =>
           animate(
-            460,
+            dur,
             (q) => {
-              const d = offset * (1 - ease(q))
-              card.style.translate = `0 ${d}px`
+              const e = 1 - ease(q)
+              card.style.translate = `${dx * e}px ${dy * e}px`
               const r = pageRect(card)
-              c.path = [{ x: r.x + r.w / 2, y: r.y + 12 }]
+              c.path = [{ x: r.x + Math.min(r.w / 2, 60), y: r.y + 14 }]
             },
             () => (card.style.translate = ''),
           ),
         )
-        t += 700
+        t += dur + 300
       })
       return t
     },
@@ -630,6 +701,7 @@ export function startSwarm(labels: Labels, locale: string): () => void {
         at(i * 90, () => {
           const r = pageRect(item)
           enter(c, r.x - 4, r.y + r.h / 2)
+          unveil(u, item)
           const tick = mark(u, 'swarm-tick', 'data', {
             x: r.x - 16,
             y: r.y + r.h / 2 - 5,
@@ -762,6 +834,10 @@ export function startSwarm(labels: Labels, locale: string): () => void {
     gabriel: () => 0,
   }
 
+  /** Where Layout's cards belong, and how far out they start. */
+  const slots = new WeakMap<Element, Rect>()
+  const offsets = new WeakMap<Element, [number, number]>()
+
   // ---- Building a unit ----
   const queue: Unit[] = []
   let current: Unit | null = null
@@ -770,6 +846,7 @@ export function startSwarm(labels: Labels, locale: string): () => void {
     let list = crews[u.kind]
     if (u.kind === 'project') {
       const extras = [0, 1].map((k) => projectExtras[(u.index * 2 + k) % projectExtras.length]!)
+      if (u.index % 2 === 0 && !extras.includes('mockup')) extras[1] = 'mockup'
       if (u.el.querySelector('a[href^="http"]')) extras[1] = 'security'
       list = [...list, ...extras]
     }
@@ -787,29 +864,38 @@ export function startSwarm(labels: Labels, locale: string): () => void {
     html.dataset.swarm = 'building'
     setSlot('status', labels.building)
     const p = parts(u) as Parts
-    // Layout's cards start a few pixels out of their slots, and are dragged in.
-    if (crewFor(u).includes('layout')) {
+    const crew = crewFor(u)
+    // Layout's cards start out of their slots and are dragged in: an image from further away,
+    // a panel the last few pixels. CSS translate, so nothing around them moves.
+    if (crew.includes('layout')) {
       ;(p.cards ?? []).slice(0, phone ? 1 : 2).forEach((card, i) => {
-        card.style.translate = `0 ${16 + i * 6}px`
+        const far = card.matches('.project-image, .contact-photo')
+        const offset: [number, number] = far ? [phone ? -28 : -56, 40] : [0, 16 + i * 6]
+        slots.set(card, pageRect(card))
+        offsets.set(card, offset)
+        card.style.translate = `${offset[0]}px ${offset[1]}px`
         u.undo.push(() => (card.style.translate = ''))
       })
     }
-    let end = 0
+    // What Copy will type, and what Data will fill, waits under its veil.
+    if (crew.includes('copy')) for (const el of (p.texts ?? []).slice(0, phone ? 1 : 2)) veil(u, el)
+    if (crew.includes('data')) for (const el of (p.items ?? []).slice(0, 9)) veil(u, el)
     let slot = 0
     const starts: Partial<Record<Role, number>> = {
       architect: 0,
-      mockup: 120,
-      copy: 220,
-      layout: 320,
+      layout: 150,
+      copy: 260,
       diagram: 380,
       data: 450,
       typography: 650,
+      mockup: 1050,
     }
-    for (const role of crewFor(u)) {
+    u.until = time + 900
+    for (const role of crew) {
       const c = agent(role)
       if (c.busy && c.busy !== u) continue
       // On screen or already claimed, leaving ones included; one place is kept for Gabriel.
-      const taken = cursors.filter((x) => x.on || x.busy).length
+      const taken = cursors.filter((x) => x.busy || (x.on && !x.leaving)).length
       if (!c.on && taken >= maxActive - 1) continue
       c.busy = u
       u.crew.push(c)
@@ -818,14 +904,18 @@ export function startSwarm(labels: Labels, locale: string): () => void {
       at(start, () => {
         if (u.state !== 'building') return
         const took = jobs[role](u, p, c, mySlot)
+        u.until = Math.max(u.until, time + took)
         if (took === 0) leave(c)
       })
-      end = Math.max(end, start + 900)
     }
-    // Gabriel reviews last, and approves.
+    // Text no agent came for is simply there.
+    const working = new Set(u.crew.map((c) => c.role))
+    if (!working.has('copy')) for (const el of p.texts ?? []) unveil(u, el)
+    if (!working.has('data')) for (const el of p.items ?? []) unveil(u, el)
     const g = agent('gabriel')
-    at(end, () => {
+    const review = () => {
       if (u.state !== 'building') return
+      if (time < u.until) return at(u.until - time + 60, review)
       const head = p.headings.at(-1)
       let x: number
       let y: number
@@ -845,12 +935,14 @@ export function startSwarm(labels: Labels, locale: string): () => void {
         approveMark(x, y)
         finish(u)
       })
-    })
+    }
+    at(1000, review)
   }
 
   /** Approve a unit: its marks fade, its crew moves on, the next unit starts. */
   const finish = (u: Unit, instant = false) => {
     setState(u, 'built')
+    for (const el of [...u.veils.keys()]) unveil(u, el)
     for (const el of u.marks) {
       if (instant) el.remove()
       else at(400, () => fadeOut(el))
@@ -861,9 +953,9 @@ export function startSwarm(labels: Labels, locale: string): () => void {
     const away = u.kind === 'hero' ? leaveUp : leave
     for (const c of u.crew) {
       if (c.busy === u) c.busy = null
-      at(instant ? 0 : 300, () => c.busy === null && away(c))
+      if (c.busy === null) away(c)
     }
-    at(instant ? 0 : 500, () => agent('gabriel').busy === null && away(agent('gabriel')))
+    at(instant ? 0 : 400, () => agent('gabriel').busy === null && away(agent('gabriel')))
     u.crew = []
     if (current === u) current = null
     if (u.kind === 'contact' && !instant) at(700, vortex)
@@ -1070,7 +1162,8 @@ export function startSwarm(labels: Labels, locale: string): () => void {
     let n = 0
     for (const c of cursors) {
       if (!c.on) continue
-      n++
+      if (!c.leaving) n++
+      c.el.classList.toggle('swarm-leaving', c.leaving)
       c.el.style.transform = `translate3d(${c.x}px, ${c.y}px, 0)`
       const showLabel = !c.quiet && !c.leaving && !c.arriving
       c.label.hidden = !showLabel

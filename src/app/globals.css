@@ -857,6 +857,17 @@
   background: var(--c);
 }
 
+/* Not typed yet: the ground at 45% over body ink keeps it at 5.4:1 (tested). */
+.swarm-veil {
+  background: color-mix(in srgb, var(--color-screen) 45%, transparent);
+}
+
+/* Where a dragged card belongs. */
+.swarm-ghost {
+  border: 1px dashed var(--c);
+  background: color-mix(in oklch, var(--c) 6%, transparent);
+}
+
 .swarm-select {
   background: color-mix(in oklch, var(--c) 24%, transparent);
 }
