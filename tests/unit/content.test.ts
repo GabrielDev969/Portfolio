@@ -154,24 +154,40 @@ describe('content', () => {
     }
   })
 
+  // design/COMMIT-SHEET.md §4: every project fits on the page, inline, in a few lines.
+  describe('project summaries', () => {
+    const words = (prose: unknown) =>
+      strings(prose).flatMap(([, text]) => text.split(/\s+/).filter(Boolean)).length
+    // A sentence ends at . ! or ? followed by a space, so "1.4.2" and "Next.js" stay whole.
+    const sentences = (prose: unknown) =>
+      strings(prose).reduce((sum, [, text]) => sum + text.trim().split(/[.!?]\s+/).length, 0)
+
+    for (const locale of locales) {
+      for (const { title, summary } of getContent(locale).projects) {
+        it(`${title} · ${locale}: at most 70 words, one sentence each for problem and result`, () => {
+          const total = words(summary.problem) + words(summary.built) + words(summary.result)
+          assert.ok(total <= 70, `${total} words`)
+          assert.equal(sentences(summary.problem), 1, 'problem')
+          assert.equal(sentences(summary.result), 1, 'result')
+          const built = sentences(summary.built)
+          assert.ok(built >= 1 && built <= 2, `what I built has ${built} sentences`)
+        })
+      }
+    }
+  })
+
   for (const project of getContent('en').projects) {
     describe(project.title, () => {
-      const td = project.technicalDetails
-
-      it('has two or three key decisions', () => {
-        assert.ok(td.decisions.length >= 2 && td.decisions.length <= 3, `${td.decisions.length}`)
-      })
-
       it('has an architecture whose edges join existing nodes', () => {
-        const ids = new Set(td.architecture.nodes.map((n) => n.id))
+        const ids = new Set(project.architecture.nodes.map((n) => n.id))
         assert.ok(ids.size >= 2)
-        for (const edge of td.architecture.edges) {
+        for (const edge of project.architecture.edges) {
           assert.ok(ids.has(edge.from) && ids.has(edge.to), `${edge.from} → ${edge.to}`)
         }
       })
 
       if (project.internal) {
-        it('as an internal system, has no links and a fictional still', () => {
+        it('as an internal system, has no links and a fictional image', () => {
           assert.deepEqual(project.links, { kind: 'internal' })
           assert.equal(project.image.kind, 'mockup')
         })

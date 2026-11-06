@@ -28,14 +28,7 @@ test('both modes expose the same headings and links', async ({ browser }) => {
     await context.addInitScript((m) => localStorage.setItem('viewMode', m), mode)
     const page = await context.newPage()
     await page.goto('en/')
-    // Behind-the-scenes parts are inline in Quick view but wait in a closed drawer in the full view
-    // mode; tests/e2e/projects.spec.ts checks that both hold the same parts.
-    const headings = await page
-      .getByRole('heading')
-      .filter({
-        hasNot: page.locator('xpath=self::*[ancestor::*[contains(@class,"details-parts")]]'),
-      })
-      .allInnerTexts()
+    const headings = await page.getByRole('heading').allInnerTexts()
     const links = await page
       .locator('main a[href]')
       .evaluateAll((as) => as.map((a) => a.getAttribute('href')))
