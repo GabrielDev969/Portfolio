@@ -242,22 +242,35 @@ test('it pauses while the tab is hidden', async ({ page }) => {
 
 // The finished page, with no one on it.
 test.describe('the finished page from the first paint', () => {
-  test('on a second visit this session', async ({ page }) => {
+  // Already built (a reload this session, a deep link): the page is all there at once, and
+  // the dock is back as it was at the end, ready to build it again.
+  const finishedDock = async (page: Page) => {
+    await expect(page.locator('.swarm-dock [data-k="status"]')).toHaveText('Ready · deployed')
+    await expect(page.locator('.swarm-dock [data-k="progress"]')).toHaveText('100%')
+    await expect(
+      page.locator('.swarm-dock').getByRole('button', { name: 'Build it again' }),
+    ).toBeVisible()
+    expect(await atWork(page)).toBe(0)
+  }
+
+  test('on a second visit this session, with the finished dock', async ({ page }) => {
     await page.goto('en/')
     await page.evaluate(() => sessionStorage.setItem('swarm:built', '1'))
     await page.reload()
     await expect(page.locator('html')).not.toHaveAttribute('data-build', /.*/)
-    await page.waitForTimeout(800)
-    await expect(page.locator('.swarm, .swarm-dock')).toHaveCount(0)
-    // Buttons finish their own 220 ms fade once they are shown.
+    await finishedDock(page)
     await expect.poll(() => unseen(page)).toEqual([])
+    // And it builds again from there.
+    await page.locator('.swarm-dock').getByRole('button', { name: 'Build it again' }).click()
+    await expect(page.locator('html')).toHaveAttribute('data-build', '')
+    await expect(page.locator('html')).toHaveAttribute('data-swarm', /booting|building/)
   })
 
-  test('on a deep link', async ({ page }) => {
+  test('on a deep link, with the finished dock', async ({ page }) => {
     await page.goto('en/#contact')
     await expect(page.locator('html')).not.toHaveAttribute('data-build', /.*/)
     await expect(page.locator('#contact h2')).toBeInViewport()
-    // Buttons finish their own 220 ms fade once they are shown.
+    await finishedDock(page)
     await expect.poll(() => unseen(page)).toEqual([])
   })
 

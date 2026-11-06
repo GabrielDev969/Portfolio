@@ -178,7 +178,15 @@ const arrow =
 const check =
   '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9.5" style="fill: var(--c)"/><path d="m5.5 10.2 3 3 6-6.4" fill="none" style="stroke: var(--color-screen)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 
-export function startSwarm(labels: Labels, locale: string): () => void {
+/**
+ * `built`: the page was already built this session (a reload, a deep link): no build, only the
+ * dock, as it was at the end ("Ready · deployed", Build it again).
+ */
+export function startSwarm(
+  labels: Labels,
+  locale: string,
+  { built = false }: { built?: boolean } = {},
+): () => void {
   const html = document.documentElement
   const phone = matchMedia('(max-width: 767px)').matches
   const maxActive = phone ? 6 : 8
@@ -1155,10 +1163,14 @@ export function startSwarm(labels: Labels, locale: string): () => void {
         setSlot('js', `JS ${f.js.kb[locale]} KB`)
         setSlot('commit', f.commit.hash)
         setSlot('host', f.deploy.target)
+        if (done) setSlot('log', `${f.deploy.target} · ${f.commit.hash}`)
       }
     })
-  scrollTo(0, 0)
-  boot()
+  if (built) complete()
+  else {
+    scrollTo(0, 0)
+    boot()
+  }
   // The boot reads "Booting swarm…" for up to 800 ms, then the count.
   setTimeout(() => {
     if (!stopped && html.dataset.swarm === 'booting') {

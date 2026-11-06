@@ -8,7 +8,8 @@ type Props = { labels: SiteContent['swarm']; locale: string }
 
 /**
  * Starts the swarm (src/swarm/engine.ts) when the head script has opened the page empty for it
- * (html[data-build]): straight away, since the reader is looking at an empty page. The engine is
+ * (html[data-build]): straight away, since the reader is looking at an empty page. Otherwise
+ * (built earlier this session, or a deep link) it shows only the finished dock. The engine is
  * its own chunk, outside the first-paint budget. If it cannot load, the page is simply shown.
  * Switching to Quick view, asking for reduced motion or printing (which goes through Quick
  * view) stops it, and the page is all there.
@@ -41,21 +42,31 @@ export function Swarm({ labels, locale }: Props) {
       replaying.current = false
       html.dataset.build = ''
     }
-    if (!('build' in html.dataset)) return
     if (mode !== 'full' || reduced) {
       delete html.dataset.build
       return
     }
+    // Already built this session (a reload, a deep link): no build, but the dock is back as it
+    // was at the end, with Build it again. Fetched once the browser is idle.
+    const built = !('build' in html.dataset)
     let stop: (() => void) | undefined
     let alive = true
-    import('./engine')
-      .then(({ startSwarm }) => {
-        // Too late (the head script's 5 s safety already showed the page): nothing to build.
-        if (alive && 'build' in html.dataset) stop = startSwarm(labels, locale)
-      })
-      .catch(() => delete html.dataset.build)
+    let idle = 0
+    const start = () =>
+      import('./engine')
+        .then(({ startSwarm }) => {
+          if (!alive) return
+          // Too late to build (the head script's 5 s safety already showed the page): the dock.
+          stop = startSwarm(labels, locale, { built: built || !('build' in html.dataset) })
+        })
+        .catch(() => delete html.dataset.build)
+    if (built) {
+      const whenIdle = window.requestIdleCallback ?? ((run: () => void) => setTimeout(run, 300))
+      idle = whenIdle(() => void start())
+    } else void start()
     return () => {
       alive = false
+      ;(window.cancelIdleCallback ?? clearTimeout)(idle)
       stop?.()
     }
   }, [mode, reduced, labels, locale, run])
