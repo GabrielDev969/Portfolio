@@ -77,7 +77,7 @@ const pairing: Record<Kind, string> = {
   experience: 'ink/screen',
   project: 'ink-2/screen',
   how: 'ink/screen',
-  contact: 'crimson/screen',
+  contact: 'accent/screen',
 }
 
 /** The agents who only report, by kind of section: they come beside the heading with a number. */
@@ -453,65 +453,81 @@ export function startSwarm(labels: Labels, locale: string): () => void {
     add(hero, one(h, '.hero-backdrop'), 'show', 'architect')
   }
 
+  /** A section's title: the mono tag line outlined, then the title swept in. */
+  const heading = (u: Unit | null, section: Element) => {
+    add(u, one(section, '.section-tag'), 'show', 'architect')
+    add(u, one(section, 'h2'), 'heading', 'typography')
+  }
+
   const exp = document.getElementById('experience')
   const expUnit = unit('experience', exp, exp && one(exp, 'h2'))
   if (exp && expUnit) {
-    add(expUnit, one(exp, 'h2'), 'heading', 'typography')
-    add(expUnit, one(exp, '.timeline'), 'self', 'architect')
+    heading(expUnit, exp)
     for (const li of all(exp, '.timeline-item')) {
       add(expUnit, li, 'self', 'layout')
-      add(expUnit, one(li, '.timeline-years'), 'items', 'data', [one(li, '.timeline-years')!])
+      add(expUnit, one(li, '.timeline-years'), 'type', 'copy')
       add(expUnit, one(li, '.timeline-body'), 'type', 'copy', all(li, '.timeline-body > *'))
     }
+    const callout = one(exp, '.callout')
+    add(expUnit, callout, 'self', 'architect')
+    if (callout) add(expUnit, callout, 'type', 'copy', all(callout, 'p'))
   }
 
-  const projectsTitle = document.getElementById('projects-title')
+  const projects = document.getElementById('projects')
   all<HTMLElement>(document, '#projects article').forEach((article, i) => {
     const u = unit('project', article, one(article, 'h3'))
     if (!u) return
-    if (i === 0) add(u, projectsTitle, 'heading', 'typography')
+    if (i === 0 && projects) heading(u, projects)
+    add(u, article, 'self', 'architect')
     add(u, one(article, '.project-image'), 'drag', 'layout')
     add(u, one(article, '.project-head'), 'type', 'copy', all(article, '.project-head > p'))
     add(u, one(article, 'h3'), 'heading', 'typography')
     for (const part of all(article, '.project-part')) {
       add(u, one(part, 'dt'), 'show', 'architect')
       const dd = one(part, 'dd')
-      if (dd?.querySelector('svg')) add(u, dd, 'draw', 'diagram')
+      if (dd?.querySelector('.pipeline')) add(u, dd, 'items', 'diagram', all(dd, '.node'))
       else add(u, dd, 'type', 'copy')
     }
+    const metrics = one(article, '.metrics')
+    if (metrics) add(u, metrics, 'items', 'data', all(metrics, '.metric'))
     const stack = one(article, '.project-stack')
-    add(u, stack, 'drag', 'layout')
-    if (stack) add(u, one(stack, 'ul'), 'items', 'data', all(stack, '.stack-line'))
+    if (stack) add(u, stack, 'items', 'data', all(stack, '.chip'))
     add(u, one(article, '.project-links'), 'click', 'security')
   })
 
   const how = document.getElementById('how-i-work')
   const howUnit = unit('how', how, how && one(how, 'h2'))
   if (how && howUnit) {
-    add(howUnit, one(how, 'h2'), 'heading', 'typography')
+    heading(howUnit, how)
     for (const step of all(how, '.step')) {
       add(howUnit, step, 'drag', 'layout')
       add(howUnit, one(step, 'svg'), 'draw', 'diagram')
     }
-    add(howUnit, one(how, '.page-grid > p'), 'type', 'copy')
+    const callout = one(how, '.callout')
+    add(howUnit, callout, 'self', 'architect')
+    add(howUnit, one(how, '.closing'), 'type', 'copy')
     add(howUnit, one(how, '.build-loop'), 'show', 'architect')
   }
 
   const contact = document.getElementById('contact')
   const contactUnit = unit('contact', contact, contact && one(contact, 'h2'))
   if (contact && contactUnit) {
-    add(contactUnit, one(contact, 'h2'), 'heading', 'typography')
+    heading(contactUnit, contact)
     const left = one(contact, '.page-grid > div:first-child')
     if (left) {
-      for (const p of all(left, ':scope > p')) add(contactUnit, p, 'type', 'copy')
+      add(contactUnit, one(left, '.contact-lead'), 'heading', 'typography')
+      for (const p of all(left, ':scope > p:not(.contact-lead)'))
+        add(contactUnit, p, 'type', 'copy')
       add(contactUnit, one(left, ':scope > div'), 'click', 'tests')
-      add(contactUnit, one(left, ':scope > ul'), 'click', 'security')
+      add(contactUnit, one(left, '.email-box'), 'click', 'tests')
+      add(contactUnit, one(left, '.contact-links'), 'click', 'security')
     }
-    add(contactUnit, one(contact, '.contact-photo'), 'drag', 'layout')
-    add(contactUnit, one(contact, '.contact-about h3'), 'heading', 'typography')
+    const about = one(contact, '.contact-about')
+    add(contactUnit, about, 'self', 'architect')
+    add(contactUnit, about && one(about, 'h3'), 'type', 'copy')
     for (const dl of all(contact, '.skill-list'))
       add(contactUnit, dl, 'items', 'data', all(dl, '.skill-group'))
-    add(contactUnit, one(contact, '.page-grid > p:last-child'), 'show', 'architect')
+    add(contactUnit, one(contact, '.site-footer'), 'show', 'architect')
   }
 
   // ---- Facts ----
@@ -958,8 +974,8 @@ export function startSwarm(labels: Labels, locale: string): () => void {
     }
     getLenis()?.start()
     if (document.activeElement === skip) document.getElementById('main')?.focus()
-    // Invisible but in place: the dock keeps its size, so nothing in it moves.
-    skip.style.visibility = 'hidden'
+    // The same button, same size (its width is fixed in CSS), now to build the page again.
+    skip.textContent = labels.replay
     unlisten()
   }
 
@@ -978,7 +994,10 @@ export function startSwarm(labels: Labels, locale: string): () => void {
     complete()
     render()
   }
-  skip.addEventListener('click', skipAll)
+  // Before the end it skips; after, it builds the page again (Swarm.tsx listens).
+  skip.addEventListener('click', () =>
+    done ? dispatchEvent(new Event('swarm:replay')) : skipAll(),
+  )
   /** The reader scrolls, clicks or types: the page is theirs, all of it, at once. */
   const takeOver = (event: Event) => {
     if (event.target instanceof Node && dock.contains(event.target)) return
