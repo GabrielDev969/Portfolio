@@ -44,116 +44,77 @@ De la base de datos a la pantalla.
 == Proyectos ==
 
 -- Sistema Wave (Group Wave Enterprise) --
-Una plataforma interna que usan unas 100 personas para publicar campañas en Meta de forma masiva, editar y mejorar creatividades con IA, generar copies, gestionar solicitudes entre equipos (al estilo de ClickUp) y seguir datos de campañas, finanzas y salud de la empresa en dashboards.
 [image] Un tablero de solicitudes estilizado, con equipos y tareas ficticios, en lugar del sistema interno.
 [mockup words] Campañas · Solicitudes · Informes · Dashboard · Todos los equipos · Esta semana · Nueva solicitud · Solicitadas · En curso · En revisión · Listas · Creativo · Datos · Redacción · Medios · Lun · Mar · Mié · Jue · Vie · Hoy · Listo · Banners, 6 tamaños · Auditoría de UTM · Secuencia de 3 correos · Corte de video, 15 s · Título de la landing · Oferta, versión móvil · Informe semanal · Píxel del nuevo dominio · Carrusel, 5 imágenes · Anuncios, 2.ª ronda
+El problema: Cada campaña se armaba a mano en cada plataforma de anuncios.
+Lo que construí: Una plataforma interna que publica campañas en Meta en masa, edita creatividades con IA, genera copies, gestiona solicitudes entre equipos y muestra dashboards de campañas y finanzas. El equipo divide el trabajo por áreas; yo trabajo en todas, para que cada parte encaje en el conjunto.
+Arquitectura:
+  App web (Next.js, React) → API (NestJS)
+  API (NestJS) → PostgreSQL
+  API (NestJS) → API de Meta
+Resultado: Más de 500 campañas al día, publicadas por unas 100 personas.
 Stack: Next.js, React, NestJS, TypeScript, PostgreSQL, Meta API, Prometheus, Grafana, Jenkins
-[button] Detalles técnicos
-  El problema: Antes de la plataforma, cada campaña se armaba a mano en NewsBreak, Meta Ads y Taboola.
-  Mi rol: El equipo divide el trabajo por áreas, y yo trabajo en todas ellas, para que cada parte encaje en el sistema completo.
-  Arquitectura:
-    App web (Next.js, React) → API (NestJS)
-    API (NestJS) → PostgreSQL
-    API (NestJS) → API de Meta
-  Decisiones clave:
-    - Las campañas se publican a través de la API de Meta, varias a la vez. Antes, cada campaña se armaba a mano en cada plataforma de anuncios.
-    - Prometheus, Grafana y logs vigilan el sistema, y las alertas llegan a Telegram ante errores o cuando una ruta está sobrecargada. Para saber cómo está el sistema en todo momento, y enterarse de errores y rutas sobrecargadas en cuanto ocurren.
-  Pruebas y despliegue: Pruebas de seguridad que simulan ataques reales, y pruebas de estrés que buscan errores y fallas que podrían abrir una brecha de seguridad. Jenkins ejecuta las pruebas y validaciones, y un cambio solo se aprueba si las pasa. Primero va al entorno de develop, donde lo probamos, y cuando todo está aprobado el tech lead hace el deploy.
-  Resultado: Más de 500 campañas publicadas al día a través de la API de Meta, por unas 100 personas dentro de la empresa.
-  Sistema interno, sin enlace público
-  [button] Cerrar
+Sistema interno, sin enlace público
 
 -- Campaign BI (Group Wave Enterprise) --
-Un sistema interno de datos de campañas, que usan todos los días los dueños, finanzas y los líderes de squad: resultados mensuales y semanales y el rendimiento de cada media buyer, actualizados cada hora. Workers en NestJS procesan los datos de RedTrack desde una cola en RabbitMQ y los guardan en PostgreSQL, y una app en Next.js con inicio de sesión de Google los consulta a través de la API en NestJS.
 [image] Un gráfico de rendimiento semanal con campañas ficticias y media buyers inventados, en lugar del sistema interno.
 [mockup words] Rendimiento de campañas · Mensual · Semanal · S · Ingresos · Inversión · Por media buyer · campañas
+El problema: Finanzas esperaba de 45 minutos a 2 horas por CSV de RedTrack.
+Lo que construí: Diseñé y construí todo: n8n publica los datos de RedTrack en una cola RabbitMQ y workers NestJS los escriben en paralelo en PostgreSQL, así un registro que falla se reintenta y nada se pierde. Una app Next.js muestra resultados mensuales, semanales y por media buyer.
+Arquitectura:
+  RedTrack → n8n
+  n8n → RabbitMQ
+  RabbitMQ → NestJS (workers y API)
+  App Next.js (inicio de sesión de Google) → NestJS (workers y API)
+  NestJS (workers y API) → PostgreSQL
+Resultado: Datos actualizados cada hora, y Campaign BI hoy funciona dentro de Sistema Wave.
 Stack: Next.js, NestJS, PostgreSQL, RabbitMQ, n8n, RedTrack
-[button] Detalles técnicos
-  El problema: Finanzas extraía los datos de RedTrack con un pequeño script en Python que generaba archivos CSV. Cada extracción tardaba de 45 minutos a 2 horas, según el período.
-  Mi rol: Diseñé la arquitectura y construí todo el sistema, de punta a punta.
-  Arquitectura:
-    RedTrack → n8n
-    n8n → RabbitMQ
-    RabbitMQ → NestJS (workers y API)
-    App Next.js (inicio de sesión de Google) → NestJS (workers y API)
-    NestJS (workers y API) → PostgreSQL
-  Decisiones clave:
-    - Vistas mensuales y semanales de los datos de RedTrack, y el rendimiento de cada media buyer. Los dueños, finanzas y los líderes de squad analizan los datos todos los días: qué está funcionando, qué está gastando y cómo va cada media buyer.
-    - n8n publica los datos de RedTrack en una cola de RabbitMQ, y varios workers en NestJS los procesan en paralelo hasta PostgreSQL. Son muchos datos a la vez. La cola separa la llegada de los datos de su procesamiento: n8n publica todo en RabbitMQ, y los workers lo consumen al ritmo que la base de datos soporta. Un registro que falla se reintenta sin afectar a los demás, y si un worker se cae no se pierde nada, porque el mensaje sigue en la cola. RedTrack identifica cada registro, así que un mensaje procesado más de una vez no duplica datos.
-    - Un script de asignación por el método de los restos mayores para conversiones e ingresos. Las métricas estaban infladas. El script corrigió los números, y los resultados se conciliaron con las planillas de referencia.
-  Pruebas y despliegue: Las verificaciones se ejecutan en CI con cada cambio. Nada se publica sin pasar el CI, así que un error aparece en el pipeline, y no después de tumbar el sistema, aunque sea por poco tiempo.
-  Resultado: Los datos de RedTrack ahora se actualizan cada hora durante el día, y las cargas más grandes corren de madrugada. Los dashboards los leen de PostgreSQL con consultas optimizadas, en lugar de esperar de 45 minutos a 2 horas por un CSV. Campaign BI hoy funciona dentro de Sistema Wave.
-  Sistema interno, sin enlace público
-  [button] Cerrar
+Sistema interno, sin enlace público
 
 -- Zibby --
-Mi propia plataforma de e-commerce multitienda, lanzada en octubre de 2026: tienda online, panel de administración con registro de productos y dashboards de ventas que muestran cómo se vende cada producto, y pagos con Stripe. Cada integración es un provider, así que cada tienda puede crearse y personalizarse con las APIs que necesite.
 [image] Una tienda ficticia junto a su panel de administración.
 [mockup words] Novedades · Hogar · Cocina · Carrito (2) · Para cada día · Taza de cerámica · Lámpara de mesa · Bolso de lino · Pedidos · Admin · En preparación · Pagado · Despachado · Entregado
+El problema: Gestionar varias tiendas online desde un solo lugar, cada una con sus propios productos, ventas e integraciones.
+Lo que construí: Mi propia plataforma multitienda (tienda, panel de administración, pagos con Stripe), construida por fases con agentes de IA. Un monolito modular en NestJS, porque una persona la construye y opera: un deploy, una base de datos, cada área en su propio módulo, lista para separarse si necesita escalar.
+Arquitectura:
+  Tienda (Next.js) → API (NestJS, monolito modular)
+  Panel de administración (Next.js) → API (NestJS, monolito modular)
+  API (NestJS, monolito modular) → PostgreSQL (Prisma)
+  API (NestJS, monolito modular) → Stripe (provider de pagos)
+  API (NestJS, monolito modular) → Resend (provider de e-mail)
+  Tienda (Next.js) → Microsoft Clarity, Píxel de Meta
+Resultado: Lanzada en octubre de 2026.
 Stack: Next.js, NestJS, PostgreSQL, Prisma, Stripe, Resend, Microsoft Clarity, Meta Pixel
-[button] Detalles técnicos
-  El problema: Gestionar varias tiendas online desde un solo lugar, cada una con sus propios productos, ventas e integraciones.
-  Mi rol: Producto propio. Lo construí por fases con agentes de IA para programar, y cada fase siguió plan → revisión → implementación → pruebas → revisión del diff → merge.
-  Arquitectura:
-    Tienda (Next.js) → API (NestJS, monolito modular)
-    Panel de administración (Next.js) → API (NestJS, monolito modular)
-    API (NestJS, monolito modular) → PostgreSQL (Prisma)
-    API (NestJS, monolito modular) → Stripe (provider de pagos)
-    API (NestJS, monolito modular) → Resend (provider de e-mail)
-    Tienda (Next.js) → Microsoft Clarity, Píxel de Meta
-  Decisiones clave:
-    - Un monorepo pnpm con la API en NestJS y la tienda y el panel en Next.js, organizado como monolito modular. Una sola persona lo construye y lo opera, así que todo sale en un deploy, con una base de datos y un solo lugar para rastrear un error. Los microservicios sumarían llamadas de red, deploys separados y fallas repartidas entre servicios, sin ganancia a este tamaño. Cada área (tiendas, productos, pedidos, pagos) queda en su propio módulo, con una frontera clara, así que una de ellas puede convertirse en un servicio aparte si algún día necesita escalar. Y en el monorepo, un cambio que cruza la API, la tienda y el panel sale en un solo commit.
-    - Microsoft Clarity en la tienda, y el Píxel de Meta configurado por tienda. Clarity graba las sesiones y genera mapas de calor, así que se puede ver dónde hacen clic los clientes, hasta dónde bajan en la página y dónde abandonan. Cada tienda agrega su propio Píxel de Meta, que envía visitas, productos agregados al carrito y compras de vuelta a Meta, para medir y optimizar sus anuncios.
-    - Cada integración es un provider: Stripe para pagos y Resend para e-mail son los primeros, y otras APIs se conectan de la misma forma. Para que cada tienda pueda crearse y personalizarse como necesite, con los servicios que elija.
-  Pruebas y despliegue: Pruebas automatizadas en todo el monorepo; cada fase las pasó antes de la revisión del diff. Desplegado en un VPS, con copias de seguridad de emergencia. Los datos de los clientes y las claves de API están cifrados: incluso ante una intrusión, solo pueden leerse con la clave de descifrado.
-  Resultado: Lanzada en octubre de 2026.
-  Sin enlace público
-  [button] Cerrar
+Sin enlace público
 
 -- Hostly (IA Robots Solutions) --
-Una plataforma multiempresa para robots de servicio OrionStar: una app Android propia reemplaza la de fábrica y reproduce las campañas, la música y los mensajes de voz programados en un panel web. Los anuncios también van a pantallas LED registradas, también en eventos.
 [image] Una pantalla de programación del robot con una playlist de campañas ficticia, en lugar del sistema real.
 [mockup words] Hoy · Campaña · Música · Bienvenida · Lobby, lista A · Oferta semanal · Menú de almuerzo · Lobby, lista B · Reproduciendo · Campaña, 30 segundos · A continuación · Luz de mañana · Puertas abiertas · Hora tranquila · Segundo piso · Check-in tardío
+El problema: La app de fábrica no permitía programar campañas ni generaba informes.
+Lo que construí: Escribí la especificación y desarrollo todo el sistema con agentes de IA: app del robot, panel, API y worker de contenidos. La app accede a RobotOS por una capa propia, el RobotGateway, así funciona sin el robot real y puede pasar a AgentOS más adelante.
+Arquitectura:
+  Panel (Next.js) → API (NestJS)
+  App del robot (Kotlin) → API (NestJS) (WebSocket)
+  App del robot (Kotlin) → RobotOS en LuckiBot Plus (RobotGateway)
+  API (NestJS) → Worker de contenidos (FFmpeg) (cola)
+  API (NestJS) → PostgreSQL
+  API (NestJS) → Pantalla LED registrada (anuncios)
+  Worker de contenidos (FFmpeg) → Almacenamiento S3
+Resultado: En uso, transmitiendo anuncios al robot y a pantallas LED.
 Stack: Kotlin, RobotOS, NestJS, Next.js, PostgreSQL, Redis, BullMQ, FFmpeg, Docker
-[button] Detalles técnicos
-  El problema: La app de fábrica del robot hacía difícil cambiar los contenidos, no permitía programar campañas, fallaba en la pantalla grande y no generaba informes.
-  Mi rol: Escribí la especificación y desarrollo todo el sistema, con agentes de IA trabajando en paralelo, uno por issue: la API, el panel, el worker de contenidos y la app Android del robot.
-  Arquitectura:
-    Panel (Next.js) → API (NestJS)
-    App del robot (Kotlin) → API (NestJS) (WebSocket)
-    App del robot (Kotlin) → RobotOS en LuckiBot Plus (RobotGateway)
-    API (NestJS) → Worker de contenidos (FFmpeg) (cola)
-    API (NestJS) → PostgreSQL
-    API (NestJS) → Pantalla LED registrada (anuncios)
-    Worker de contenidos (FFmpeg) → Almacenamiento S3
-  Decisiones clave:
-    - La app del robot accede a RobotOS a través de una capa propia, el RobotGateway, que también tiene una versión falsa para el emulador. La app funciona y se prueba sin el robot real, y si OrionStar libera AgentOS para el LuckiBot Plus, solo cambia esa capa.
-    - La nube decide y el robot ejecuta: cada cambio en el panel recompila un manifiesto versionado, y el robot sigue el último que recibió. Sin internet, el robot sigue su agenda, reproduce los contenidos de la caché y guarda los eventos para enviarlos cuando vuelva la red.
-    - Multiempresa desde el inicio: operadora, clientes, sitios y robots, con roles y una marca por cliente que el robot hereda del cliente o de la operadora. Cada cliente, como un centro comercial, usa el panel con su propia marca y ve solo sus propios robots y campañas. El alcance por organización se aplica en el centro de la API y en la base de datos, y no ruta por ruta, así que la misma base puede convertirse en un SaaS.
-  Pruebas y despliegue: Pruebas unitarias y de punta a punta en la API, el panel y el worker, pruebas de contrato del RobotGateway y las verificaciones de la app Android, todo en CI con cada cambio. La API niega por defecto, con un barrido que falla si alguna ruta queda sin guarda; el inicio de sesión tiene autenticación de doble factor, y la auditoría es una cadena firmada con HMAC. La API, el panel, el worker, PostgreSQL y Redis corren con Docker Compose en un VPS, detrás de HTTPS automático. Los contenidos están en un almacenamiento S3 privado, servidos solo con URL firmadas; el deploy solo pasa por VPN, y una copia de seguridad diaria cifrada sale del servidor.
-  Resultado: En uso: se conecta al robot y a las pantallas LED registradas y transmite anuncios en ambos, también en eventos.
-  Sistema interno, sin enlace público
-  [button] Cerrar
+Sistema interno, sin enlace público
 
 -- BookOwl --
-Un sistema open source de gestión de bibliotecas en Python y Django, hecho para la biblioteca real de una iglesia.
 [image alt] La pantalla de inicio de BookOwl: el logo del búho sobre un mensaje de bienvenida.
+El problema: La biblioteca de una iglesia no sabía qué libros tenía ni quién los tenía.
+Lo que construí: La construí de principio a fin en Python y Django, open source, para la secretaria de la iglesia. Cada préstamo sigue sus estados (pendiente de retiro, activo, atrasado, devuelto, cancelado) y actualiza sus libros, así la biblioteca siempre sabe qué está en el estante.
+Arquitectura:
+  Pantallas de la biblioteca (navegador) → App Django (Python)
+  App Django (Python) → PostgreSQL
+  App Django (Python) → Telegram (feedback) (feedback)
+Resultado: En uso en la biblioteca de la iglesia, en la versión 1.4.2.
 Stack: Python, Django, PostgreSQL, pandas
-[button] Detalles técnicos
-  El problema: La biblioteca de una iglesia no sabía qué libros tenía ni dónde estaban, quién se había llevado cada uno, cuándo debía devolverlo, ni si lo devolvió y cuándo.
-  Mi rol: Lo construí solo, de punta a punta, para la secretaria de la iglesia que cuida la biblioteca: el modelo de datos, las pantallas, la importación de planillas y el deploy.
-  Arquitectura:
-    Pantallas de la biblioteca (navegador) → App Django (Python)
-    App Django (Python) → PostgreSQL
-    App Django (Python) → Telegram (feedback) (feedback)
-  Decisiones clave:
-    - Cada préstamo sigue sus propios estados: esperando retiro, activo, atrasado, devuelto o cancelado, y cada cambio también actualiza el estado de sus libros. En cualquier momento la biblioteca sabe qué libros están en el estante, quién tiene cada uno, la fecha prevista de devolución y la fecha en que realmente volvió.
-    - El catálogo que ya existía entra por una planilla CSV o Excel, leída con pandas y revisada fila por fila antes de guardar nada. Nadie tuvo que registrar los libros uno por uno, y una fila con error muestra el problema en pantalla en lugar de llegar a la base de datos.
-    - Cada libro, lector y préstamo pertenece a una biblioteca, y cada cuenta ve solo la suya. La misma instalación puede servir a otras iglesias, pequeñas instituciones o una colección personal, y por eso también es open source.
-  Pruebas y despliegue: Probado a mano; el repositorio todavía no tiene pruebas automatizadas. Corre en un servidor interno de la iglesia, con Gunicorn sirviendo la app Django y WhiteNoise sus archivos estáticos. En desarrollo usa SQLite.
-  Resultado: En uso en la biblioteca de la iglesia, en la versión 1.4.2: la secretaria ve qué libros tiene la biblioteca, quién tiene cada uno y cuándo debe devolverlo.
-  [link] Código en GitHub
-  [button] Cerrar
+[link] Código en GitHub
 
 == Cómo trabajo ==
 

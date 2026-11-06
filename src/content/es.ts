@@ -68,22 +68,17 @@ export const es: SiteContent = {
     contact: 'Contacto',
     downloadCv: 'Descargar CV',
     seeProjects: 'Ver proyectos',
-    technicalDetails: 'Detalles técnicos',
-    close: 'Cerrar',
     internalNoLink: 'Sistema interno, sin enlace público',
     noPublicLink: 'Sin enlace público',
     backToTop: 'Volver arriba',
     stack: 'Stack',
     sectionsNav: 'Secciones',
     languageNav: 'Elige un idioma',
-    details: {
+    project: {
       problem: 'El problema',
-      role: 'Mi rol',
+      built: 'Lo que construí',
       architecture: 'Arquitectura',
-      decisions: 'Decisiones clave',
-      testingAndDeploy: 'Pruebas y despliegue',
-      outcome: 'Resultado',
-      links: 'Enlaces',
+      result: 'Resultado',
     },
   },
   sections: {
@@ -96,202 +91,120 @@ export const es: SiteContent = {
   projects: [
     {
       ...wave,
-      logline:
-        'Una plataforma interna que usan unas 100 personas para publicar campañas en Meta de forma masiva, editar y mejorar creatividades con IA, generar copies, gestionar solicitudes entre equipos (al estilo de ClickUp) y seguir datos de campañas, finanzas y salud de la empresa en dashboards.',
       image: {
         kind: 'mockup',
         mockup: 'wave-board',
         description:
           'Un tablero de solicitudes estilizado, con equipos y tareas ficticios, en lugar del sistema interno.',
       },
-      technicalDetails: {
-        problem:
-          'Antes de la plataforma, cada campaña se armaba a mano en NewsBreak, Meta Ads y Taboola.',
-        role: 'El equipo divide el trabajo por áreas, y yo trabajo en todas ellas, para que cada parte encaje en el sistema completo.',
-        architecture: {
-          ...wave.technicalDetails.architecture,
-          nodes: [
-            { id: 'web', label: 'App web (Next.js, React)', kind: 'client' },
-            { id: 'api', label: 'API (NestJS)', kind: 'service' },
-            { id: 'db', label: 'PostgreSQL', kind: 'data' },
-            { id: 'meta', label: 'API de Meta', kind: 'external' },
-          ],
-        },
-        decisions: [
-          {
-            what: 'Las campañas se publican a través de la API de Meta, varias a la vez.',
-            why: 'Antes, cada campaña se armaba a mano en cada plataforma de anuncios.',
-          },
-          {
-            what: 'Prometheus, Grafana y logs vigilan el sistema, y las alertas llegan a Telegram ante errores o cuando una ruta está sobrecargada.',
-            why: 'Para saber cómo está el sistema en todo momento, y enterarse de errores y rutas sobrecargadas en cuanto ocurren.',
-          },
+      summary: {
+        problem: 'Cada campaña se armaba a mano en cada plataforma de anuncios.',
+        built:
+          'Una plataforma interna que publica campañas en Meta en masa, edita creatividades con IA, genera copies, gestiona solicitudes entre equipos y muestra dashboards de campañas y finanzas. El equipo divide el trabajo por áreas; yo trabajo en todas, para que cada parte encaje en el conjunto.',
+        result: 'Más de 500 campañas al día, publicadas por unas 100 personas.',
+      },
+      architecture: {
+        ...wave.architecture,
+        nodes: [
+          { id: 'web', label: 'App web (Next.js, React)', kind: 'client' },
+          { id: 'api', label: 'API (NestJS)', kind: 'service' },
+          { id: 'db', label: 'PostgreSQL', kind: 'data' },
+          { id: 'meta', label: 'API de Meta', kind: 'external' },
         ],
-        testing:
-          'Pruebas de seguridad que simulan ataques reales, y pruebas de estrés que buscan errores y fallas que podrían abrir una brecha de seguridad.',
-        deploy:
-          'Jenkins ejecuta las pruebas y validaciones, y un cambio solo se aprueba si las pasa. Primero va al entorno de develop, donde lo probamos, y cuando todo está aprobado el tech lead hace el deploy.',
-        outcome:
-          'Más de 500 campañas publicadas al día a través de la API de Meta, por unas 100 personas dentro de la empresa.',
       },
     },
     {
       ...bi,
-      logline:
-        'Un sistema interno de datos de campañas, que usan todos los días los dueños, finanzas y los líderes de squad: resultados mensuales y semanales y el rendimiento de cada media buyer, actualizados cada hora. Workers en NestJS procesan los datos de RedTrack desde una cola en RabbitMQ y los guardan en PostgreSQL, y una app en Next.js con inicio de sesión de Google los consulta a través de la API en NestJS.',
       image: {
         kind: 'mockup',
         mockup: 'campaign-chart',
         description:
           'Un gráfico de rendimiento semanal con campañas ficticias y media buyers inventados, en lugar del sistema interno.',
       },
-      technicalDetails: {
-        problem:
-          'Finanzas extraía los datos de RedTrack con un pequeño script en Python que generaba archivos CSV. Cada extracción tardaba de 45 minutos a 2 horas, según el período.',
-        role: 'Diseñé la arquitectura y construí todo el sistema, de punta a punta.',
-        architecture: {
-          ...bi.technicalDetails.architecture,
-          nodes: [
-            { id: 'redtrack', label: 'RedTrack', kind: 'external' },
-            { id: 'n8n', label: 'n8n', kind: 'service' },
-            { id: 'queue', label: 'RabbitMQ', kind: 'service' },
-            { id: 'web', label: 'App Next.js (inicio de sesión de Google)', kind: 'client' },
-            { id: 'api', label: 'NestJS (workers y API)', kind: 'service' },
-            { id: 'db', label: 'PostgreSQL', kind: 'data' },
-          ],
-        },
-        decisions: [
-          {
-            what: 'Vistas mensuales y semanales de los datos de RedTrack, y el rendimiento de cada media buyer.',
-            why: 'Los dueños, finanzas y los líderes de squad analizan los datos todos los días: qué está funcionando, qué está gastando y cómo va cada media buyer.',
-          },
-          {
-            what: 'n8n publica los datos de RedTrack en una cola de RabbitMQ, y varios workers en NestJS los procesan en paralelo hasta PostgreSQL.',
-            why: 'Son muchos datos a la vez. La cola separa la llegada de los datos de su procesamiento: n8n publica todo en RabbitMQ, y los workers lo consumen al ritmo que la base de datos soporta. Un registro que falla se reintenta sin afectar a los demás, y si un worker se cae no se pierde nada, porque el mensaje sigue en la cola. RedTrack identifica cada registro, así que un mensaje procesado más de una vez no duplica datos.',
-          },
-          {
-            what: 'Un script de asignación por el método de los restos mayores para conversiones e ingresos.',
-            why: 'Las métricas estaban infladas. El script corrigió los números, y los resultados se conciliaron con las planillas de referencia.',
-          },
+      summary: {
+        problem: 'Finanzas esperaba de 45 minutos a 2 horas por CSV de RedTrack.',
+        built:
+          'Diseñé y construí todo: n8n publica los datos de RedTrack en una cola RabbitMQ y workers NestJS los escriben en paralelo en PostgreSQL, así un registro que falla se reintenta y nada se pierde. Una app Next.js muestra resultados mensuales, semanales y por media buyer.',
+        result: 'Datos actualizados cada hora, y Campaign BI hoy funciona dentro de Sistema Wave.',
+      },
+      architecture: {
+        ...bi.architecture,
+        nodes: [
+          { id: 'redtrack', label: 'RedTrack', kind: 'external' },
+          { id: 'n8n', label: 'n8n', kind: 'service' },
+          { id: 'queue', label: 'RabbitMQ', kind: 'service' },
+          { id: 'web', label: 'App Next.js (inicio de sesión de Google)', kind: 'client' },
+          { id: 'api', label: 'NestJS (workers y API)', kind: 'service' },
+          { id: 'db', label: 'PostgreSQL', kind: 'data' },
         ],
-        testing: 'Las verificaciones se ejecutan en CI con cada cambio.',
-        deploy:
-          'Nada se publica sin pasar el CI, así que un error aparece en el pipeline, y no después de tumbar el sistema, aunque sea por poco tiempo.',
-        outcome:
-          'Los datos de RedTrack ahora se actualizan cada hora durante el día, y las cargas más grandes corren de madrugada. Los dashboards los leen de PostgreSQL con consultas optimizadas, en lugar de esperar de 45 minutos a 2 horas por un CSV. Campaign BI hoy funciona dentro de Sistema Wave.',
       },
     },
     {
       ...zibby,
-      logline:
-        'Mi propia plataforma de e-commerce multitienda, lanzada en octubre de 2026: tienda online, panel de administración con registro de productos y dashboards de ventas que muestran cómo se vende cada producto, y pagos con Stripe. Cada integración es un provider, así que cada tienda puede crearse y personalizarse con las APIs que necesite.',
       image: {
         kind: 'mockup',
         mockup: 'zibby-store',
         description: 'Una tienda ficticia junto a su panel de administración.',
       },
-      technicalDetails: {
+      summary: {
         problem:
           'Gestionar varias tiendas online desde un solo lugar, cada una con sus propios productos, ventas e integraciones.',
-        role: [
-          'Producto propio.',
-          'Lo construí por fases con agentes de IA para programar, y cada fase siguió plan → revisión → implementación → pruebas → revisión del diff → merge.',
+        built:
+          'Mi propia plataforma multitienda (tienda, panel de administración, pagos con Stripe), construida por fases con agentes de IA. Un monolito modular en NestJS, porque una persona la construye y opera: un deploy, una base de datos, cada área en su propio módulo, lista para separarse si necesita escalar.',
+        result: 'Lanzada en octubre de 2026.',
+      },
+      architecture: {
+        ...zibby.architecture,
+        nodes: [
+          { id: 'storefront', label: 'Tienda (Next.js)', kind: 'client' },
+          { id: 'tracking', label: 'Microsoft Clarity, Píxel de Meta', kind: 'external' },
+          { id: 'admin', label: 'Panel de administración (Next.js)', kind: 'client' },
+          { id: 'api', label: 'API (NestJS, monolito modular)', kind: 'service' },
+          { id: 'db', label: 'PostgreSQL (Prisma)', kind: 'data' },
+          { id: 'stripe', label: 'Stripe (provider de pagos)', kind: 'external' },
+          { id: 'email', label: 'Resend (provider de e-mail)', kind: 'external' },
         ],
-        architecture: {
-          ...zibby.technicalDetails.architecture,
-          nodes: [
-            { id: 'storefront', label: 'Tienda (Next.js)', kind: 'client' },
-            { id: 'tracking', label: 'Microsoft Clarity, Píxel de Meta', kind: 'external' },
-            { id: 'admin', label: 'Panel de administración (Next.js)', kind: 'client' },
-            { id: 'api', label: 'API (NestJS, monolito modular)', kind: 'service' },
-            { id: 'db', label: 'PostgreSQL (Prisma)', kind: 'data' },
-            { id: 'stripe', label: 'Stripe (provider de pagos)', kind: 'external' },
-            { id: 'email', label: 'Resend (provider de e-mail)', kind: 'external' },
-          ],
-        },
-        decisions: [
-          {
-            what: 'Un monorepo pnpm con la API en NestJS y la tienda y el panel en Next.js, organizado como monolito modular.',
-            why: 'Una sola persona lo construye y lo opera, así que todo sale en un deploy, con una base de datos y un solo lugar para rastrear un error. Los microservicios sumarían llamadas de red, deploys separados y fallas repartidas entre servicios, sin ganancia a este tamaño. Cada área (tiendas, productos, pedidos, pagos) queda en su propio módulo, con una frontera clara, así que una de ellas puede convertirse en un servicio aparte si algún día necesita escalar. Y en el monorepo, un cambio que cruza la API, la tienda y el panel sale en un solo commit.',
-          },
-          {
-            what: 'Microsoft Clarity en la tienda, y el Píxel de Meta configurado por tienda.',
-            why: 'Clarity graba las sesiones y genera mapas de calor, así que se puede ver dónde hacen clic los clientes, hasta dónde bajan en la página y dónde abandonan. Cada tienda agrega su propio Píxel de Meta, que envía visitas, productos agregados al carrito y compras de vuelta a Meta, para medir y optimizar sus anuncios.',
-          },
-          {
-            what: 'Cada integración es un provider: Stripe para pagos y Resend para e-mail son los primeros, y otras APIs se conectan de la misma forma.',
-            why: 'Para que cada tienda pueda crearse y personalizarse como necesite, con los servicios que elija.',
-          },
-        ],
-        testing:
-          'Pruebas automatizadas en todo el monorepo; cada fase las pasó antes de la revisión del diff.',
-        deploy:
-          'Desplegado en un VPS, con copias de seguridad de emergencia. Los datos de los clientes y las claves de API están cifrados: incluso ante una intrusión, solo pueden leerse con la clave de descifrado.',
-        outcome: 'Lanzada en octubre de 2026.',
       },
     },
     {
       ...hostly,
-      logline:
-        'Una plataforma multiempresa para robots de servicio OrionStar: una app Android propia reemplaza la de fábrica y reproduce las campañas, la música y los mensajes de voz programados en un panel web. Los anuncios también van a pantallas LED registradas, también en eventos.',
       image: {
         kind: 'mockup',
         mockup: 'hostly-schedule',
         description:
           'Una pantalla de programación del robot con una playlist de campañas ficticia, en lugar del sistema real.',
       },
-      technicalDetails: {
-        problem:
-          'La app de fábrica del robot hacía difícil cambiar los contenidos, no permitía programar campañas, fallaba en la pantalla grande y no generaba informes.',
-        role: 'Escribí la especificación y desarrollo todo el sistema, con agentes de IA trabajando en paralelo, uno por issue: la API, el panel, el worker de contenidos y la app Android del robot.',
-        architecture: {
-          ...hostly.technicalDetails.architecture,
-          nodes: [
-            { id: 'panel', label: 'Panel (Next.js)', kind: 'client' },
-            { id: 'app', label: 'App del robot (Kotlin)', kind: 'client' },
-            { id: 'api', label: 'API (NestJS)', kind: 'service' },
-            { id: 'robot', label: 'RobotOS en LuckiBot Plus', kind: 'device' },
-            { id: 'worker', label: 'Worker de contenidos (FFmpeg)', kind: 'service' },
-            { id: 'db', label: 'PostgreSQL', kind: 'data' },
-            { id: 'screen', label: 'Pantalla LED registrada', kind: 'device' },
-            { id: 'storage', label: 'Almacenamiento S3', kind: 'data' },
-          ],
-          edges: [
-            { from: 'panel', to: 'api' },
-            { from: 'app', to: 'api', label: 'WebSocket' },
-            { from: 'app', to: 'robot', label: 'RobotGateway' },
-            { from: 'api', to: 'worker', label: 'cola' },
-            { from: 'api', to: 'db' },
-            { from: 'api', to: 'screen', label: 'anuncios' },
-            { from: 'worker', to: 'storage' },
-          ],
-        },
-        decisions: [
-          {
-            what: 'La app del robot accede a RobotOS a través de una capa propia, el RobotGateway, que también tiene una versión falsa para el emulador.',
-            why: 'La app funciona y se prueba sin el robot real, y si OrionStar libera AgentOS para el LuckiBot Plus, solo cambia esa capa.',
-          },
-          {
-            what: 'La nube decide y el robot ejecuta: cada cambio en el panel recompila un manifiesto versionado, y el robot sigue el último que recibió.',
-            why: 'Sin internet, el robot sigue su agenda, reproduce los contenidos de la caché y guarda los eventos para enviarlos cuando vuelva la red.',
-          },
-          {
-            what: 'Multiempresa desde el inicio: operadora, clientes, sitios y robots, con roles y una marca por cliente que el robot hereda del cliente o de la operadora.',
-            why: 'Cada cliente, como un centro comercial, usa el panel con su propia marca y ve solo sus propios robots y campañas. El alcance por organización se aplica en el centro de la API y en la base de datos, y no ruta por ruta, así que la misma base puede convertirse en un SaaS.',
-          },
+      summary: {
+        problem: 'La app de fábrica no permitía programar campañas ni generaba informes.',
+        built:
+          'Escribí la especificación y desarrollo todo el sistema con agentes de IA: app del robot, panel, API y worker de contenidos. La app accede a RobotOS por una capa propia, el RobotGateway, así funciona sin el robot real y puede pasar a AgentOS más adelante.',
+        result: 'En uso, transmitiendo anuncios al robot y a pantallas LED.',
+      },
+      architecture: {
+        ...hostly.architecture,
+        nodes: [
+          { id: 'panel', label: 'Panel (Next.js)', kind: 'client' },
+          { id: 'app', label: 'App del robot (Kotlin)', kind: 'client' },
+          { id: 'api', label: 'API (NestJS)', kind: 'service' },
+          { id: 'robot', label: 'RobotOS en LuckiBot Plus', kind: 'device' },
+          { id: 'worker', label: 'Worker de contenidos (FFmpeg)', kind: 'service' },
+          { id: 'db', label: 'PostgreSQL', kind: 'data' },
+          { id: 'screen', label: 'Pantalla LED registrada', kind: 'device' },
+          { id: 'storage', label: 'Almacenamiento S3', kind: 'data' },
         ],
-        testing:
-          'Pruebas unitarias y de punta a punta en la API, el panel y el worker, pruebas de contrato del RobotGateway y las verificaciones de la app Android, todo en CI con cada cambio. La API niega por defecto, con un barrido que falla si alguna ruta queda sin guarda; el inicio de sesión tiene autenticación de doble factor, y la auditoría es una cadena firmada con HMAC.',
-        deploy:
-          'La API, el panel, el worker, PostgreSQL y Redis corren con Docker Compose en un VPS, detrás de HTTPS automático. Los contenidos están en un almacenamiento S3 privado, servidos solo con URL firmadas; el deploy solo pasa por VPN, y una copia de seguridad diaria cifrada sale del servidor.',
-        outcome:
-          'En uso: se conecta al robot y a las pantallas LED registradas y transmite anuncios en ambos, también en eventos.',
+        edges: [
+          { from: 'panel', to: 'api' },
+          { from: 'app', to: 'api', label: 'WebSocket' },
+          { from: 'app', to: 'robot', label: 'RobotGateway' },
+          { from: 'api', to: 'worker', label: 'cola' },
+          { from: 'api', to: 'db' },
+          { from: 'api', to: 'screen', label: 'anuncios' },
+          { from: 'worker', to: 'storage' },
+        ],
       },
     },
     {
       ...bookowl,
-      logline:
-        'Un sistema open source de gestión de bibliotecas en Python y Django, hecho para la biblioteca real de una iglesia.',
       image: {
         kind: 'image',
         id: 'bookowl',
@@ -301,38 +214,20 @@ export const es: SiteContent = {
         kind: 'public',
         links: [{ label: 'Código en GitHub', href: 'https://github.com/GabrielDev969/BookOwl' }],
       },
-      technicalDetails: {
-        problem:
-          'La biblioteca de una iglesia no sabía qué libros tenía ni dónde estaban, quién se había llevado cada uno, cuándo debía devolverlo, ni si lo devolvió y cuándo.',
-        role: 'Lo construí solo, de punta a punta, para la secretaria de la iglesia que cuida la biblioteca: el modelo de datos, las pantallas, la importación de planillas y el deploy.',
-        architecture: {
-          ...bookowl.technicalDetails.architecture,
-          nodes: [
-            { id: 'browser', label: 'Pantallas de la biblioteca (navegador)', kind: 'client' },
-            { id: 'app', label: 'App Django (Python)', kind: 'service' },
-            { id: 'db', label: 'PostgreSQL', kind: 'data' },
-            { id: 'telegram', label: 'Telegram (feedback)', kind: 'external' },
-          ],
-        },
-        decisions: [
-          {
-            what: 'Cada préstamo sigue sus propios estados: esperando retiro, activo, atrasado, devuelto o cancelado, y cada cambio también actualiza el estado de sus libros.',
-            why: 'En cualquier momento la biblioteca sabe qué libros están en el estante, quién tiene cada uno, la fecha prevista de devolución y la fecha en que realmente volvió.',
-          },
-          {
-            what: 'El catálogo que ya existía entra por una planilla CSV o Excel, leída con pandas y revisada fila por fila antes de guardar nada.',
-            why: 'Nadie tuvo que registrar los libros uno por uno, y una fila con error muestra el problema en pantalla en lugar de llegar a la base de datos.',
-          },
-          {
-            what: 'Cada libro, lector y préstamo pertenece a una biblioteca, y cada cuenta ve solo la suya.',
-            why: 'La misma instalación puede servir a otras iglesias, pequeñas instituciones o una colección personal, y por eso también es open source.',
-          },
+      summary: {
+        problem: 'La biblioteca de una iglesia no sabía qué libros tenía ni quién los tenía.',
+        built:
+          'La construí de principio a fin en Python y Django, open source, para la secretaria de la iglesia. Cada préstamo sigue sus estados (pendiente de retiro, activo, atrasado, devuelto, cancelado) y actualiza sus libros, así la biblioteca siempre sabe qué está en el estante.',
+        result: 'En uso en la biblioteca de la iglesia, en la versión 1.4.2.',
+      },
+      architecture: {
+        ...bookowl.architecture,
+        nodes: [
+          { id: 'browser', label: 'Pantallas de la biblioteca (navegador)', kind: 'client' },
+          { id: 'app', label: 'App Django (Python)', kind: 'service' },
+          { id: 'db', label: 'PostgreSQL', kind: 'data' },
+          { id: 'telegram', label: 'Telegram (feedback)', kind: 'external' },
         ],
-        testing: 'Probado a mano; el repositorio todavía no tiene pruebas automatizadas.',
-        deploy:
-          'Corre en un servidor interno de la iglesia, con Gunicorn sirviendo la app Django y WhiteNoise sus archivos estáticos. En desarrollo usa SQLite.',
-        outcome:
-          'En uso en la biblioteca de la iglesia, en la versión 1.4.2: la secretaria ve qué libros tiene la biblioteca, quién tiene cada uno y cuándo debe devolverlo.',
       },
     },
   ],
