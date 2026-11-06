@@ -106,11 +106,20 @@ export type SiteContent = {
     /** Spanish only: PT and EN must not mention relocation. */
     relocation?: string
     heroLine: string
+    /**
+     * The hero's three counters. Every number must already be in the content (about, the
+     * experience, the projects); tests/unit/content.test.ts checks it.
+     */
+    stats: { value: string; label: string }[]
     availability: string
     about: string
     photo: { id: ImageId; alt: string }
   }
   ui: {
+    /** The red serif line over the name: "Hi, I'm". */
+    greeting: string
+    /** The giant outlined word behind the hero; decorative. */
+    backdrop: string
     skipToContent: string
     /** For date ranges that are still open: "2025–present". */
     present: string

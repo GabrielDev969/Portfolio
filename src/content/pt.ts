@@ -48,6 +48,11 @@ export const pt: SiteContent = {
     location: 'Salvador, Bahia',
     workMode: 'Remoto',
     heroLine: 'Do banco de dados à tela.',
+    stats: [
+      { value: '~5', label: 'anos de experiência' },
+      { value: '500+', label: 'campanhas por dia no Sistema Wave' },
+      { value: '~100', label: 'pessoas usam todo dia' },
+    ],
     availability: 'Disponível para novos projetos',
     about:
       'Desenvolvedor Full Stack com cerca de 5 anos de experiência: 4 como Analista de Sistemas e mais de 1 trabalhando remoto. Construo produtos completos, do banco de dados à interface: frontends e dashboards com Next.js e React, APIs com Node.js e NestJS, e dados em PostgreSQL. Programo todos os dias com agentes de IA para ir mais rápido sem abrir mão do critério técnico, e faço pós-graduação em Engenharia de Software com IA Aplicada.',
@@ -57,6 +62,8 @@ export const pt: SiteContent = {
     },
   },
   ui: {
+    greeting: 'Olá, eu sou',
+    backdrop: 'PORTFÓLIO',
     skipToContent: 'Pular para o conteúdo',
     present: 'atual',
     quickView: 'Visão rápida',

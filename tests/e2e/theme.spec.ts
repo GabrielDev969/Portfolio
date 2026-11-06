@@ -35,14 +35,17 @@ test('paper goes light', async ({ page }) => {
   expect(await groundLuminance(page, 'body')).toBeGreaterThan(0.9)
 })
 
-// The mono face is the swarm's voice only (design/COMMIT-SHEET.md §3): no content is set in it.
-test('no content is set in the mono face', async ({ page }) => {
+// Mono is for labels (tags, pills, chips, stat labels, the nav, buttons) and never for running
+// text: names, headings, paragraphs and descriptions stay in the display face and the serif
+// (design/COMMIT-SHEET.md §3).
+test('running text is never set in mono', async ({ page }) => {
   await page.goto('en/')
   const mono = await page.locator('main').evaluate((main) =>
-    [...main.querySelectorAll('*')]
-      .filter((el) => !el.closest('[aria-hidden="true"]'))
+    [...main.querySelectorAll('h1, h2, h3, p, dd')]
+      .filter((el) => !el.closest('[aria-hidden="true"], .tag, .pill, .chip, .stat, .chips'))
+      .filter((el) => !el.matches('.tag, .pill, .stat-label'))
       .filter((el) => /mono/i.test(getComputedStyle(el).fontFamily))
-      .map((el) => el.tagName.toLowerCase()),
+      .map((el) => `${el.tagName.toLowerCase()} "${(el.textContent ?? '').trim().slice(0, 30)}"`),
   )
   expect(mono).toEqual([])
 })

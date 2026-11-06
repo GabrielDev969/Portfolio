@@ -14,16 +14,24 @@
 /* Only when JavaScript runs (set by the head script). */
 @custom-variant js (&:where([data-js], [data-js] *));
 
-/* Tokens from design/COMMIT-SHEET.md §2: a dark ground (2026-11-05). tests/unit/contrast.test.ts
-   checks every text pairing, every agent color against the ground and under its label, and that
-   the agents stay apart from each other and from the contact accent. */
+/* Tokens from design/COMMIT-SHEET.md §2: the engineering console (Gabriel, 2026-11-06: the
+   reference reel's design is the target). tests/unit/contrast.test.ts checks every text pairing,
+   every agent color against the ground and under its label, and that the agents stay apart from
+   each other and from the accent. */
 @theme {
   --color-*: initial;
-  --color-screen: oklch(0.17 0.012 255);
-  --color-screen-2: oklch(0.215 0.014 255);
-  --color-ink: oklch(0.94 0.008 240);
-  --color-ink-2: oklch(0.74 0.015 245);
-  --color-velvet: oklch(0.68 0.19 25);
+  /* Near-black ground (#0a0a0a) and the one surface tone for cards (#121212). */
+  --color-screen: oklch(0.145 0 0);
+  --color-screen-2: oklch(0.182 0 0);
+  /* Near-white text (#f2f2f0) and the muted slate (#7c8491): 5.3:1 on the ground. */
+  --color-ink: oklch(0.961 0.003 106.4);
+  --color-ink-2: oklch(0.611 0.022 260.2);
+  /* One crimson (#ea4346): Hi I'm, the section badges, the primary button, Copy. */
+  --color-crimson: oklch(0.628 0.204 24.4);
+  /* Cyan (#22d3ee) for selection and focus only; the swarm reuses it. */
+  --color-cyan: oklch(0.797 0.134 211.5);
+  /* Hairlines on every card and panel. */
+  --color-line: oklch(1 0 0 / 0.12);
   /* The swarm's sixteen agents: two lightness steps, hues 22.5° apart. Swarm UI only. */
   --color-agent-1: oklch(0.74 0.157 10);
   --color-agent-2: oklch(0.82 0.099 32.5);
@@ -44,10 +52,11 @@
   --color-transparent: transparent;
   --color-current: currentColor;
 
-  /* Title: capped by height too, so the 5-second test passes on short laptop screens. */
-  --text-title: min(30vw, 22svh, 13rem);
-  --text-title--line-height: 0.86;
-  --text-title--letter-spacing: -0.03em;
+  /* Title: the name, sized by the narrower of its column and the screen's height, so the
+     5-second test passes on short laptop screens. Archivo 900 at 118% width. */
+  --text-title: min(15vw, 13svh, 8rem);
+  --text-title--line-height: 0.9;
+  --text-title--letter-spacing: -0.035em;
   --text-heading: clamp(2.75rem, 6vw, 5rem);
   --text-heading--line-height: 0.95;
   --text-heading--letter-spacing: -0.02em;
@@ -58,9 +67,9 @@
 }
 
 @theme inline {
-  --font-display: var(--font-big-shoulders), 'Arial Narrow', sans-serif;
+  --font-display: var(--font-archivo), 'Arial Black', sans-serif;
   --font-text: var(--font-newsreader), Georgia, serif;
-  /* The swarm UI only: cursor labels, size badges, the dock (design/COMMIT-SHEET.md §3). */
+  /* Tags, badges, key/value data, the nav, stat labels, chips and the dock (COMMIT-SHEET §3). */
   --font-mono: var(--font-spline-mono), ui-monospace, Menlo, monospace;
 }
 
@@ -79,14 +88,17 @@
     --color-screen-2: oklch(0.94 0.006 240);
     --color-ink: oklch(0.22 0.025 255);
     --color-ink-2: oklch(0.42 0.02 255);
-    --color-velvet: oklch(0.47 0.17 22);
+    --color-crimson: oklch(0.503 0.177 25.2);
     color-scheme: light;
   }
 }
 
 @layer base {
+  /* The ground, with a faint dotted grid over the whole page (24 px pitch, white at 6%). */
   body {
-    background: var(--color-screen);
+    background:
+      radial-gradient(oklch(1 0 0 / 0.06) 1px, transparent 1.4px) 0 0 / 24px 24px,
+      var(--color-screen);
     color: var(--color-ink);
     font-family: var(--font-text);
     font-size: var(--text-body);
@@ -95,13 +107,14 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* Cyan is for focus and selection only (COMMIT-SHEET §2). */
   :focus-visible {
-    outline: 2px solid currentColor;
+    outline: 2px solid var(--color-cyan);
     outline-offset: 3px;
   }
 
   ::selection {
-    background: var(--color-ink);
+    background: var(--color-cyan);
     color: var(--color-screen);
   }
 }
@@ -122,17 +135,287 @@
   font-variant-numeric: tabular-nums lining-nums;
 }
 
-/* The top bar: fixed, on the page's own ground, with a hairline under it. */
+/* The top bar: fixed, on the page's own ground, with a hairline under it; mono throughout. */
 .top-bar {
   position: fixed;
   inset: 0 0 auto;
   z-index: 50;
   height: var(--top-bar);
   background: var(--color-screen);
-  border-bottom: 1px solid color-mix(in oklch, var(--color-ink) 15%, transparent);
+  border-bottom: 1px solid var(--color-line);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
-/* ---- Hero: family A, the name rises from behind its mask (CSS, so first paint needs no JS) ---- */
+.monogram {
+  display: inline-grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--color-line);
+  border-radius: 3px;
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-weight: 900;
+  font-stretch: 118%;
+  letter-spacing: 0;
+  transition: border-color 150ms var(--ease-out);
+
+  &:hover {
+    border-color: var(--color-crimson);
+  }
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding-inline: 0.625rem;
+  color: var(--color-ink-2);
+  transition: color 150ms var(--ease-out);
+
+  &:hover {
+    color: var(--color-ink);
+  }
+}
+
+/* ---- Shared pieces: cards, tags, pills, chips ---- */
+
+/* A surface with a 1 px hairline; the border brightens on hover (150 ms). */
+.card {
+  position: relative;
+  border: 1px solid var(--color-line);
+  border-radius: 4px;
+  background: var(--color-screen-2);
+  padding: 1rem 1.125rem;
+  transition: border-color 150ms var(--ease-out);
+
+  &:hover {
+    border-color: oklch(1 0 0 / 0.24);
+  }
+}
+
+/* Small corner brackets on feature cards, as on a drafting sheet. */
+.card-brackets::before,
+.card-brackets::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: var(--color-ink-2);
+  border-style: solid;
+  pointer-events: none;
+}
+
+.card-brackets::before {
+  top: -1px;
+  left: -1px;
+  border-width: 1px 0 0 1px;
+}
+
+.card-brackets::after {
+  right: -1px;
+  bottom: -1px;
+  border-width: 0 1px 1px 0;
+}
+
+/* Key/value and labels in mono, sentence-case content left alone. */
+.tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-ink-2);
+}
+
+.pill {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-crimson);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.chip {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--color-line);
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-ink);
+}
+
+/* ---- Hero (design/STORYBOARD.md §1) ----
+   The introduction, the photo card and three small cards, over the giant outlined word. Phones
+   stack them in that order; from 1024 px they sit side by side (6 · 3 · 3 columns). */
+.hero {
+  position: relative;
+  min-height: 100svh;
+  align-content: center;
+  row-gap: 2rem;
+  padding-top: calc(var(--top-bar) + clamp(20px, 5svh, 56px));
+  padding-bottom: clamp(24px, 5svh, 56px);
+  overflow-x: clip;
+}
+
+.hero-intro {
+  grid-column: 1 / -1;
+}
+
+.hero-photo,
+.hero-cards {
+  grid-column: 1 / -1;
+}
+
+.hero-photo {
+  padding: 0.75rem;
+}
+
+.hero-cards {
+  display: grid;
+  gap: 0.75rem;
+  align-content: center;
+}
+
+/* The giant outlined word: the serif, no fill, white at 7%. Decorative (aria-hidden). */
+.hero-backdrop {
+  position: absolute;
+  inset: auto 0 6% 0;
+  z-index: -1;
+  overflow: hidden;
+  font-family: var(--font-text);
+  font-size: clamp(6rem, 22vw, 22rem);
+  font-style: italic;
+  line-height: 0.8;
+  text-align: center;
+  white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: 1px oklch(1 0 0 / 0.07);
+  pointer-events: none;
+  user-select: none;
+}
+
+.hero-greeting {
+  font-family: var(--font-text);
+  font-size: clamp(1.375rem, 2.2vw, 2rem);
+  font-style: italic;
+  color: var(--color-crimson);
+}
+
+.hero-name {
+  margin-top: 0.25rem;
+  font-family: var(--font-display);
+  font-size: var(--text-title);
+  font-weight: 900;
+  font-stretch: 118%;
+  line-height: var(--text-title--line-height);
+  letter-spacing: var(--text-title--letter-spacing);
+  text-transform: uppercase;
+}
+
+.hero-line {
+  margin-top: 1rem;
+  max-width: 34ch;
+  font-size: 1.125rem;
+  color: var(--color-ink-2);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--color-line);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column-reverse;
+  /* The label comes first in the markup (dt, dd); the numbers line up at the top. */
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
+.stat-value {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 800;
+  font-stretch: 112%;
+  line-height: 1;
+}
+
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  line-height: 1.35;
+  text-transform: uppercase;
+  color: var(--color-ink-2);
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .hero-photo {
+    grid-column: 1 / 7;
+  }
+
+  .hero-cards {
+    grid-column: 7 / -1;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero {
+    --text-title: min(8.4vw, 13svh, 8rem);
+  }
+
+  .hero-intro {
+    grid-column: 1 / 7;
+  }
+
+  .hero-photo {
+    grid-column: 7 / 10;
+    align-self: center;
+  }
+
+  .hero-cards {
+    grid-column: 10 / -1;
+  }
+}
+
+/* Quick view: one column, no photo, no backdrop. */
+[data-view='quick'] .hero {
+  min-height: 0;
+  --text-title: var(--text-heading);
+}
+
+[data-view='quick'] .hero-intro,
+[data-view='quick'] .hero-cards {
+  grid-column: 1 / -1;
+}
+
+/* ---- Hero: the name rises from behind its mask (CSS, so first paint needs no JS) ---- */
 .rise-line {
   display: block;
   /* The mask only needs to hide the line below it. Clip vertically, never sideways: a single

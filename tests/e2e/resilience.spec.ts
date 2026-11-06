@@ -9,7 +9,8 @@ test.describe('without JavaScript', () => {
     for (const name of ['Experience', 'Projects', 'How I work', 'Contact']) {
       await expect(page.getByRole('heading', { level: 2, name })).toBeVisible()
     }
-    await expect(page.getByText('Remote.')).toBeVisible()
+    await expect(page.locator('[data-fact="remote"]')).toHaveText('Remote')
+    await expect(page.locator('[data-fact="remote"]')).toBeVisible()
     // Quick view needs JS to remember the choice, so it is not offered.
     await expect(page.getByRole('button', { name: 'Quick view' })).toBeHidden()
   })

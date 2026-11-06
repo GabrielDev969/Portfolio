@@ -34,7 +34,7 @@ export function Contact({ content }: Props) {
           {person.relocation ? <p>{person.relocation}.</p> : null}
           <p className="font-semibold">{person.availability}</p>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-            <Button variant="velvet" href={`mailto:${contact.email}`}>
+            <Button variant="primary" href={`mailto:${contact.email}`}>
               {contact.cta}
             </Button>
             <a

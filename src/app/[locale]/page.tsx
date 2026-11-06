@@ -21,7 +21,7 @@ export default async function LocalePage({ params }: Props) {
       <PersonJsonLd locale={locale} content={content} />
       <TopBar locale={locale} content={content} />
       <main id="main" tabIndex={-1} className="outline-none">
-        <Hero locale={locale} content={content} />
+        <Hero content={content} />
         <Experience content={content} />
         <Projects content={content} />
         <HowIWork content={content} />

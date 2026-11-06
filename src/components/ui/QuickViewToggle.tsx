@@ -23,11 +23,31 @@ export function QuickViewToggle({ quickView, fullView }: Props) {
       type="button"
       aria-pressed={quick}
       onClick={toggle}
-      className="hidden min-h-11 items-center px-1.5 text-small whitespace-nowrap underline-offset-4 hover:underline sm:px-2 js:inline-flex"
+      title={quick ? fullView : quickView}
+      className="hidden size-11 items-center justify-center rounded-[3px] text-ink-2 transition-colors duration-150 hover:text-ink aria-pressed:text-crimson js:inline-flex"
     >
-      {/* CSS picks the label, so it is right before hydration too (the store reads "full" then). */}
-      <span className="quick:hidden">{quickView}</span>
-      <span className="hidden quick:inline">{fullView}</span>
+      {/* A terminal: the compact, text-only page. CSS picks the name, so it is right before
+          hydration too (the store reads "full" then). */}
+      <svg aria-hidden="true" viewBox="0 0 20 20" className="size-5" fill="none">
+        <rect
+          x="2.5"
+          y="3.5"
+          width="15"
+          height="13"
+          rx="1.5"
+          stroke="currentColor"
+          strokeWidth="1.3"
+        />
+        <path
+          d="m6 8 2.5 2L6 12M10 12.5h4"
+          stroke="currentColor"
+          strokeWidth="1.3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+      <span className="sr-only quick:hidden">{quickView}</span>
+      <span className="sr-only hidden quick:inline">{fullView}</span>
     </button>
   )
 }
