@@ -98,8 +98,8 @@ Motion families (see COMMIT-SHEET §5): **A** mask rise · **B** draw · **C** p
 
 - **Sees:** fifteen agents and Gabriel, each a colored cursor with its role name, working on the section the reader has reached.
   - Outline boxes with their real size badges.
-  - A caret and underline along the text.
-  - A card dragged the last 16–22 px into its slot.
+  - Text typed a word at a time behind a caret; what is not typed yet waits under a veil that keeps it at 5.4:1 (AA).
+  - Images dragged in from about 70 px away and panels the last 16–22 px, each to a dashed slot.
   - An architecture diagram traced stroke by stroke.
   - A brush across a project image.
   - A selection over the heading.
@@ -108,7 +108,7 @@ Motion families (see COMMIT-SHEET §5): **A** mask rise · **B** draw · **C** p
   - Gabriel's check beside the heading.
   - The dock at the bottom.
 - **Units:** the hero (at boot), Experience, each of the five projects, How I work, Contact. Each builds once, in about 1.5 s, when its top passes 82% of the screen; one at a time, the next waiting its turn. A unit the reader has already scrolled past waits until it is back in view.
-- **Crews:** up to 5 agents per unit plus Gabriel (3 on phones). At most 8 cursors on screen (6 on phones).
+- **Crews:** up to 7 agents per unit plus Gabriel (3 on phones), Layout and Copy first. At most 8 at work at once (6 on phones); cursors on their way out do not count.
 - **Boot:** see COMMIT-SHEET §6. The dock reads "Booting swarm…" for up to 800 ms, then the count; the boot plays once per session.
 - **End:** when Contact is approved, the cursors gather into a vortex on free ground beside it and spin out; the dock reads "Ready · deployed".
 - **Skip build:** every unit approved at once, no one left on screen.

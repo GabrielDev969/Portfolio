@@ -157,8 +157,8 @@ Commitment tier: **restrained ground, one accent, and a set of agent colors conf
 - **Agents come and go.** An agent flies in when its section nears the viewport, works, and leaves when its part is done. About 4–8 are active at once; phones run about 6.
 - **Per section (≈ 1–1.5 s, triggered once, never scrubbed, so reading is never blocked):**
   1. outline boxes with size badges (real sizes, from `getBoundingClientRect`);
-  2. text streams in;
-  3. cards are dragged the last 16–24 px into place;
+  2. text streams in, typed a word at a time behind a caret (Gabriel, 2026-11-06). Text not typed yet waits under a veil of the ground at 45%, which keeps body ink at 5.4:1: dimmer, never below AA, never hidden. Only full-ink text is veiled; muted text would drop below AA. The years and stack lists light up the same way, item by item;
+  3. cards are dragged into place: the project images and the contact photo from about 70 px away, panels, entries and steps the last 16–22 px. A dashed frame marks the slot, and the Architect's box outlines the slot, not the card. CSS `translate`, so nothing around them moves;
   4. the diagram is drawn;
   5. a selection highlight passes over the heading;
   6. a click ripple lands on the buttons;
