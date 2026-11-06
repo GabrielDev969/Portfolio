@@ -144,3 +144,12 @@ Architecture: Clean Architecture, SOLID, TDD, Modular monolith, Multi-tenant, Mi
 Languages: Portuguese (native), Spanish (basic, studying), English (basic, studying)
 
 [link] Back to top
+
+== Build overlay (decorative, aria-hidden) ==
+
+Agents: Planner · Architect · Layout · Typography · Copy · Data · Diagram · Mockup · i18n · A11y · Perf · Tests · Security · Motion · Deploy · Gabriel
+Dock: Booting swarm… / Building / Ready · deployed
+  Active N / Total 16
+[button] Skip build
+Gabriel: approved
+Units: sections, words, items, boxes, arrows, drawings, links

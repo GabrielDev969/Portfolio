@@ -147,6 +147,34 @@ export type SiteContent = {
   /** `loop` labels the three beats of the animation beside the closing line. */
   workflow: { steps: string[]; closing: string; loop: [string, string, string] }
   skills: { stack: Group[]; languages: Group }
+  /**
+   * The build overlay's words (design/COMMIT-SHEET.md §6): the sixteen role names, in roster
+   * order, and the dock. The overlay is decorative and aria-hidden; only "Skip build" is a
+   * control. Every number it shows comes from build-facts.json or the page itself, never from here.
+   */
+  swarm: {
+    /** Planner, Architect, Layout, Typography, Copy, Data, Diagram, Mockup, i18n, A11y, Perf,
+     *  Tests, Security, Motion, Deploy, and Gabriel last. */
+    agents: string[]
+    booting: string
+    building: string
+    /** "Ready · deployed", once the last section is approved. */
+    ready: string
+    active: string
+    total: string
+    skip: string
+    approved: string
+    /** Units after a real count: "62 words", "9 items". */
+    units: {
+      sections: string
+      words: string
+      items: string
+      boxes: string
+      arrows: string
+      drawings: string
+      links: string
+    }
+  }
   contact: {
     cta: string
     email: string
