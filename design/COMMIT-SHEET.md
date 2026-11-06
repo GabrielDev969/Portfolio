@@ -29,6 +29,13 @@ It ships in three PRs, in order:
 
 Where a value is still to be measured (OKLCH, contrast ratios, timings), the PR that sets it fills it in here. The decisions themselves do not change.
 
+**Redesigned 2026-11-06 (Gabriel: "the reference reel's design is the target").**
+
+- The look is now the reference's: a dark, technical engineering console, precise, dense and high-contrast. There is no neon glow, no gradient and no glassmorphism.
+- It brings a dotted grid, hairline cards with corner brackets, mono tags and status pills, a heavy wide grotesque, and one accent: an electric blue, by Gabriel's choice the same day.
+- We take the reference's feel, never its text or its claims.
+- §2, §3, §5, §7, §8 and the devices that survive are rewritten for it. The swarm (§6) builds this layout.
+
 ## Rule zero
 
 **It is a developer's portfolio. "Cinematic" meant production quality, never a film metaphor** (Gabriel, 2026-10-28: "Sou desenvolvedor, não diretor"). No cold open, masking bars, timecode, acts, film strip, credits or reel.
@@ -87,40 +94,44 @@ There are two moments of intensity 4, at the two ends of the page. Everything be
 
 ## 2. Color
 
-Commitment tier: **restrained ground, one accent, and a set of agent colors confined to the swarm.** Values set in PR 2 (`feat/dark-theme`); `tests/unit/contrast.test.ts` reads them from `globals.css` and fails the build if any pairing drops below its floor.
+Commitment tier: **one surface tone, one accent, cyan for focus only, and the agents' colors confined to the swarm.** `tests/unit/contrast.test.ts` reads every value from `globals.css` and fails the build if a pairing drops below its floor.
 
-| Token                   | OKLCH                                    | Hex                   | Role                                                            |
-| ----------------------- | ---------------------------------------- | --------------------- | --------------------------------------------------------------- |
-| `--screen` (ground)     | `oklch(0.17 0.012 255)`                  | `#0c1015`             | A near-black ground, slightly cool, not pure black              |
-| `--screen-2` (one step) | `oklch(0.215 0.014 255)`                 | `#151a20`             | Panels, image frames, the dock. A tone step, no shadows         |
-| `--ink`                 | `oklch(0.94 0.008 240)`                  | `#e7ecf0`             | All running text and display type. Light, not pure white        |
-| `--ink-2`               | `oklch(0.74 0.015 245)`                  | `#a3acb4`             | Metadata only (years, places, labels)                           |
-| `--velvet` (accent)     | `oklch(0.68 0.19 25)`                    | `#f75d59`             | The contact action only: a coral red, its label in ground color |
-| `--agent-1…16`          | L 0.74 / 0.82, hues 22.5° apart from 10° | `#fc7c94` … `#fda4d2` | One per agent: cursor, label pill, outline box. Swarm UI only   |
+| Token                  | OKLCH                                 | Hex       | Role                                                              |
+| ---------------------- | ------------------------------------- | --------- | ----------------------------------------------------------------- |
+| `--screen` (ground)    | `oklch(0.145 0 0)`                    | `#0a0a0a` | The page, under a dotted grid (white at 6%, 24 px pitch)          |
+| `--screen-2` (surface) | `oklch(0.182 0 0)`                    | `#121212` | Every card and panel                                              |
+| `--line`               | white at 12%                          |           | The 1 px hairline on every card and panel; it brightens on hover  |
+| `--ink`                | `oklch(0.961 0.003 106.4)`            | `#f2f2f0` | Running text and display type                                     |
+| `--ink-2`              | `oklch(0.611 0.022 260.2)`            | `#7c8491` | Muted text, tags, labels                                          |
+| `--accent`             | `oklch(0.627 0.2 266.1)`              | `#4f7dff` | "Hi, I'm", the section badges, the primary button's outline, Copy |
+| `--cyan`               | `oklch(0.797 0.134 211.5)`            | `#22d3ee` | Focus outlines and selection only                                 |
+| `--agent-1…16`         | two lightness steps, hues 22.5° apart |           | The swarm only                                                    |
 
 - **Contrast** (computed from the OKLCH values):
-  - ink on screen 16.1:1, on screen-2 14.7:1
-  - ink-2 on screen 8.3:1, on screen-2 7.6:1
-  - screen on velvet (the Contact label) 6.1:1, and velvet against the ground 6.1:1 (≥ 3:1 for a UI shape)
-  - screen on ink (the Download CV label) 16.1:1
-  - every agent color against the ground 7.7–11.6:1 (7.0:1 at least on screen-2), and the dark label on every pill the same 7.7–11.6:1
-- **Distinguishable:** the sixteen agents alternate two lightness steps around the hue circle, so any two are at least 0.075 apart in OKLab (about four times a just-noticeable difference), and none is closer than 0.08 to the contact accent. Each agent also carries its role name, so color is never the only cue.
-- **Accent budget: one use.** The contact action is still the only accent on the page. **Download CV**, the other primary button, is solid ink with ground-colored text; both share one size and shape. The agent colors live only in the swarm layer, which is `aria-hidden` and gone in Quick view, in print and with reduced motion.
-- **The mockups are re-toned for the dark ground:** the screens they show are dark too, and the panels that were solid ink (Zibby's order list, Hostly's tablet) are now the tone step outlined with a hairline, so no light block outshines the text beside it.
-- **Print goes light.** Paper gets Quick view on white with the 2026-10-28 ink (`oklch(0.22 0.025 255)`) and red, which print well and cost no toner for a dark ground.
-- **Why dark now:** Gabriel's call (2026-11-05). And sixteen colored cursors and outline boxes only read as a crowd at work on a dark ground; on the old silver-white ground, half of any such palette washes out below 3:1. §7 says what keeps it from the dark-portfolio reflex.
+  - ink on the ground 17.7:1, on a card 16.7:1;
+  - ink-2 5.3:1 and 5.0:1;
+  - the accent as text 5.4:1 and 5.1:1;
+  - dark text on the accent (the badges, Copy) 5.4:1;
+  - cyan against the ground 11:1;
+  - every agent at least 0.08 from the accent in OKLab.
+- **The reference's values were moved where they failed:**
+  - its slate `#6B7280` gives 4.1:1 on the ground and 3.9:1 on a card, so it became `#7c8491`;
+  - the first accent, a crimson, gave 4.4:1 on a card.
+- **Blue, not red** (Gabriel, 2026-11-06). His photo in the hero is a black-and-blue duotone made at build time from the original, so it stays sharp.
+- **Print goes light:** black on white, the accent a darker blue.
 
 ## 3. Type
 
-| Role    | Family                                                                                                | Why                                                                                                                                                               |
-| ------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Display | **Big Shoulders** (variable `wght` 100–900 and `opsz`; the latin subset, which already holds ã, ç, ñ) | Kept. A tall condensed grotesque, without the Bebas/Anton/Oswald reflex; "Gabriel Santos" can be huge and still sit in two lines at 390 px                        |
-| Text    | **Newsreader** (variable `wght` and `opsz`, real italics)                                             | Kept. A reading serif with optical sizes; its italic still does the work of labels                                                                                |
-| Swarm   | **Spline Sans Mono** 500, latin subset, self-hosted by `next/font`, `font-display: optional`          | Only for the swarm UI: cursor labels, size badges, the dock, logs. Soft, open shapes rather than the JetBrains/Fira reflex; one weight keeps it to one small file |
+Three families, each the latin subset only, self-hosted by `next/font`.
 
-- **No strong reason to change the display and text faces**, so they stay. The contrast axis is unchanged: a condensed grotesque against a humanist serif.
-- **The mono face never sets content.** Names, headings, copy, the stack, buttons and links stay in Big Shoulders and Newsreader. With `font-display: optional`, a slow network gets a system mono for the swarm and no layout shift.
-- **Scale:** the same three sizes do the visible work (title, heading, text), plus small for metadata. The swarm UI uses one mono size, the small size or below.
+| Role    | Family                                             | Why                                                                                                                                                                                                                          |
+| ------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Display | **Archivo** variable, 800–900 at 112–118% width    | A heavy, wide grotesque: the dense "GABRIEL SANTOS." of the reference. Big Shoulders is condensed and reads as signage, not as a console, so it went (Gabriel approved, 2026-11-06). Not Inter or Space Grotesk, the reflex. |
+| Serif   | **Newsreader**                                     | The accent line ("Hi, I'm") in italic, the callouts, the giant outlined backdrop word (`-webkit-text-stroke`, no fill, white at 7%), and the body text at 17–19 px with lines of at most 68ch                                |
+| Mono    | **Spline Sans Mono** 500, `font-display: optional` | Tags, badges, key/value data, the nav, stat labels, chips, pipeline nodes, the dock. Soft, open shapes rather than the JetBrains/Fira reflex                                                                                 |
+
+- **Mono is for labels and data, never for running text.** Names, headings, paragraphs and descriptions stay in the display face and the serif; an e2e test checks it.
+- **The mockups keep their condensed titles:** inside them the display face runs at Archivo's narrowest width (62%), the width they were drawn for.
 
 ## 4. One page, no clicking
 
@@ -136,13 +147,22 @@ Commitment tier: **restrained ground, one accent, and a set of agent colors conf
 - **The rest is deleted** (Gabriel, 2026-11-05): the other key decisions, testing and deploy. They remain in git history.
 - The only controls left are navigation (Sections, language, Quick view) and, in PR 3, "Skip build". None of them holds content back.
 
-## 5. Grid break
+## 5. Layout: the console
 
-**Project images bleed off the left edge of the viewport** (from the page edge to the end of column 8). The stack panel, on `--screen-2`, **overlaps the image's bottom-right corner by exactly one column** (columns 8–10).
-
-- Nothing sits on a headline. The overlap is on the image, and the title and summary stay on the ground in columns 9–12.
-- The architecture diagram sits under the image (columns 1–7), and the result and links sit under the summary (columns 9–12).
-- Everything else sits on a strict 12-column grid with equal outer margins. Quick view drops the bleed.
+- **Every block is a card:**
+  - the surface tone, a 1 px hairline and a 4 px radius;
+  - feature cards (the hero photo, the first project) carry small corner brackets;
+  - hover brightens the hairline over 150 ms.
+- **The hero** has three columns from 1024 px over the outlined `PORTFOLIO`:
+  - the introduction;
+  - the photo card;
+  - three small cards.
+- **The projects:**
+  - a feature card that spans the row and sets its body in two columns;
+  - the other four two to a row;
+  - each with its image as a header.
+- **The architecture** is a pipeline of mono chips with arrows, one step per layer of the data flow. Parallel nodes share a step, so a system that branches is never drawn as a line, and the full list of connections is there for screen readers.
+- **Quick view** is one column, with no photo, no images and no card chrome.
 
 ## 6. Motion: the build
 
@@ -213,30 +233,26 @@ Commitment tier: **restrained ground, one accent, and a set of agent colors conf
 ## 7. Reflex check
 
 - **(a) A generic AI dev portfolio:**
-  - a blue-to-purple hero and "Hi, I'm Gabriel 👋" in Inter
-  - a grid of identical project cards and a grid of tech logos
-  - a dark-mode toggle
-- **(b) An AI avoiding (a):** a near-black "terminal" page with mono labels everywhere, an amber or acid-green accent and film grain. Or a concept site that turns the portfolio into a metaphor (a film, a magazine, an OS) the reader has to decode first. The first rebuild did the latter, and the 2026-10-28 sheet was written against both.
+  - a blue-to-purple hero and "Hi, I'm Gabriel 👋" in Inter;
+  - a grid of identical project cards and a grid of tech logos.
+- **(b) An AI avoiding (a):** a near-black terminal page with neon, glow, scanlines and a blinking prompt, or a concept site the reader has to decode.
 - **(c) This page:**
-  - **Dark, but not that.** Gabriel chose a dark ground on 2026-11-05.
-    - The ground is near-black without a prompt, a blinking caret or a scanline.
-    - The accent is one red-family hue on the contact action only, never amber or green.
-    - There is no grain.
-    - Mono is confined to the swarm's own UI. The content is set in a condensed display face and a reading serif.
-  - **The swarm is the honest part.** Every badge, ratio, size, count and hash is read from the repo at build time, so the page shows how it was made instead of claiming it.
-  - **Craft in the details:** type sized to its longest word in every language, content complete in the HTML, budgets enforced in CI, and Quick view for anyone who just wants the facts.
+  - **The console, done straight:** near-black with a faint grid, hairlines instead of shadows, one blue and nothing else, no glow, no gradient, no glass.
+  - **"Hi, I'm" survives, without the reflex:** a serif italic line in the accent over a heavy grotesque name, no emoji, no Inter (Gabriel's reference asks for it).
+  - **The cards are not identical:** the feature card leads with its metrics, and every card carries its own status, its own architecture as a pipeline, and real text.
+  - **The stack is text chips, never logos.**
+  - **Every number is real:** the counters and tiles repeat numbers the content states, which a unit test checks, and the swarm reads its numbers from the build.
 
 ## 8. Tells broken
 
-| Habit not repeated                                             | Replaced by                                                                                                          |
-| -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| Amber / acid-green accent                                      | One accent, on the contact action only                                                                               |
-| Mono "service" labels on content                               | Mono only in the swarm UI. Content labels in Newsreader italic, sentence case                                        |
-| Fake terminal or fake metrics                                  | Real numbers from `build-facts.json`; no number that cannot be traced to the repo                                    |
-| Meta strings joined with middle dots ("Salvador · Remote · …") | Plain sentences. The full stack in the contact section is a definition list: the area on the left, one name per line |
-| Eyebrow labels over section titles ("01 — ABOUT")              | The section title alone, in plain words: Experience, Projects, How I work, Contact                                   |
-| A grid of tech logos                                           | The stack as text, and no third-party logos or product names in the swarm                                            |
-| Content behind a click ("Read more", drawers, modals)          | Every fact inline (§4)                                                                                               |
+| Habit not repeated                   | Replaced by                                                                       |
+| ------------------------------------ | --------------------------------------------------------------------------------- |
+| Neon accent, glow, gradients, glass  | One electric blue on hairlines, flat surfaces                                     |
+| Fake metrics and invented counters   | Three counters and two tiles, each a number the content already states (tested)   |
+| A grid of tech logos                 | The stack as mono text chips                                                      |
+| Filter tabs, "View project", drawers | Every project's facts inline; nothing to click                                    |
+| A diagram as decoration              | The architecture from the content, as a pipeline whose steps follow the data flow |
+| Content in a terminal font           | Mono for labels and data only; prose in the serif                                 |
 
 ## 9. Words the copy does not use
 
@@ -269,19 +285,15 @@ Under it sits a small **"Back to top"** link. The swarm's vortex and "Ready · d
 
 ## Banned devices that survive, with reasons
 
-- **Numbered sequence markers in How I work:** a six-step workflow is a real sequence, so it is a real `<ol>`. The timeline is a dated `<ol>`; its years do the numbering.
-- **Interface mockups with fictional data** (the images of Sistema Wave, Campaign BI, Zibby and Hostly). The anti-generic list bans fake dashboards, but these are not decoration.
-  - Three are internal systems whose real screens and numbers cannot be shown, and Zibby's catalogue is not public.
-  - Each is a specific screen of that project: a request board, a performance chart by media buyer, a storefront with its order list, a robot's schedule. Each is drawn in the site's own type and tones and labeled as fictional in its text description. None uses gradients, glow or placeholder bars.
-  - The words inside the mockups follow the page's language (Gabriel's call): Sistema Wave and Hostly are Brazilian systems, so a Portuguese reader sees them as they would be used.
-  - The words live in `components/mockups/copy.ts`, beside the drawings, not in `content/`, because they are fictional.
-  - Widths that depend on a word (the chips, the store menu) are computed from it, and decimals use the locale's separator. `tests/e2e/mockups.spec.ts` checks in every locale that each label fits its box and keeps a word space from its neighbours.
-  - PR 2 re-tones them for the dark ground.
-- **A near-black ground** (banned as the dark-portfolio reflex in the 2026-10-28 sheet). It survives because Gabriel chose it, and because the colored swarm needs it to read. §7(c) lists what keeps it from the reflex.
-- **A mono face** (banned on the old sheet). It survives only as the swarm UI's voice: cursor labels, size badges, the dock and logs. Content never uses it.
-- **Multiplayer cursors, outline boxes and size badges.** They are a simulation, so they could read as decoration. They survive because:
-  - each shows a real size, ratio, count or hash;
-  - they are `aria-hidden`;
-  - they never cover the 5-second facts;
-  - they are gone in Quick view, in print, with reduced motion and without JS.
+- **Section tags and badges** (`[01] // EXPERIENCE ── [01/04]`), once banned as "eyebrow labels". They survive because the reference's look is built on them, and they carry real information: the section's place in the page. The tag repeats the title, so it is hidden from assistive technology and the h2 says it once.
+- **"Hi, I'm"**, once listed as the generic reflex. It survives as a serif italic line in the accent, without emoji. See §7.
+- **Mono labels and status pills** (`[•] IN USE`, `[•] INTERNAL`, `[•] LAUNCHED OCT 2026`). They survive because the status is a real fact of each project, written in the content in all three languages.
+- **Counters.** They survive because each number repeats one the content already states (about 5 years, more than 500 campaigns a day, about 100 people); a unit test fails on any other.
+- **Numbered sequence markers in How I work:** a six-step workflow is a real sequence, so it is a real `<ol>`, numbered `01`–`06` in mono.
+- **Interface mockups with fictional data** (Sistema Wave, Campaign BI, Zibby, Hostly):
+  - three are internal systems whose screens and numbers cannot be shown, and Zibby's catalogue is not public;
+  - each is a specific screen of its project, drawn in the site's own type and tones, and labeled as fictional in its text description;
+  - the words inside follow the page's language, and `tests/e2e/mockups.spec.ts` checks in every locale that each label fits its box.
+- **A near-black ground and a mono face:** the reference's look, and the swarm needs the dark to read.
+- **Multiplayer cursors, outline boxes and size badges:** a simulation that shows real sizes, ratios, counts and hashes. It is aria-hidden, and gone in Quick view, in print, with reduced motion and without JS.
 - None of the other banned devices survive.
