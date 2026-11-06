@@ -12,10 +12,10 @@ const pairings: [fg: string, bg: string, min: number][] = [
   ['ink-2', 'screen', 4.5],
   ['ink-2', 'screen-2', 4.5],
   // Crimson is text too: Hi I'm, the badges, the primary button's label.
-  ['crimson', 'screen', 4.5],
-  ['crimson', 'screen-2', 4.5],
-  // Copy: dark text on a crimson button.
-  ['screen', 'crimson', 4.5],
+  ['accent', 'screen', 4.5],
+  ['accent', 'screen-2', 4.5],
+  // Copy: dark text on a accent button.
+  ['screen', 'accent', 4.5],
   ['screen', 'ink', 4.5],
   // Focus outlines and selection, against the ground: WCAG's 3:1 for UI.
   ['cyan', 'screen', 3],
@@ -55,7 +55,7 @@ describe('agent colors', () => {
   })
 
   it('no agent looks like the contact accent (at least 0.08 apart)', () => {
-    const close = agents.filter((a) => distance(a, 'crimson') < 0.08)
+    const close = agents.filter((a) => distance(a, 'accent') < 0.08)
     assert.deepEqual(close, [])
   })
 })

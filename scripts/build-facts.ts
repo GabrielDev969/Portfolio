@@ -83,8 +83,8 @@ export function collectFacts(): Omit<BuildFacts, 'js'> {
     ['ink', 'screen-2'],
     ['ink-2', 'screen'],
     ['ink-2', 'screen-2'],
-    ['screen', 'crimson'],
-    ['crimson', 'screen'],
+    ['screen', 'accent'],
+    ['accent', 'screen'],
     ['screen', 'ink'],
   ] as const
   return {

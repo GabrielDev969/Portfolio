@@ -3,9 +3,9 @@ import type { AnchorHTMLAttributes, ReactNode } from 'react'
 type Variant = 'primary' | 'dark' | 'outline'
 
 const variants: Record<Variant, string> = {
-  // The primary action is outlined in crimson, the page's one accent (design/COMMIT-SHEET.md §2).
+  // The primary action is outlined in accent, the page's one accent (design/COMMIT-SHEET.md §2).
   // Paper drops backgrounds, so printed buttons are outlined in ink.
-  primary: 'border border-crimson text-crimson hover:bg-crimson/10 print:border-ink print:text-ink',
+  primary: 'border border-accent text-accent hover:bg-accent/10 print:border-ink print:text-ink',
   dark: 'border border-line bg-screen-2 text-ink hover:border-ink/40 print:border-ink',
   outline: 'border border-current text-ink',
 }

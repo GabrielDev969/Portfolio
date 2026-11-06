@@ -41,7 +41,7 @@ export function Hero({ content }: Props) {
             <span key={word} className="rise-line">
               <span style={{ '--i': i } as CSSProperties}>
                 {word}
-                {i === words.length - 1 ? <span className="text-crimson">.</span> : null}
+                {i === words.length - 1 ? <span className="text-accent">.</span> : null}
               </span>
             </span>
           ))}

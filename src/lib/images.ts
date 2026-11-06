@@ -9,13 +9,13 @@ export const images = {
     height: 460,
     widths: [240, 460],
   },
-  /** Gabriel's photo as a black-and-crimson duotone, for the hero (design/COMMIT-SHEET.md §2). */
+  /** Gabriel's photo as a black-and-blue duotone, for the hero (design/COMMIT-SHEET.md §2). */
   portrait: {
     source: 'assets/images/gabriel.png',
     width: 460,
     height: 460,
     widths: [320, 460],
-    duotone: { shadow: [10, 10, 10], light: [242, 110, 106] },
+    duotone: { shadow: [10, 10, 10], light: [140, 172, 255] },
   },
   bookowl: {
     source: 'assets/images/bookowl.png',
