@@ -50,8 +50,24 @@ export function HostlySchedule({ locale }: { locale: Locale }) {
       })}
 
       {/* The robot's screen */}
-      <rect x="300" y="24" width="600" height="454" rx="28" className="fill-ink" />
-      <rect x="324" y="48" width="552" height="406" rx="10" className="fill-screen" />
+      <rect
+        x="301"
+        y="25"
+        width="598"
+        height="452"
+        rx="28"
+        strokeWidth="2"
+        className="fill-screen stroke-ink/35"
+      />
+      <rect
+        x="324"
+        y="48"
+        width="552"
+        height="406"
+        rx="10"
+        strokeWidth="1.5"
+        className="fill-screen-2 stroke-ink/20"
+      />
       <text x="356" y="96" fontSize="15" className="fill-ink-2 italic">
         {copy.nowPlaying}
       </text>
@@ -83,7 +99,7 @@ export function HostlySchedule({ locale }: { locale: Locale }) {
           </text>
         </g>
       ))}
-      <circle cx="600" cy="36" r="4" className="fill-screen/40" />
+      <circle cx="600" cy="36" r="4" className="fill-ink/40" />
 
       {/* Playlist */}
       <text x="948" y="66" fontSize="30" className="fill-ink font-display font-bold">
