@@ -446,8 +446,6 @@ export const en: SiteContent = {
     links: [
       { label: 'LinkedIn', href: 'https://www.linkedin.com/in/gabriel-santos-b53632196/' },
       { label: 'GitHub', href: 'https://github.com/GabrielDev969' },
-      { label: 'YouTube', href: 'https://www.youtube.com/@Gabriel.Dev969' },
-      { label: 'TikTok', href: 'https://www.tiktok.com/@gabriel.dev969' },
     ],
     cv: {
       href: 'cv/CV_Gabriel_Santos_EN.pdf',
