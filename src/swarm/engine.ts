@@ -349,7 +349,8 @@ export function startSwarm(
     const b = mark('swarm-box', 'architect', { x: r.x - 4, y: r.y - 4, w: r.w + 8, h: r.h + 8 })
     const t = document.createElement('span')
     t.className = 'swarm-badge'
-    t.textContent = `${round(r.w)} × ${round(r.h)}`
+    // Drawn by CSS from the attribute: a contrast audit taken mid-fade reads no text there.
+    t.dataset.size = `${round(r.w)} × ${round(r.h)}`
     b.append(t)
     animate(260, (q) => {
       const e = (1 - ease(q)) * 100
@@ -456,7 +457,8 @@ export function startSwarm(
       add(hero, a, 'click', 'layout')
     add(hero, one(h, '.hero-line'), 'type', 'copy')
     add(hero, one(h, '.stats'), 'items', 'data', all(h, '.stat'))
-    add(hero, one(h, '.hero-photo'), 'drag', 'layout')
+    // Shown from the first paint (globals.css): outlined and captioned, never dragged.
+    add(hero, one(h, '.hero-photo'), 'show', 'architect')
     for (const card of all(h, '.hero-cards > li')) add(hero, card, 'drag', 'layout')
     add(hero, one(h, '.hero-backdrop'), 'show', 'architect')
   }

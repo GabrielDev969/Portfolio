@@ -186,7 +186,7 @@ Three families, each the latin subset only, self-hosted by `next/font`.
 - **Gabriel** approves each section's diff.
 
 - **The page that builds itself (Gabriel, 2026-11-06):**
-  - **It opens empty.** The head script marks the page `data-build` before the first paint, and every element starts at opacity 0. Only the top bar's own ground and the dock show.
+  - **It opens empty.** The head script marks the page `data-build` before the first paint, and every element starts at opacity 0.001, too faint to show on the ground, but painted, so a phone's LCP is not a paragraph typed twenty seconds later. Only the top bar's own ground, the dock and the hero portrait show; the portrait is the page's largest picture, so it is there from the first paint and the swarm outlines it.
   - **The swarm builds it piece by piece**, from the top bar to Back to top, in about 40 s on a desktop. Each piece arrives its own way:
     - headings swept in and selected;
     - text typed a word at a time;

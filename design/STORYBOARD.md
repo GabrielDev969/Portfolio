@@ -108,6 +108,7 @@ Motion families (see COMMIT-SHEET §5): **A** mask rise · **B** draw · **C** p
      - role, stack and place typed;
      - Contact and Download CV clicked;
      - the line typed;
+     - the photo, there from the first paint (the page's largest picture, so a phone's LCP), outlined and captioned;
   3. **Experience:**
      - the title;
      - the rule;

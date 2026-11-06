@@ -57,10 +57,23 @@ test('it opens empty, with every word already in the page', async ({ browser, pa
   const reference = await noJsText(browser)
   await page.goto('en/')
   await expect(page.locator('html')).toHaveAttribute('data-build', '')
-  expect(await page.locator('#hero-name').evaluate((el) => getComputedStyle(el).opacity)).toBe('0')
+  // Near zero, not zero: painted but unseen, so a phone's LCP is the portrait, not a paragraph
+  // the swarm types twenty seconds later (globals.css).
+  expect(
+    Number(await page.locator('#hero-name').evaluate((el) => getComputedStyle(el).opacity)),
+  ).toBeLessThan(0.01)
   // Hidden from the eye only: the words are in the HTML and the accessibility tree.
   expect(await mainText(page)).toBe(reference)
   await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/Gabriel\s*Santos/i)
+  // The portrait is the one piece already there: the largest picture, so a phone's LCP.
+  expect(
+    await page.locator('.hero-photo img').evaluate((img) => {
+      let o = 1
+      for (let el: Element | null = img; el; el = el.parentElement)
+        o *= Number(getComputedStyle(el).opacity)
+      return o
+    }),
+  ).toBe(1)
 })
 
 // Gabriel, 2026-11-06: on a first visit the full hero (name, role, stack, Remote and both
@@ -86,6 +99,12 @@ for (const [width, height] of [
               v.getBoundingClientRect(),
             )
             const facts = [...document.querySelectorAll('[data-fact]')]
+            // Full ink: hidden pieces sit at a near-zero opacity, which checkVisibility passes.
+            const opaque = (el: Element) => {
+              for (let e: Element | null = el; e; e = e.parentElement)
+                if (Number(getComputedStyle(e).opacity) < 1) return false
+              return true
+            }
             const ok =
               facts.length === 6 &&
               facts.every((el) => {
@@ -98,12 +117,7 @@ for (const [width, height] of [
                     v.top < r.bottom &&
                     v.bottom > r.top,
                 )
-                return (
-                  el.checkVisibility({ opacityProperty: true }) &&
-                  r.bottom <= innerHeight &&
-                  r.top >= 0 &&
-                  !covered
-                )
+                return opaque(el) && r.bottom <= innerHeight && r.top >= 0 && !covered
               })
             if (ok) resolve(performance.now())
             else requestAnimationFrame(check)

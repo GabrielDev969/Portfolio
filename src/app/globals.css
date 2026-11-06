@@ -1281,12 +1281,22 @@
 /* ---- The page opens empty and the swarm builds it (html[data-build], head script) ----
    Opacity only: the words stay in the HTML and the accessibility tree, and no box moves. The
    swarm reveals a piece with .b-on (it and everything in it) or .b-self (only its own box,
-   such as a hairline or a list's rule). Without the attribute everything is simply there. */
+   such as a hairline or a list's rule). Without the attribute everything is simply there.
+   Near zero, not zero: 0.001 of ink on the ground rounds to the ground's own value, so nothing
+   shows, but the browser paints every piece at first paint. At zero it painted each one only
+   when revealed, and a phone counted a paragraph typed twenty seconds in as the page's largest
+   content (LCP 20.9 s in PT); now that is the portrait, at first paint. */
 [data-build] :is(header.top-bar, main) :where(*) {
-  opacity: 0;
+  opacity: 0.001;
 }
 
 [data-build] :is(header.top-bar, main) :is(.b-on, .b-on *, .b-self) {
+  opacity: 1;
+}
+
+/* The portrait is there from the first paint, framed, and the swarm builds around it: the
+   page's largest picture, so hiding it held a phone's LCP until the engine loaded (6.7 s). */
+[data-build] :is(#top, .hero-photo, .hero-photo picture, .hero-photo img) {
   opacity: 1;
 }
 
@@ -1372,6 +1382,10 @@
   left: -1px;
   padding: 1px 5px;
   font-size: 10px;
+
+  &::before {
+    content: attr(data-size);
+  }
 }
 
 .swarm-mark {
