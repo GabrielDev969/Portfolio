@@ -11,6 +11,14 @@ Decided on paper before any markup. Any banned device that survives into the bui
 - a fixed status dock;
 - cursors that gather and spin out at the end.
 
+**Revised 2026-11-06 (Gabriel):** the page **opens empty and the swarm builds it in front of the visitor, scrolling down by itself**: the visitor does not scroll to make it happen. This overrides three rules of 2026-11-05, as he asked:
+
+- content visible from the first paint;
+- facts readable within 1 s;
+- no scroll driven by the page.
+
+The rest of this sheet is written for the empty-page build; §6, "The page that builds itself", says how the overridden rules are kept as close as the idea allows.
+
 We take its feel, not its copy. This sheet replaces the light "bright, well-set technical page" of 2026-10-28, and the two task drafts before this one ("parallel build scene" and "built live as you scroll").
 
 It ships in three PRs, in order:
@@ -31,7 +39,10 @@ When any effect competes with finding a fact (who, what stack, where, how to rea
 
 ## Non-negotiables
 
-- **The content is real HTML from the first byte.** The swarm is a simulation layered on top. It reveals content and never withholds it: screen readers, search engines and visitors without JS get the full page.
+- **The content is real HTML from the first byte.**
+  - The empty page is visual only (opacity), so screen readers, search engines and visitors without JS get the full page.
+  - Reduced motion, Quick view, print, a deep link and a second visit this session also get the full page.
+  - The visitor's first scroll, click or key hands the whole page over at once.
 - **Nothing on screen is invented.** Every number the swarm or the dock shows comes from the real repo or the real build. A script writes `src/content/build-facts.json` at build time with:
   - the JS gzip size;
   - the test counts per spec;
@@ -56,7 +67,7 @@ When any effect competes with finding a fact (who, what stack, where, how to rea
   - "Remote"
   - two primary buttons, **Download CV** and **Contact**
 
-  All of them must be readable within 1 s, and **never covered by the swarm**: no cursor, box or badge sits over them during boot. A Playwright test enforces it, in every locale. The build leaves Download CV out if its PDF is missing from `public/cv/`, so the page never links to a 404; the tests then fail.
+  The swarm builds the hero first, and all of them are readable **within 3 s** of opening the page (Gabriel's empty-page build, 2026-11-06; it was 1 s before). A Playwright test enforces it, in every locale. The build leaves Download CV out if its PDF is missing from `public/cv/`, so the page never links to a 404; the tests then fail.
 
 ## The concept in one line
 
@@ -154,32 +165,25 @@ Commitment tier: **restrained ground, one accent, and a set of agent colors conf
 - **Deploy** ships to GitHub Pages at the end.
 - **Gabriel** approves each section's diff.
 
-- **Agents come and go.** An agent flies in when its section nears the viewport, works, and leaves when its part is done. About 4–8 are active at once; phones run about 6.
-- **Per section (≈ 1–1.5 s, triggered once, never scrubbed, so reading is never blocked):**
-  1. outline boxes with size badges (real sizes, from `getBoundingClientRect`);
-  2. text streams in, typed a word at a time behind a caret (Gabriel, 2026-11-06). Text not typed yet waits under a veil of the ground at 45%, which keeps body ink at 5.4:1: dimmer, never below AA, never hidden. Only full-ink text is veiled; muted text would drop below AA. The years and stack lists light up the same way, item by item;
-  3. cards are dragged into place: the project images and the contact photo from about 70 px away, panels, entries and steps the last 16–22 px. A dashed frame marks the slot, and the Architect's box outlines the slot, not the card. CSS `translate`, so nothing around them moves;
-  4. the diagram is drawn;
-  5. a selection highlight passes over the heading;
-  6. a click ripple lands on the buttons;
-  7. Gabriel's cursor approves the section with a check.
-- **The dock** (fixed at the bottom, compact, mono) shows:
-  - the swarm status;
-  - Active / Total;
-  - build progress (follows scroll, 100% at Contact);
-  - the JS size;
-  - the commit hash;
-  - "GitHub Pages".
-
-  **"Skip build"** finishes everything at once.
-
-- **Engine:**
-  - one overlay layer (SVG or canvas) moved by transforms;
-  - cursors lerp toward DOM targets, with no React state per frame;
-  - it pauses when the tab is hidden;
-  - no new dependencies, and the JS budget stays at 180 KB gzip.
-- **Nothing is pinned and scroll is never hijacked.** Lenis only smooths the wheel; touch, keyboard, find-in-page, anchors and the scrollbar behave natively.
-- **CLS stays 0.** Overlays sit on boxes that already have their final size; streaming text reveals text that is already laid out.
+- **The page that builds itself (Gabriel, 2026-11-06):**
+  - **It opens empty.** The head script marks the page `data-build` before the first paint, and every element starts at opacity 0. Only the top bar's own ground and the dock show.
+  - **The swarm builds it piece by piece**, from the top bar to Back to top, in about 40 s on a desktop. Each piece arrives its own way:
+    - headings swept in and selected;
+    - text typed a word at a time;
+    - images and cards dragged in;
+    - diagrams and drawings traced;
+    - lists lit up item by item;
+    - buttons clicked.
+  - **The page scrolls down by itself** to follow the work. Lenis stands aside while it does.
+  - **Gabriel approves each section** as the next one starts, and at the end the cursors spin out and the dock reads "Ready · deployed".
+  - **About 4–8 agents work at once** (6 on phones). An agent with nothing to do for a moment leaves.
+  - **The reader can always take over.** The first wheel, touch, click or key ends the build: everything is there at once and the page is theirs. So does Skip build.
+  - **Every visitor still gets the page:**
+    - reduced motion, Quick view, print, a deep link (`#contact`) and a second visit this session all show the finished page from the first paint;
+    - if the swarm has not started 5 s after the head script, the page shows itself.
+- **CLS stays 0.**
+  - The build changes only opacity, overlays and transforms, so the page is laid out once, at its final size.
+  - Even a label flipping sides moves by transform. Tested through the whole build at 1440 and 390 px.
 - **Reduced motion, no JS, Quick view and print** get the finished page with no cursors. The swarm UI is `aria-hidden`, and the dock exposes nothing a screen reader needs.
 - **What it replaces (as built in PR 3):**
   - **Mask rise is gone** from the section titles and from "What I built": it hid words for a second, which the swarm may never do. The Typography agent's selection takes its place. The hero name keeps its CSS rise at first paint, since it is the page's one entrance and never covers a fact.

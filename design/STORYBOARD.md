@@ -94,26 +94,41 @@ Motion families (see COMMIT-SHEET §5): **A** mask rise · **B** draw · **C** p
 
 ---
 
-## The swarm, over every section (intensity 3; the boot and the ending 4)
+## The swarm: the page builds itself (intensity 4; Gabriel, 2026-11-06)
 
-- **Sees:** fifteen agents and Gabriel, each a colored cursor with its role name, working on the section the reader has reached.
-  - Outline boxes with their real size badges.
-  - Text typed a word at a time behind a caret; what is not typed yet waits under a veil that keeps it at 5.4:1 (AA).
-  - Images dragged in from about 70 px away and panels the last 16–22 px, each to a dashed slot.
-  - An architecture diagram traced stroke by stroke.
-  - A brush across a project image.
-  - A selection over the heading.
-  - A ripple on its buttons and links.
-  - Pills with real numbers (contrast, JS size, e2e count, link check, font size, word count).
-  - Gabriel's check beside the heading.
-  - The dock at the bottom.
-- **Units:** the hero (at boot), Experience, each of the five projects, How I work, Contact. Each builds once, in about 1.5 s, when its top passes 82% of the screen; one at a time, the next waiting its turn. A unit the reader has already scrolled past waits until it is back in view.
-- **Crews:** up to 7 agents per unit plus Gabriel (3 on phones), Layout and Copy first. At most 8 at work at once (6 on phones); cursors on their way out do not count.
-- **Boot:** see COMMIT-SHEET §6. The dock reads "Booting swarm…" for up to 800 ms, then the count; the boot plays once per session.
-- **End:** when Contact is approved, the cursors gather into a vortex on free ground beside it and spin out; the dock reads "Ready · deployed".
-- **Skip build:** every unit approved at once, no one left on screen.
-- **Pauses** while the tab is hidden: its clock stops.
-- **Reduced, Quick view, print, no-JS:** no swarm, no dock: the finished page. Switching to Quick view removes a running swarm and undoes every mark.
+- **Opens:** empty. The top bar's ground and the dock ("Booting swarm…") are all there is.
+- **Then:** the cursors burst out of the logo and build the page in reading order, about 40 s on a desktop:
+  1. **the top bar:** outlined, shown;
+  2. **the hero:**
+     - the name swept in;
+     - role, stack and place typed;
+     - Contact and Download CV clicked;
+     - the line typed;
+  3. **Experience:**
+     - the title;
+     - the rule;
+     - each entry's dot, year lit and words typed;
+  4. **each project:**
+     - the image dragged in and painted;
+     - the organization typed and the title swept in;
+     - each label shown and each part typed;
+     - the diagram traced;
+     - the stack panel dragged in and its tools lit;
+     - the links clicked;
+  5. **How I work:**
+     - the title;
+     - each step dragged in and its drawing traced;
+     - the closing line typed;
+  6. **Contact:**
+     - the words typed and the buttons and profile links clicked;
+     - the photo dragged in;
+     - the stack and languages lit;
+     - Back to top.
+- **Moves by itself:** the page scrolls down to follow the work. The reader does nothing.
+- **Approvals:** Gabriel approves each section as the next starts. Reporters (Planner, Perf, A11y, Tests, i18n, Motion, Security, Deploy) come beside each heading with a real number.
+- **End:** the cursors gather into a vortex on the freest ground in view and spin out; the dock reads "Ready · deployed".
+- **Takes over:** the first wheel, touch, click or key, or Skip build, and the whole page is there at once.
+- **Finished from the first paint:** reduced motion, Quick view, print, no-JS, a deep link and a second visit this session. If the swarm has not started within 5 s, the page shows itself.
 
 ---
 
