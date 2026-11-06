@@ -49,7 +49,7 @@ When any effect competes with finding a fact (who, what stack, where, how to rea
 - **The content is real HTML from the first byte.**
   - The empty page is visual only (opacity), so screen readers, search engines and visitors without JS get the full page.
   - Reduced motion, Quick view, print, a deep link and a second visit this session also get the full page.
-  - The visitor's first scroll, click or key hands the whole page over at once.
+  - Skip build, or Tab for a keyboard reader, hands the whole page over at once.
 - **Nothing on screen is invented.** Every number the swarm or the dock shows comes from the real repo or the real build. A script writes `src/content/build-facts.json` at build time with:
   - the JS gzip size;
   - the test counts per spec;
@@ -197,7 +197,7 @@ Three families, each the latin subset only, self-hosted by `next/font`.
   - **The page scrolls down by itself** to follow the work. Lenis stands aside while it does.
   - **Gabriel approves each section** as the next one starts, and at the end the cursors spin out and the dock reads "Ready · deployed".
   - **About 4–8 agents work at once** (6 on phones). An agent with nothing to do for a moment leaves.
-  - **The reader can always take over.** The first wheel, touch, click or key ends the build: everything is there at once and the page is theirs. So does Skip build.
+  - **The reader can move, and the build goes on** (Gabriel, 2026-11-06). Scrolling up or down never stops it: the page stops scrolling itself while they scroll, and after 3 s still it follows the work again. Tab hands the whole page over at once, so a keyboard reader never lands on a link that is not there yet; so does Skip build.
   - **Every visitor still gets the page:**
     - reduced motion, Quick view, print, a deep link (`#contact`) and a second visit this session all show the finished page from the first paint;
     - if the swarm has not started 5 s after the head script, the page shows itself.

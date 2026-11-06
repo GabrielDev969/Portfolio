@@ -9,8 +9,8 @@ import { factsFile, type BuildFacts } from './facts'
  * The swarm (design/COMMIT-SHEET.md §6). The page opens empty (html[data-build], set by the
  * head script) and fifteen agents and Gabriel build it in front of the reader, piece by piece,
  * from the top bar to Contact, while the page scrolls down by itself. The reader never has to
- * scroll; the moment they scroll, click or press a key, the build hands over and everything is
- * there. The words are in the HTML and the accessibility tree from the first byte: the build
+ * scroll; if they do, the build goes on and the page waits for them to stop. Skip build, or Tab,
+ * hands everything over at once. The words are in the HTML and the accessibility tree from the first byte: the build
  * only ever changes opacity, overlays and transforms, so nothing moves and nothing is lost.
  *
  * One overlay in page coordinates holds every cursor and mark; one requestAnimationFrame loop
@@ -568,7 +568,8 @@ export function startSwarm(
     focusY = y
   }
   const scrollStep = (dt: number) => {
-    if (focusY === null || done) return
+    // The reader is scrolling: the page is theirs until they stop (see hold()).
+    if (focusY === null || done || performance.now() < heldUntil) return
     const max = document.documentElement.scrollHeight - innerHeight
     const want = Math.min(Math.max(focusY - innerHeight * 0.38, 0), max)
     const k = 1 - (1 - 0.07) ** (dt / 16.7)
@@ -987,7 +988,7 @@ export function startSwarm(
     unlisten()
   }
 
-  /** Skip build, or the reader taking the page: everything at once, no one left on screen. */
+  /** Skip build, or Tab: everything at once, no one left on screen. */
   const skipAll = () => {
     if (done) return
     tasks.length = 0
@@ -1006,21 +1007,28 @@ export function startSwarm(
   skip.addEventListener('click', () =>
     done ? dispatchEvent(new Event('swarm:replay')) : skipAll(),
   )
-  /** The reader scrolls, clicks or types: the page is theirs, all of it, at once. */
-  const takeOver = (event: Event) => {
+  /**
+   * The reader moves (Gabriel, 2026-11-06): the build goes on, and the page stops scrolling
+   * itself while they scroll, for 3 s after their last move; then it follows the work again. Tab
+   * is the one exception: a keyboard reader must never land on a link that is not there yet, so
+   * Tab hands the whole page over at once.
+   */
+  let heldUntil = 0
+  const hold = () => (heldUntil = performance.now() + 3000)
+  const scrollKeys = new Set(['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '])
+  const onKey = (event: KeyboardEvent) => {
     if (event.target instanceof Node && dock.contains(event.target)) return
-    skipAll()
+    if (event.key === 'Tab') skipAll()
+    else if (scrollKeys.has(event.key)) hold()
   }
   const unlisten = () => {
-    removeEventListener('wheel', takeOver)
-    removeEventListener('touchstart', takeOver)
-    removeEventListener('keydown', takeOver)
-    removeEventListener('pointerdown', takeOver)
+    removeEventListener('wheel', hold)
+    removeEventListener('touchmove', hold)
+    removeEventListener('keydown', onKey)
   }
-  addEventListener('wheel', takeOver, { passive: true })
-  addEventListener('touchstart', takeOver, { passive: true })
-  addEventListener('keydown', takeOver)
-  addEventListener('pointerdown', takeOver)
+  addEventListener('wheel', hold, { passive: true })
+  addEventListener('touchmove', hold, { passive: true })
+  addEventListener('keydown', onKey)
 
   // ---- The loop ----
   const render = () => {
@@ -1050,7 +1058,11 @@ export function startSwarm(
     last = now
     time += dt
     // Lenis smooths the reader's wheel; while the page drives itself it stands aside.
-    if (!done) getLenis()?.stop()
+    // While the page drives itself Lenis stands aside; while the reader scrolls it is theirs.
+    if (!done) {
+      if (performance.now() < heldUntil) getLenis()?.start()
+      else getLenis()?.stop()
+    }
     for (let i = 0; i < tasks.length;) {
       if (tasks[i]!.at <= time) tasks.splice(i, 1)[0]!.run()
       else i++

@@ -131,7 +131,7 @@ Motion families (see COMMIT-SHEET §5): **A** mask rise · **B** draw · **C** p
 - **Moves by itself:** the page scrolls down to follow the work. The reader does nothing.
 - **Approvals:** Gabriel approves each section as the next starts. Reporters (Planner, Perf, A11y, Tests, i18n, Motion, Security, Deploy) come beside each heading with a real number.
 - **End:** the cursors gather into a vortex on the freest ground in view and spin out; the dock reads "Ready · deployed".
-- **Takes over:** the first wheel, touch, click or key, or Skip build, and the whole page is there at once.
+- **The reader moves:** the build goes on (Gabriel, 2026-11-06). While they scroll up or down the page stops scrolling itself, and after 3 s still it follows the work again. Tab or Skip build: the whole page at once.
 - **Finished from the first paint:** reduced motion, Quick view, print, no-JS, a deep link and a second visit this session. If the swarm has not started within 5 s, the page shows itself.
 
 ---

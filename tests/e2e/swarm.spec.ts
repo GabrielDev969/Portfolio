@@ -182,15 +182,37 @@ for (const [width, height, cap] of [
   })
 }
 
-test('the reader scrolls: the build hands over, everything at once', async ({ page }) => {
+// Gabriel, 2026-11-06: the reader may scroll up and down mid-build; the build goes on, and the
+// page stops scrolling itself until they have been still for 3 s.
+test('the reader scrolls: the build goes on, and the page waits for them', async ({ page }) => {
   await page.goto('en/')
   await started(page)
   await page.waitForTimeout(1500)
-  await page.mouse.wheel(0, 400)
+  const progress = () => page.locator('.swarm-dock [data-k="progress"]').textContent()
+  const before = await progress()
+  // Up to the top while it builds lower down, and the page stays there while they read.
+  await page.mouse.move(400, 400)
+  await page.mouse.wheel(0, -2000)
+  await page.waitForTimeout(400)
+  const y = await page.evaluate(() => scrollY)
+  await page.waitForTimeout(1500)
+  expect(Math.abs((await page.evaluate(() => scrollY)) - y)).toBeLessThan(40)
+  // Still building, and still moving on.
+  await expect(page.locator('html')).toHaveAttribute('data-build', '')
+  await expect(page.locator('html')).toHaveAttribute('data-swarm', 'building')
+  expect(await progress()).not.toBe(before)
+  // Once still, the page follows the work again.
+  await expect.poll(() => page.evaluate(() => scrollY), { timeout: 8000 }).toBeGreaterThan(y + 200)
+})
+
+test('Tab hands the whole page over at once, for keyboard readers', async ({ page }) => {
+  await page.goto('en/')
+  await started(page)
+  await page.waitForTimeout(800)
+  await page.keyboard.press('Tab')
   await expect(page.locator('html')).not.toHaveAttribute('data-build', /.*/, { timeout: 500 })
   await expect(page.locator('html')).toHaveAttribute('data-swarm', 'done')
   expect(await atWork(page)).toBe(0)
-  // Buttons finish their own 220 ms fade once they are shown.
   await expect.poll(() => unseen(page)).toEqual([])
 })
 
