@@ -24,7 +24,25 @@
   --color-ink: oklch(0.94 0.008 240);
   --color-ink-2: oklch(0.74 0.015 245);
   --color-velvet: oklch(0.68 0.19 25);
-  /* The swarm's sixteen agents: two lightness steps, hues 22.5° apart. Swarm UI only. */
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  /* Title: capped by height too, so the 5-second test passes on short laptop screens. */
+  --text-title: min(30vw, 22svh, 13rem);
+  --text-title--line-height: 0.86;
+  --text-title--letter-spacing: -0.03em;
+  --text-heading: clamp(2.75rem, 6vw, 5rem);
+  --text-heading--line-height: 0.95;
+  --text-heading--letter-spacing: -0.02em;
+  --text-body: 1.1875rem;
+  --text-body--line-height: 1.55;
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.4;
+}
+
+/* The swarm's sixteen agents: two lightness steps, hues 22.5° apart. Swarm UI only. `static`,
+   because the engine sets them from JS and Tailwind would otherwise drop them as unused. */
+@theme static {
   --color-agent-1: oklch(0.74 0.157 10);
   --color-agent-2: oklch(0.82 0.099 32.5);
   --color-agent-3: oklch(0.74 0.17 55);
@@ -41,20 +59,6 @@
   --color-agent-14: oklch(0.82 0.105 302.5);
   --color-agent-15: oklch(0.74 0.17 325);
   --color-agent-16: oklch(0.82 0.12 347.5);
-  --color-transparent: transparent;
-  --color-current: currentColor;
-
-  /* Title: capped by height too, so the 5-second test passes on short laptop screens. */
-  --text-title: min(30vw, 22svh, 13rem);
-  --text-title--line-height: 0.86;
-  --text-title--letter-spacing: -0.03em;
-  --text-heading: clamp(2.75rem, 6vw, 5rem);
-  --text-heading--line-height: 0.95;
-  --text-heading--letter-spacing: -0.02em;
-  --text-body: 1.1875rem;
-  --text-body--line-height: 1.55;
-  --text-small: 0.875rem;
-  --text-small--line-height: 1.4;
 }
 
 @theme inline {
@@ -762,6 +766,277 @@
     .contact-about {
       display: block;
     }
+  }
+}
+
+/* ---- The swarm (design/COMMIT-SHEET.md §6) ----
+   One overlay in page coordinates over the finished page: cursors, outline boxes with their
+   size badges, underlines, highlights, ripples and checks. Decorative and aria-hidden; it never
+   takes a click. The dock is fixed at the bottom; only its "Skip build" button is a control. */
+.swarm {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 45;
+  overflow: hidden;
+  pointer-events: none;
+  contain: layout style;
+  font: 500 11px/1.3 var(--font-mono);
+}
+
+.swarm > * {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.swarm-cursor {
+  will-change: transform;
+
+  > svg {
+    display: block;
+    width: 16px;
+    height: 20px;
+  }
+}
+
+.swarm-label,
+.swarm-badge {
+  position: absolute;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: var(--c);
+  color: var(--color-screen);
+  white-space: nowrap;
+}
+
+.swarm-label {
+  top: 18px;
+  left: 12px;
+}
+
+.swarm-flip .swarm-label {
+  right: 4px;
+  left: auto;
+}
+
+.swarm-box {
+  border: 1px solid var(--c);
+  outline: 1px solid color-mix(in oklch, var(--c) 25%, transparent);
+  outline-offset: 2px;
+}
+
+/* Corner handles, as in a design tool. */
+.swarm-box::before,
+.swarm-box::after {
+  content: '';
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  background: var(--color-screen);
+  border: 1px solid var(--c);
+}
+
+.swarm-box::before {
+  top: -3px;
+  left: -3px;
+}
+
+.swarm-box::after {
+  right: -3px;
+  bottom: -3px;
+}
+
+.swarm-badge {
+  bottom: calc(100% + 4px);
+  left: -1px;
+  padding: 1px 5px;
+  font-size: 10px;
+}
+
+.swarm-mark {
+  background: var(--c);
+}
+
+.swarm-select {
+  background: color-mix(in oklch, var(--c) 24%, transparent);
+}
+
+.swarm-paint {
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklch, var(--c) 6%, transparent),
+    color-mix(in oklch, var(--c) 22%, transparent) 92%,
+    var(--c)
+  );
+}
+
+.swarm-tick {
+  border-radius: 50%;
+  background: var(--c);
+}
+
+.swarm-ring {
+  border: 2px solid var(--c);
+  border-radius: 50%;
+}
+
+.swarm-check > svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+.swarm-trace {
+  fill: none;
+  stroke: var(--c);
+  stroke-width: 2.5;
+}
+
+/* Room at the end of the page, so the dock never sits on Back to top. */
+.swarm-on body {
+  padding-bottom: 72px;
+}
+
+.swarm-dock {
+  position: fixed;
+  right: var(--page-margin);
+  bottom: 12px;
+  z-index: 55;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 12px;
+  /* A fixed size, and a fixed width for every slot (the face is mono, so ch is exact): the
+     numbers change, the dock never moves. */
+  width: min(47rem, calc(100vw - 2 * var(--page-margin)));
+  padding: 6px 6px 6px 12px;
+  border: 1px solid color-mix(in oklch, var(--color-ink) 14%, transparent);
+  border-radius: 4px;
+  background: var(--color-screen-2);
+  color: var(--color-ink-2);
+  font: 500 11px/1.5 var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.swarm-dock-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 12px;
+  align-items: center;
+
+  > * {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  > [data-k='status'] {
+    width: 22ch;
+    color: var(--color-ink);
+  }
+
+  > [data-k='active'] {
+    width: 20ch;
+  }
+
+  > [data-k='progress'] {
+    width: 4ch;
+    text-align: right;
+  }
+
+  > [data-k='js'] {
+    width: 11ch;
+  }
+
+  > [data-k='commit'] {
+    width: 7ch;
+  }
+
+  > [data-k='host'] {
+    width: 12ch;
+  }
+}
+
+.swarm-dot {
+  width: 7px;
+  height: 7px;
+  margin-right: -8px;
+  border-radius: 50%;
+  background: var(--color-agent-7);
+  animation: swarm-blink 1.4s ease-in-out infinite;
+}
+
+[data-swarm='done'] .swarm-dot {
+  animation: none;
+}
+
+@keyframes swarm-blink {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.swarm-dock-log {
+  grid-row: 2;
+  min-height: 1.5em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.swarm-skip {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid color-mix(in oklch, var(--color-ink) 30%, transparent);
+  border-radius: 3px;
+  color: var(--color-ink);
+  cursor: pointer;
+  font: inherit;
+
+  &:hover {
+    border-color: var(--color-ink);
+  }
+}
+
+@media (max-width: 639px) {
+  .swarm-dock {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    width: auto;
+  }
+
+  /* Two lines on a phone, always the same two: the status and progress, then the count. The
+     build's size, commit and host stay on wider screens. */
+  .swarm-dock-row > :is([data-k='js'], [data-k='commit'], [data-k='host']),
+  .swarm-dock-log {
+    display: none;
+  }
+
+  .swarm-dock-row > [data-k='progress'] {
+    order: 1;
+  }
+
+  .swarm-dock-row > [data-k='active'] {
+    order: 2;
+  }
+}
+
+/* The finished page, with no one on it: Quick view, reduced motion and paper. */
+[data-view='quick'] :is(.swarm, .swarm-dock) {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce), print {
+  .swarm,
+  .swarm-dock {
+    display: none !important;
+  }
+
+  .swarm-on body {
+    padding-bottom: 0;
   }
 }
 

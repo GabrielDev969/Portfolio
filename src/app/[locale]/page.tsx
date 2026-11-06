@@ -8,6 +8,7 @@ import { HowIWork } from '@/components/sections/HowIWork'
 import { Projects } from '@/components/sections/Projects'
 import { getContent } from '@/content'
 import { isLocale } from '@/lib/i18n'
+import { Swarm } from '@/swarm/Swarm'
 
 type Props = { params: Promise<{ locale: string }> }
 
@@ -27,6 +28,7 @@ export default async function LocalePage({ params }: Props) {
         <HowIWork content={content} />
         <Contact content={content} />
       </main>
+      <Swarm labels={content.swarm} locale={locale} />
     </>
   )
 }
