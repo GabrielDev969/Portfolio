@@ -77,7 +77,7 @@ const pairing: Record<Kind, string> = {
   experience: 'ink/screen',
   project: 'ink-2/screen',
   how: 'ink/screen',
-  contact: 'screen/velvet',
+  contact: 'crimson/screen',
 }
 
 /** The agents who only report, by kind of section: they come beside the heading with a number. */
@@ -184,6 +184,8 @@ export function startSwarm(labels: Labels, locale: string): () => void {
   const maxActive = phone ? 6 : 8
   /** Phones go a little faster: there is less on screen at once. */
   const pace = phone ? 0.85 : 1
+  /** The current piece's tempo: the hero goes faster (see next()). */
+  let tempo = 1
   let facts: BuildFacts | null = null
   let stopped = false
   let done = false
@@ -434,13 +436,21 @@ export function startSwarm(labels: Labels, locale: string): () => void {
   const bar = document.querySelector('header.top-bar')
   const hero = unit('hero', document.getElementById('top'), document.getElementById('hero-name'))
   if (hero) {
+    const h = hero.el
+    // The 5-second facts first (name, role and Remote, the stack, both buttons), all on screen
+    // within 1.5 s; then the rest of the hero.
     add(hero, bar?.firstElementChild, 'show', 'architect')
+    add(hero, one(h, '.hero-greeting'), 'type', 'copy')
     add(hero, document.getElementById('hero-name'), 'heading', 'typography')
-    for (const p of all(hero.el, ':scope > div:first-of-type > p')) add(hero, p, 'type', 'copy')
-    for (const a of all(hero.el, '[data-fact="contact"], [data-fact="cv"]'))
+    add(hero, one(h, '.pill'), 'type', 'copy')
+    add(hero, one(h, '[data-fact="stack"]'), 'items', 'data', all(h, '[data-fact="stack"] > li'))
+    for (const a of all(h, '[data-fact="contact"], [data-fact="cv"]'))
       add(hero, a, 'click', 'layout')
-    add(hero, one(hero.el, ':scope > p'), 'type', 'copy')
-    add(hero, one(hero.el, ':scope > a'), 'show', 'architect')
+    add(hero, one(h, '.hero-line'), 'type', 'copy')
+    add(hero, one(h, '.stats'), 'items', 'data', all(h, '.stat'))
+    add(hero, one(h, '.hero-photo'), 'drag', 'layout')
+    for (const card of all(h, '.hero-cards > li')) add(hero, card, 'drag', 'layout')
+    add(hero, one(h, '.hero-backdrop'), 'show', 'architect')
   }
 
   const exp = document.getElementById('experience')
@@ -554,7 +564,7 @@ export function startSwarm(labels: Labels, locale: string): () => void {
         continue
       }
       // Streamed a word at a time, as an agent writes: about 22 ms a word, quicker when long.
-      const dur = Math.min(Math.max(ends.length * 22, 180), 900) * pace
+      const dur = Math.min(Math.max(ends.length * 22, 180), 900) * pace * tempo
       at(t, () => {
         const first = ends[0]!
         const caret = mark('swarm-mark', 'copy', { x: first.x, y: first.y, w: 2, h: first.h })
@@ -644,7 +654,7 @@ export function startSwarm(labels: Labels, locale: string): () => void {
       const veils = veil(el)
       reveal(el)
       const lines = veils.map((v) => v.line)
-      const dur = 320 * pace
+      const dur = 320 * pace * tempo
       if (lines[0]) enter(c, lines[0].x, lines[0].y + lines[0].h)
       animate(
         dur,
@@ -674,7 +684,7 @@ export function startSwarm(labels: Labels, locale: string): () => void {
     drag: (p, c) => {
       const el = p.el as HTMLElement
       const slot = pageRect(el)
-      const far = el.matches('.project-image, .contact-photo')
+      const far = el.matches('.project-image, .contact-photo, .hero-photo')
       const dx = far ? (phone ? -28 : -64) : 0
       const dy = far ? 44 : 22
       el.style.translate = `${dx}px ${dy}px`
@@ -688,7 +698,7 @@ export function startSwarm(labels: Labels, locale: string): () => void {
       })
       enter(c, grab(1).x, grab(1).y)
       say(c, `${round(Math.hypot(dx, dy))} px`)
-      const dur = (far ? 620 : 380) * pace
+      const dur = (far ? 620 : 380) * pace * tempo
       at(120, () =>
         animate(
           dur,
@@ -713,7 +723,7 @@ export function startSwarm(labels: Labels, locale: string): () => void {
       const items = p.group ?? []
       reveal(p.el, true)
       say(c, `${items.length} ${labels.units.items}`)
-      const step = Math.min(90, 700 / Math.max(items.length, 1)) * pace
+      const step = Math.min(90, 700 / Math.max(items.length, 1)) * pace * tempo
       items.forEach((item, i) =>
         at(i * step, () => {
           const r = pageRect(item)
@@ -865,9 +875,11 @@ export function startSwarm(labels: Labels, locale: string): () => void {
     index++
     setSlot('progress', `${Math.round((index / pieces.length) * 100)}%`)
     focus(pageRect(piece.el).y)
+    tempo = piece.unit.kind === 'hero' ? 0.5 : 1
     const took = arrive[piece.how](piece, agent(piece.role))
-    // The next piece starts while this one is still landing: a crowd at work, not a queue.
-    at(Math.max(took * 0.62, 110), next)
+    // The next piece starts while this one is still landing: a crowd at work, not a queue. The
+    // hero goes twice as fast: its facts must all be there within 1.5 s (Gabriel, 2026-11-06).
+    at(Math.max(took * 0.62 * (tempo === 1 ? 1 : 0.8), 60), next)
   }
 
   // ---- The end: the cursors gather into a vortex beside Contact and spin out ----
@@ -1110,7 +1122,7 @@ export function startSwarm(labels: Labels, locale: string): () => void {
       })
       at(520 + i * 40, () => (c.quiet = false))
     })
-    at(450, next)
+    at(150, next)
   }
 
   render()

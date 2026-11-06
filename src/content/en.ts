@@ -15,6 +15,11 @@ export const en: SiteContent = {
     location: 'Salvador, Brazil',
     workMode: 'Remote',
     heroLine: 'From the database to the screen.',
+    stats: [
+      { value: '~5', label: 'years of experience' },
+      { value: '500+', label: 'campaigns a day on Sistema Wave' },
+      { value: '~100', label: 'people use it every day' },
+    ],
     availability: 'Available for new projects',
     about:
       'Full Stack Developer with about 5 years of experience: 4 as a Systems Analyst and over 1 working remotely. I build complete products, from the database to the interface: frontends and dashboards with Next.js and React, APIs with Node.js and NestJS, and data in PostgreSQL. I use AI coding agents daily to move faster without giving up technical judgment, and I am pursuing a postgraduate degree in Software Engineering for Applied AI.',
@@ -24,6 +29,8 @@ export const en: SiteContent = {
     },
   },
   ui: {
+    greeting: "Hi, I'm",
+    backdrop: 'PORTFOLIO',
     skipToContent: 'Skip to content',
     present: 'present',
     quickView: 'Quick view',

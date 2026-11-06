@@ -56,29 +56,61 @@ test('it opens empty, with every word already in the page', async ({ browser, pa
   await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/Gabriel\s*Santos/i)
 })
 
-test('the hero is built first: every 5-second fact readable within 3 s', async ({ page }) => {
-  await page.goto('en/')
-  const t0 = Date.now()
-  await expect(page.locator('#top')).toHaveAttribute('data-swarm-unit', 'built', {
-    timeout: 3000,
+// Gabriel, 2026-11-06: on a first visit the full hero (name, role, stack, Remote and both
+// buttons) is on screen within 1.5 s of opening the page, and Skip is visible all along.
+for (const [width, height] of [
+  [1440, 900],
+  [1280, 720],
+  [390, 844],
+] as const) {
+  test(`the 5-second facts are all on screen within 1.5 s · ${width}×${height}`, async ({
+    browser,
+  }) => {
+    const context = await browser.newContext({ viewport: { width, height } })
+    const page = await context.newPage()
+    await page.goto('en/')
+    await expect(page.locator('html')).toHaveAttribute('data-build', '')
+    // Milliseconds since navigation started, when every fact is shown, in view and unveiled.
+    const ready = await page.evaluate(
+      () =>
+        new Promise<number>((resolve) => {
+          const check = () => {
+            const veils = [...document.querySelectorAll('.swarm-veil')].map((v) =>
+              v.getBoundingClientRect(),
+            )
+            const facts = [...document.querySelectorAll('[data-fact]')]
+            const ok =
+              facts.length === 6 &&
+              facts.every((el) => {
+                const r = el.getBoundingClientRect()
+                const covered = veils.some(
+                  (v) =>
+                    v.width > 1 &&
+                    v.left < r.right &&
+                    v.right > r.left &&
+                    v.top < r.bottom &&
+                    v.bottom > r.top,
+                )
+                return (
+                  el.checkVisibility({ opacityProperty: true }) &&
+                  r.bottom <= innerHeight &&
+                  r.top >= 0 &&
+                  !covered
+                )
+              })
+            if (ok) resolve(performance.now())
+            else requestAnimationFrame(check)
+          }
+          check()
+        }),
+    )
+    expect(ready).toBeLessThanOrEqual(1500)
+    await expect(page.getByRole('button', { name: 'Skip build' })).toBeInViewport()
+    await page.waitForTimeout(3000)
+    await expect(page.getByRole('button', { name: 'Skip build' })).toBeInViewport()
+    await context.close()
   })
-  expect(Date.now() - t0).toBeLessThan(3000)
-  const facts = await page.locator('[data-fact]').evaluateAll((els) =>
-    els.map((el) => ({
-      fact: (el as HTMLElement).dataset.fact,
-      shown: el.checkVisibility({ opacityProperty: true }),
-    })),
-  )
-  expect(facts.map((f) => f.fact).sort()).toEqual([
-    'contact',
-    'cv',
-    'name',
-    'remote',
-    'role',
-    'stack',
-  ])
-  for (const f of facts) expect(f, f.fact).toMatchObject({ shown: true })
-})
+}
 
 // The whole show, watched without touching anything.
 for (const [width, height, cap] of [

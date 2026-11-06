@@ -11,10 +11,14 @@ const pairings: [fg: string, bg: string, min: number][] = [
   ['ink', 'screen-2', 4.5],
   ['ink-2', 'screen', 4.5],
   ['ink-2', 'screen-2', 4.5],
-  ['screen', 'velvet', 4.5],
+  // Crimson is text too: Hi I'm, the badges, the primary button's label.
+  ['crimson', 'screen', 4.5],
+  ['crimson', 'screen-2', 4.5],
+  // Copy: dark text on a crimson button.
+  ['screen', 'crimson', 4.5],
   ['screen', 'ink', 4.5],
-  // The contact button is a shape on the ground too: WCAG's 3:1 for UI components.
-  ['velvet', 'screen', 3],
+  // Focus outlines and selection, against the ground: WCAG's 3:1 for UI.
+  ['cyan', 'screen', 3],
 ]
 
 describe('color contrast', () => {
@@ -51,7 +55,7 @@ describe('agent colors', () => {
   })
 
   it('no agent looks like the contact accent (at least 0.08 apart)', () => {
-    const close = agents.filter((a) => distance(a, 'velvet') < 0.08)
+    const close = agents.filter((a) => distance(a, 'crimson') < 0.08)
     assert.deepEqual(close, [])
   })
 })
