@@ -24,7 +24,7 @@ export function QuickViewToggle({ quickView, fullView }: Props) {
       aria-pressed={quick}
       onClick={toggle}
       title={quick ? fullView : quickView}
-      className="hidden size-11 items-center justify-center rounded-[3px] text-ink-2 transition-colors duration-150 hover:text-ink aria-pressed:text-crimson js:inline-flex"
+      className="hidden size-11 items-center justify-center rounded-[3px] text-ink-2 transition-colors duration-150 hover:text-ink aria-pressed:text-accent js:inline-flex"
     >
       {/* A terminal: the compact, text-only page. CSS picks the name, so it is right before
           hydration too (the store reads "full" then). */}

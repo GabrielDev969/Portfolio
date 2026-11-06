@@ -8,7 +8,13 @@ import { ease, scrub } from '@/motion/tokens'
  * (1.12 → 1), scrubbed to the scroll, while the swarm's Mockup agent paints it in. Nothing with
  * words moves: the text is always simply there. With reduced motion there is nothing to do.
  */
-export function ProjectPushIn({ children }: { children: ReactNode }) {
+export function ProjectPushIn({
+  children,
+  feature = false,
+}: {
+  children: ReactNode
+  feature?: boolean
+}) {
   const scope = useRef<HTMLDivElement>(null)
 
   useScrollScene(
@@ -33,5 +39,10 @@ export function ProjectPushIn({ children }: { children: ReactNode }) {
     { scope },
   )
 
-  return <div ref={scope}>{children}</div>
+  // The grid item: the feature card spans the whole row.
+  return (
+    <div ref={scope} className={feature ? 'project-cell project-cell-feature' : 'project-cell'}>
+      {children}
+    </div>
+  )
 }

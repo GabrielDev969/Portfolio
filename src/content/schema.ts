@@ -83,6 +83,10 @@ export type Project = {
   summary: Summary
   architecture: Architecture
   stack: Text[]
+  /** The status pill: "In use", "Internal", "Launched Oct 2026". */
+  status: string
+  /** Real numbers already in the summary, as tiles on the featured project. */
+  metrics?: { value: string; label: string }[]
   /** Internal systems show architecture only: fictional images, no links, no real data. */
   internal: boolean
   image: ProjectImage
@@ -113,10 +117,15 @@ export type SiteContent = {
     stats: { value: string; label: string }[]
     availability: string
     about: string
+    /** One sentence of `about`, word for word: how he works, for the Experience callout. */
+    approach: string
     photo: { id: ImageId; alt: string }
   }
   ui: {
-    /** The red serif line over the name: "Hi, I'm". */
+    /** The e-mail box's button, and what it says once the address is on the clipboard. */
+    copy: string
+    copied: string
+    /** The accent serif line over the name: "Hi, I'm". */
     greeting: string
     /** The giant outlined word behind the hero; decorative. */
     backdrop: string
@@ -172,6 +181,8 @@ export type SiteContent = {
     active: string
     total: string
     skip: string
+    /** Once built: the dock's button, and the footer's, to watch the build again. */
+    replay: string
     approved: string
     /** Units after a real count: "62 words", "9 items". */
     units: {

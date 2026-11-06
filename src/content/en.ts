@@ -23,12 +23,15 @@ export const en: SiteContent = {
     availability: 'Available for new projects',
     about:
       'Full Stack Developer with about 5 years of experience: 4 as a Systems Analyst and over 1 working remotely. I build complete products, from the database to the interface: frontends and dashboards with Next.js and React, APIs with Node.js and NestJS, and data in PostgreSQL. I use AI coding agents daily to move faster without giving up technical judgment, and I am pursuing a postgraduate degree in Software Engineering for Applied AI.',
+    approach: 'I use AI coding agents daily to move faster without giving up technical judgment.',
     photo: {
       id: 'gabriel',
       alt: 'Gabriel Santos, smiling, in a blue blazer and glasses.',
     },
   },
   ui: {
+    copy: 'Copy',
+    copied: 'Copied',
     greeting: "Hi, I'm",
     backdrop: 'PORTFOLIO',
     skipToContent: 'Skip to content',
@@ -107,6 +110,11 @@ export const en: SiteContent = {
   projects: [
     {
       id: 'sistema-wave',
+      status: 'Internal',
+      metrics: [
+        { value: '500+', label: 'campaigns a day' },
+        { value: '~100', label: 'people use it' },
+      ],
       title: 'Sistema Wave',
       organization: 'Group Wave Enterprise',
       stack: [
@@ -151,6 +159,7 @@ export const en: SiteContent = {
     },
     {
       id: 'campaign-bi',
+      status: 'Internal',
       title: 'Campaign BI',
       organization: 'Group Wave Enterprise',
       stack: ['Next.js', 'NestJS', 'PostgreSQL', 'RabbitMQ', 'n8n', 'RedTrack'],
@@ -189,6 +198,7 @@ export const en: SiteContent = {
     },
     {
       id: 'zibby',
+      status: 'Launched Oct 2026',
       title: 'Zibby',
       stack: [
         'Next.js',
@@ -237,6 +247,7 @@ export const en: SiteContent = {
     },
     {
       id: 'hostly',
+      status: 'In use',
       title: 'Hostly',
       organization: 'IA Robots Solutions',
       stack: [
@@ -289,6 +300,7 @@ export const en: SiteContent = {
     },
     {
       id: 'bookowl',
+      status: 'In use · open source',
       title: 'BookOwl',
       stack: ['Python', 'Django', 'PostgreSQL', 'pandas'],
       internal: false,
@@ -416,6 +428,7 @@ export const en: SiteContent = {
     active: 'Active',
     total: 'Total',
     skip: 'Skip build',
+    replay: 'Build it again',
     approved: 'approved',
     units: {
       sections: 'sections',
