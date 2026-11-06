@@ -5,8 +5,8 @@ import { dur, ease } from '@/motion/tokens'
 
 /**
  * Family B, draw: each step's drawing is traced once (stroke-dashoffset 1 → 0) as the step
- * arrives, its strokes in order. Nothing is pinned or scrubbed. Until this runs, and without
- * JS, the drawings are complete; reduced motion fades the steps in instead.
+ * arrives, its strokes in order, while the swarm's Diagram agent visits it. Nothing is pinned
+ * or scrubbed. Until this runs, without JS and with reduced motion, the drawings are complete.
  */
 export function StepsDraw({ children }: { children: ReactNode }) {
   const scope = useRef<HTMLDivElement>(null)
@@ -16,16 +16,7 @@ export function StepsDraw({ children }: { children: ReactNode }) {
       const root = scope.current!
       const steps = gsap.utils.toArray<HTMLElement>('.step', root)
 
-      if (!motion) {
-        gsap.from(steps, {
-          opacity: 0,
-          duration: dur.fade,
-          ease: ease.out,
-          stagger: 0.08,
-          scrollTrigger: { trigger: root, start: 'top 80%', once: true },
-        })
-        return
-      }
+      if (!motion) return
 
       for (const step of steps) {
         const strokes = gsap.utils.toArray<SVGPathElement>('path', step)

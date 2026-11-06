@@ -1,6 +1,6 @@
 # Design
 
-Gabriel Santos' portfolio: one bright page, in Portuguese, English and Spanish, that says who he is, what he builds and how to reach him, with the craft in the details. This page is the summary.
+Gabriel Santos' portfolio: one dark page, in Portuguese, English and Spanish, that says who he is, what he builds and how to reach him, with the craft in the details. This page is the summary.
 
 **Changing (2026-11-05):** the page is going dark, onto one page with no clicking, built live by a swarm of simulated agents. The new commit sheet holds the decisions; this summary follows each PR as it lands (inline project summaries first, then the dark theme, then the swarm). The decisions themselves, with their reasons, live in [`design/`](design/):
 
@@ -29,10 +29,10 @@ Gabriel Santos' portfolio: one bright page, in Portuguese, English and Spanish, 
 
 ## System
 
-- **Color:** a cool silver ground (`oklch(0.94 0.006 240)`), blue-black ink, one tone step for panels and frames, and one velvet red for the contact action only. The ground never goes dark. Every text pairing is AA or better, checked by a unit test.
-- **Type:** Big Shoulders (a tall condensed grotesque) for display, Newsreader (a reading serif with optical sizes and real italics) for text. Three sizes do the visible work: title (the name), heading (section and project titles) and text. No mono face, no all-caps labels.
+- **Color:** a near-black cool ground (`oklch(0.17 0.012 255)`), light ink, one tone step for panels and frames, one coral red for the contact action only, and sixteen agent colors used only by the swarm. Paper goes light. Every text pairing is AA or better, and every agent color reads on the ground, under its label and apart from the others; a unit test checks all of it.
+- **Type:** Big Shoulders (a tall condensed grotesque) for display, Newsreader (a reading serif with optical sizes and real italics) for text, and Spline Sans Mono for the swarm's own UI only. Three sizes do the visible work: title (the name), heading (section and project titles) and text. No content in mono, no all-caps labels.
 - **Grid:** a 12-column grid with one deliberate break, the project images bleeding off the left edge with the stack panel overlapping them by one column.
-- **Motion:** three families, each fitted to what it reveals: **mask rise** (the name on load, section titles, what each project built), **draw** (the workflow drawings, traced once) and **push-in** (scrubbed depth on the projects, without pinning). No grain, no vignette, no section fades up.
+- **Motion:** the page opens empty, and a swarm of fifteen simulated agents and Gabriel builds it in front of the visitor while it scrolls down by itself: headings swept in, text typed a word at a time, images and cards dragged into place, diagrams traced, lists lit up, buttons clicked, and Gabriel's approval on each section. It ends in a vortex and "Ready · deployed". Every number it shows is read from the build. The reader can scroll up and down while it builds; Skip build or Tab hands the whole page over. The words are in the HTML from the first byte, and reduced motion, Quick view, print, no-JS, deep links and a second visit get the finished page.
 - **Words:** no film vocabulary in any language (production, act, scene, cast, credits, reel, trailer, still, cinema…) and no portfolio clichés; a unit test fails on either.
 
 ## Every section in four versions

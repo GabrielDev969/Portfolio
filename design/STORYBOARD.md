@@ -17,80 +17,123 @@ Motion families (see COMMIT-SHEET §5): **A** mask rise · **B** draw · **C** p
 
 ## Top bar (persistent, intensity 1)
 
-- **Sees:** one bar, 56 px tall, fixed at the top on the page's own ground with a hairline under it. The name "Gabriel Santos" on the left (links to the top; the "GS" monogram below 640 px, so the row fits a 360 px phone in all three languages, with the full name kept as its accessible name). On the right, a **"Sections"** button, a **"Quick view"** toggle and the PT / EN / ES switcher. Before them in the tab order comes a "Skip to content" link, visible only on focus.
-- **Moves:**
-  - Sections opens a plain list (Experience, Projects, How I work, Contact) on the tone step, using Motion `clip-path`, 220 ms ease-out. Keyboard: Enter/Space opens it, Esc closes it and focus returns to the button.
-  - **Quick view** is a real toggle (`aria-pressed`). Its label reads "Quick view" in the full view and "Full view" in Quick view. Flipping it switches modes in place, with no reload, and keeps the reader's current section in view.
-- **Reduced:** the same; the menu opens without the wipe.
-- **Quick view:** the same bar.
-- **No-JS:** Sections is a native `<details>` list. Quick view is hidden, because it needs JS to remember the choice.
+- **Sees:** one bar, 56 px tall, fixed at the top on the ground with a hairline under it, in mono.
+  - Left: the **GS** monogram in a hairline square, with the full name as its accessible name.
+  - Right:
+    - Experience · Projects · How I work · Contact (a "Sections" menu below 768 px, where four links do not fit beside the languages);
+    - the PT / EN / ES switcher;
+    - a small **terminal icon** that toggles Quick view.
+  - Before them in the tab order comes "Skip to content", visible only on focus.
+- **Moves:** links brighten on hover (150 ms). The Quick view icon is a real toggle (`aria-pressed`) named "Quick view" / "Full view".
+- **No-JS:** Sections is a native `<details>`; the Quick view icon is hidden.
 
-## 1 · Hero (intensity 4, the page's one entrance)
+## 1 · Hero (intensity 4)
 
-- **Sees:** the name "GABRIEL SANTOS" at title size in two lines, then the role ("Full Stack Developer"), the core stack as a sentence, "Salvador, Brazil. **Remote.**" (and, in Spanish only, the relocation line), and the two primary buttons, **Contact** (velvet) and **Download CV** (ink). Beside the name on wide screens, the line "From the database to the screen." in Newsreader italic; under it, a quiet "See projects" link with an arrow that jumps to Projects.
-- **5-second test:** every fact above, and both buttons, are on the first screen under the top bar at every width (390 × 844, 768 × 1024, 1280 × 720, 1366 × 768, 1440 × 900), in every locale. Phones align the block to the top, so a font swap only moves what is below a rewrapped line.
-- **Moves:** family A, once, on load: the two lines of the name rise from behind their masks (1.1 s, `expo.out`, 60 ms apart). It is CSS, so it needs no JS and runs at first paint. Nothing else in the hero moves, and the name never changes size.
-- **Reduced:** the name is simply there.
-- **Quick view:** the name at heading size, the facts and buttons in one column.
-- **No-JS:** the same as the full view, without the rise.
+- **Sees**, over the giant outlined `PORTFOLIO` (serif italic, stroke only, white at 7%):
+  - **Left (columns 1–6):**
+    - "Hi, I'm" in the accent serif italic (PT "Olá, eu sou", ES "Hola, soy");
+    - **GABRIEL SANTOS.** in Archivo 900 at 118%, the full stop in the accent;
+    - the role pill `[•] FULL STACK DEVELOPER · REMOTE`;
+    - "From the database to the screen.";
+    - the core stack as mono chips;
+    - **Contact** (accent outline, the primary) and **Download CV** (dark pill);
+    - three counters from the content: ~5 years of experience, 500+ campaigns a day on Sistema Wave, ~100 people use it.
+  - **Center (7–9):** the photo in a bracketed card, a black-and-blue duotone made at build time, with the tag `// SALVADOR, BRAZIL · REMOTE`.
+  - **Right (10–12):** three small cards: Group Wave (2025–present), IA Robots Solutions (2025–present), and where he is based and available (and, in Spanish only, the relocation line).
+- **5-second test:**
+  - name, role, the core stack, "Remote", Contact and Download CV are on the first screen at every width, at first paint, without the swarm;
+  - on a first visit with the swarm, all of them are on screen within 1.5 s.
+  - The core stack sits in the left column, not in a right-hand card, so it stays on a phone's first screen.
+- **Phones:** name → role → line → stack → buttons → counters → photo → cards.
+- **Moves:** the name rises once on load (CSS). Hover brightens borders.
+- **Quick view:** one column, no photo, no backdrop word.
 
 ## 2 · Experience (intensity 2)
 
-- **Sees:** the title "Experience" on its hairline, then a dated timeline of five entries in date order (Systems Analyst at Fator, the B.Sc. at UNIFACS, Full Stack Developer at Group Wave, the IA Robots contract, the UNIPDS postgraduate degree). Each entry shows its start year at heading size with the end ("–2025", "–present") under it, the title, the organization, a one-line summary where there is one, and the place in `--ink-2`.
-  - **From 1024 px:** the five entries sit side by side on a horizontal hairline, a dot where each meets the line.
-  - **Below 1024 px:** a vertical list on a hairline down the left, a dot per entry.
-- **Moves:** the title rises (family A). The entries are simply there: a timeline is read, not revealed. **Nothing is pinned and nothing scrolls sideways.**
-- **Reduced:** the title fades in.
-- **Quick view:** one entry per line: "2021–2025 Systems Analyst, Fator Sistemas & Consultorias. …".
-- **No-JS:** the same as the full view.
+- **Sees:**
+  - the tag line `[01] // EXPERIENCE ── [01/04]` and the title;
+  - each role a bordered card in date order: the years in accent mono, the title, the organization, the summary, the place;
+  - five side by side from 1024 px, two on tablets, one on phones;
+  - then an accent-bordered callout: `// HOW I WORK` and his own sentence from `about` ("I use AI coding agents daily to move faster without giving up technical judgment.").
+- **Quick view:** one entry per line, the callout as plain text.
 
 ## 3 · Projects (intensity 3)
 
-- **Sees:** five projects, each sized to its content and **not pinned**, with one shared treatment and **nothing to click** (COMMIT-SHEET §4):
-  - **Image:** a 12:5 frame (4:3 on phones) on the tone step with a hairline, bleeding off the left page edge to column 8.
-  - **Title** at heading size on the ground, columns 9–12, with the organization above it in `--ink-2`.
-  - **The parts, inline, always in this order**, each under a small italic label:
-    - **Problem**, one sentence, and **What I built**, one or two sentences with the role and the key decision with its reason. Both sit in columns 9–12, beside the image.
-    - **Architecture**, the diagram of 2–6 boxes and arrows laid out at build time from the content, small (24rem, about 13 px text), with the same information as a list for screen readers. It sits under the image, columns 1–7.
-    - **Result**, one sentence, with a number when there is one. It sits under the stack panel, columns 9–12, with the public link or the note "Internal system, no public link" after it.
-    - At most 70 words of prose per project per language; a unit test counts them.
-  - **Stack panel:** a `--screen-2` panel overlapping the image's bottom-right corner, columns 8–10: "Stack" on the left, one tool per line on the right.
-  - **Phones and tablets (< 1024 px):** the parts stack in reading order (image at full bleed, title, problem, what I built, architecture, result, stack, links).
-- **The images:**
-  1. **Sistema Wave:** a stylized request board with fictional teams and tasks.
-  2. **Campaign BI:** a chart drawn from fictional weekly numbers and invented media-buyer names.
-  3. **Zibby:** a fictional storefront and its admin panel side by side.
-  4. **Hostly:** the robot schedule screen, with a fictional campaign playlist and a "now playing" track.
-  5. **BookOwl:** the real screenshot, as AVIF/WebP, with its GitHub link.
-
-  The mockups are inline SVG on one 1200 × 502 canvas, in the site's own type and tones, drawn in the page's language and marked `aria-hidden`; each frame carries a text description. The 4:3 phone crop keeps 670 of the 1200 units: Wave and Campaign BI keep the left edge, where their titles are; Zibby and Hostly keep the middle. BookOwl on phones is letterboxed on the tone step instead of cropped, so its welcome text stays whole.
-
-- **Moves:** family C, a scrubbed timeline per project as it crosses the viewport, with no pin: the image pushes in (`scale 1.12 → 1`) while the stack lines rise one by one. "What I built" uses family A (SplitText lines behind masks) when the project's top crosses 70%. PR 3 (`feat/agent-swarm`) replaces both with the build beats.
-- **A part with no facts yet** is left out with its label in production. `pnpm todos` lists every gap.
-- **Facts:** each project's words live in `src/content/{pt,en,es}.ts`; `design/copy/<locale>.txt` (`pnpm copy`) shows them in the order a reader meets them.
-- **Internal systems** (Sistema Wave, Campaign BI, Hostly) show architecture only: no real names, numbers, screenshots or data.
-- **Reduced:** no push-in. The image fades in, the stack appears at once, and the text is simply there.
-- **Quick view:** each project is a compact block with the title, the same four parts with a small diagram (22rem), and the stack as a sentence. No images, no stack panel.
-- **No-JS:** the same as the full view, without the movement. Every part is in the server HTML.
+- **Sees:**
+  - **The feature card** (Sistema Wave): corner brackets, spanning the row.
+    - Its mockup is the header.
+    - From 1024 px its body has two columns: the status pill, organization, title, problem and what I built on the left; the architecture, result, the metric tiles (500+ campaigns a day, ~100 people), the stack chips and the links on the right.
+  - **The other four**, two to a row from 1024 px, each a bordered card with:
+    - the image as the header;
+    - the status pill, the title and the inline summary;
+    - the stack chips;
+    - the links.
+  - **The architecture** of each is a pipeline of mono chips with arrows, built from `architecture.nodes` (Campaign BI: RedTrack → n8n → RabbitMQ · Next.js app → NestJS → PostgreSQL). Parallel nodes stack in a step, and it wraps on phones.
+- **No filter tabs:** everything visible, nothing to click.
+- **Moves:** the image pushes in (scrubbed, no pin).
+- **Quick view:** one column, no images, the stack as a sentence.
 
 ## 4 · How I work (intensity 2)
 
-- **Sees:** the title "How I work", then six numbered steps in workflow order, each a small line drawing on the tone step with its caption: 1 I plan (a checklist), 2 I review the plan (the sheet under a magnifying glass), 3 The AI implements (a code window), 4 I review the diff (two panes, a line removed and a line added), 5 I run the tests (three passing checks), 6 Merge (a branch joining the main line). One column on phones, two from 768 px, three from 1024 px. Then the closing line at heading size in italic: "AI speeds things up. The judgment is mine."
-- **Moves:** family B: as each step arrives, its drawing is traced once (`stroke-dashoffset 1 → 0`, 0.9 s, its strokes in order). Nothing is scrubbed or pinned; the drawings are complete in the markup until this runs.
-- **Reduced:** the steps fade in, drawings complete.
-- **Quick view:** the numbered list and the closing line, without drawings.
-- **No-JS:** the drawings are complete.
+- **Sees:**
+  - the tag line and the title;
+  - six numbered cards (mono `01`–`06`, the step, a small hairline drawing), three to a row from 1024 px;
+  - then the closing line, "AI speeds things up. The judgment is mine.", as an accent-bordered callout beside the loop of the work.
+- **Moves:** each drawing is traced once as its card arrives.
+- **Quick view:** the numbered list and the line, no drawings.
 
 ## 5 · Contact (intensity 2)
 
-- **Sees:** the title "Contact" on its hairline, on the page's ground like every other section.
-  - **Left (columns 1–6):** "Based in Salvador, Brazil, working remotely." (and, in Spanish only, the relocation line), "**Available for new projects**", then **Write to me**, the one red button of the section (`mailto:`), with the e-mail beside it, then LinkedIn, GitHub, YouTube, TikTok and Download CV as plain links.
-  - **Right (columns 8–12):** Gabriel's photo, then "Stack": each area (Frontend, Backend, Data, DevOps & automation, Architecture) on the left and its tools on the right, and the languages he speaks.
-  - **Last:** a small "Back to top" link in `--ink-2`.
-- **Moves:** the title rises (family A). Back to top is a plain `#top` anchor, which Lenis scrolls smoothly.
-- **Reduced:** the title fades in; Back to top jumps.
-- **Quick view:** one column; no photo.
-- **No-JS:** the same; Back to top is a plain anchor.
+- **Sees:**
+  - the tag line and the title;
+  - **Left:**
+    - "Available for new projects" large;
+    - where he is based (and, in Spanish only, the relocation line);
+    - **Write to me** (the primary button, `mailto:`);
+    - the **e-mail box** with `gabriel.dev969@gmail.com` and an accent **Copy** button (Clipboard API, with the `mailto:` link as the fallback);
+    - the profile links and the CV in mono.
+  - **Right:** a card with the stack by area and his languages.
+  - **Footer row:** © year and name, **Build it again** (the swarm, with JS), Back to top.
+- **No-JS:** no Copy and no Build it again; the address is a link.
+
+---
+
+## The swarm: the page builds itself (intensity 4; Gabriel, 2026-11-06)
+
+- **Opens:** empty. The top bar's ground and the dock ("Booting swarm…") are all there is.
+- **Then:** the cursors burst out of the logo and build the page in reading order, about 40 s on a desktop:
+  1. **the top bar:** outlined, shown;
+  2. **the hero:**
+     - the name swept in;
+     - role, stack and place typed;
+     - Contact and Download CV clicked;
+     - the line typed;
+     - the photo, there from the first paint (the page's largest picture, so a phone's LCP), outlined and captioned;
+  3. **Experience:**
+     - the title;
+     - the rule;
+     - each entry's dot, year lit and words typed;
+  4. **each project:**
+     - the image dragged in and painted;
+     - the organization typed and the title swept in;
+     - each label shown and each part typed;
+     - the diagram traced;
+     - the stack panel dragged in and its tools lit;
+     - the links clicked;
+  5. **How I work:**
+     - the title;
+     - each step dragged in and its drawing traced;
+     - the closing line typed;
+  6. **Contact:**
+     - the words typed and the buttons and profile links clicked;
+     - the photo dragged in;
+     - the stack and languages lit;
+     - Back to top.
+- **Moves by itself:** the page scrolls down to follow the work. The reader does nothing.
+- **Approvals:** Gabriel approves each section as the next starts. Reporters (Planner, Perf, A11y, Tests, i18n, Motion, Security, Deploy) come beside each heading with a real number.
+- **End:** the cursors gather into a vortex on the freest ground in view and spin out; the dock reads "Ready · deployed".
+- **The reader moves:** the build goes on (Gabriel, 2026-11-06). While they scroll up or down the page stops scrolling itself, and after 3 s still it follows the work again. Tab or Skip build: the whole page at once.
+- **Finished from the first paint:** reduced motion, Quick view, print, no-JS, a deep link and a second visit this session. If the swarm has not started within 5 s, the page shows itself.
 
 ---
 

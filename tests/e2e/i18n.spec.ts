@@ -115,7 +115,7 @@ for (const locale of locales) {
       await page.goto(`${locale}/`)
       await page.evaluate(() => document.fonts.ready)
       const { line, bar } = await page.evaluate(() => ({
-        line: document.querySelector('#top > p.font-text')!.getBoundingClientRect().bottom,
+        line: document.querySelector('#top .hero-line')!.getBoundingClientRect().bottom,
         bar: innerHeight,
       }))
       expect(line, `${viewport.width}×${viewport.height}`).toBeLessThanOrEqual(bar)

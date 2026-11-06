@@ -9,6 +9,7 @@
 import { mkdirSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 import { chromium } from '@playwright/test'
+import { builtStorageKey } from '../src/lib/storage-keys'
 
 const locale = process.env.LOCALE ?? 'en'
 const base = process.env.BASE_URL ?? `http://localhost:4173/Portfolio/${locale}/`
@@ -35,6 +36,8 @@ for (const width of [390, 768, 1440]) {
       reducedMotion: motion,
     })
     if (quick) await context.addInitScript(() => localStorage.setItem('viewMode', 'quick'))
+    // The finished page, as on a second visit: the build itself is read in tests/e2e/swarm.spec.ts.
+    await context.addInitScript((key) => sessionStorage.setItem(key, '1'), builtStorageKey)
     const page = await context.newPage()
     await page.goto(base, { waitUntil: 'networkidle' })
     await page.evaluate(() => document.fonts.ready)

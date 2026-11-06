@@ -50,15 +50,26 @@ export const es: SiteContent = {
     workMode: 'Remoto',
     relocation: 'Disponible para trasladarme a Santiago, Chile',
     heroLine: 'De la base de datos a la pantalla.',
+    stats: [
+      { value: '~5', label: 'años de experiencia' },
+      { value: '500+', label: 'campañas al día en Sistema Wave' },
+      { value: '~100', label: 'personas lo usan a diario' },
+    ],
     availability: 'Disponible para nuevos proyectos',
     about:
       'Desarrollador Full Stack con unos 5 años de experiencia: 4 como Analista de Sistemas y más de 1 trabajando en remoto. Construyo productos completos, de la base de datos a la interfaz: frontends y dashboards con Next.js y React, APIs con Node.js y NestJS, y datos en PostgreSQL. Programo a diario con agentes de IA para avanzar más rápido sin renunciar al criterio técnico, y curso un posgrado en Ingeniería de Software con IA Aplicada.',
+    approach:
+      'Programo a diario con agentes de IA para avanzar más rápido sin renunciar al criterio técnico.',
     photo: {
       id: en.person.photo.id,
       alt: 'Gabriel Santos, sonriendo, con blazer azul y lentes.',
     },
   },
   ui: {
+    copy: 'Copiar',
+    copied: 'Copiado',
+    greeting: 'Hola, soy',
+    backdrop: 'PORTAFOLIO',
     skipToContent: 'Saltar al contenido',
     present: 'actualidad',
     quickView: 'Vista rápida',
@@ -91,6 +102,11 @@ export const es: SiteContent = {
   projects: [
     {
       ...wave,
+      status: 'Interno',
+      metrics: [
+        { value: '500+', label: 'campañas al día' },
+        { value: '~100', label: 'personas lo usan' },
+      ],
       image: {
         kind: 'mockup',
         mockup: 'wave-board',
@@ -115,6 +131,7 @@ export const es: SiteContent = {
     },
     {
       ...bi,
+      status: 'Interno',
       image: {
         kind: 'mockup',
         mockup: 'campaign-chart',
@@ -141,6 +158,7 @@ export const es: SiteContent = {
     },
     {
       ...zibby,
+      status: 'Lanzada en oct 2026',
       image: {
         kind: 'mockup',
         mockup: 'zibby-store',
@@ -168,6 +186,7 @@ export const es: SiteContent = {
     },
     {
       ...hostly,
+      status: 'En uso',
       image: {
         kind: 'mockup',
         mockup: 'hostly-schedule',
@@ -205,6 +224,7 @@ export const es: SiteContent = {
     },
     {
       ...bookowl,
+      status: 'En uso · open source',
       image: {
         kind: 'image',
         id: 'bookowl',
@@ -272,6 +292,45 @@ export const es: SiteContent = {
     languages: {
       label: 'Idiomas',
       items: ['Portugués (nativo)', 'Español (básico, en estudio)', 'Inglés (básico, en estudio)'],
+    },
+  },
+  swarm: {
+    agents: [
+      'Planificación',
+      'Arquitectura',
+      'Layout',
+      'Tipografía',
+      'Texto',
+      'Datos',
+      'Diagrama',
+      'Mockup',
+      'i18n',
+      'A11y',
+      'Rendimiento',
+      'Pruebas',
+      'Seguridad',
+      'Movimiento',
+      'Deploy',
+      'Gabriel',
+    ],
+    booting: 'Iniciando el enjambre…',
+    building: 'Construyendo',
+    ready: 'Listo · publicado',
+    active: 'Activos',
+    total: 'Total',
+    skip: 'Saltar la construcción',
+    replay: 'Construir de nuevo',
+    approved: 'aprobado',
+    units: {
+      sections: 'secciones',
+      word: 'palabra',
+      words: 'palabras',
+      item: 'elemento',
+      items: 'elementos',
+      boxes: 'cajas',
+      arrows: 'flechas',
+      drawings: 'dibujos',
+      links: 'enlaces',
     },
   },
   contact: {

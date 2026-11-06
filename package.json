@@ -13,6 +13,7 @@
     "images": "tsx scripts/optimize-images.ts",
     "prebuild": "pnpm images",
     "build": "next build",
+    "postbuild": "tsx scripts/build-facts.ts",
     "preview": "tsx scripts/preview.ts",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",

@@ -7,10 +7,12 @@ type Props = {
   /** The rendered width, for the browser to pick a source: e.g. "(min-width: 768px) 12vw, 40vw". */
   sizes: string
   className?: string
+  /** On the first screen: fetched straight away, not when it nears the viewport. */
+  eager?: boolean
 }
 
 /** An image from public/images/ as AVIF with a WebP fallback, sized so it never shifts the layout. */
-export function Picture({ id, alt, sizes, className = '' }: Props) {
+export function Picture({ id, alt, sizes, className = '', eager = false }: Props) {
   const image = images[id]
   const srcSet = (format: ImageFormat) =>
     image.widths.map((w) => `${asset(imagePath(id, w, format))} ${w}w`).join(', ')
@@ -26,7 +28,7 @@ export function Picture({ id, alt, sizes, className = '' }: Props) {
         alt={alt}
         width={image.width}
         height={image.height}
-        loading="lazy"
+        loading={eager ? 'eager' : 'lazy'}
         decoding="async"
         className={className}
       />

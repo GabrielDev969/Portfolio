@@ -132,6 +132,17 @@ export function renderCopy(locale: Locale): string {
     `[link] ${ui.backToTop}`,
   )
 
+  section('Build overlay (decorative, aria-hidden)')
+  const { swarm } = c
+  line(
+    `Agents: ${swarm.agents.join(' · ')}`,
+    `Dock: ${swarm.booting} / ${swarm.building} / ${swarm.ready}`,
+    `  ${swarm.active} N / ${swarm.total} 16`,
+    `[button] ${swarm.skip}`,
+    `Gabriel: ${swarm.approved}`,
+    `Units: ${Object.values(swarm.units).join(', ')}`,
+  )
+
   return `${out.join('\n')}\n`
 }
 

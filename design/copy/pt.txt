@@ -132,7 +132,7 @@ Moro em Salvador, Bahia, e trabalho remoto.
 Disponível para novos projetos
 [link] Me escreva
 gabriel.dev969@gmail.com
-LinkedIn · GitHub · YouTube · TikTok
+LinkedIn · GitHub
 [link] Baixar CV
 
 Stack
@@ -144,3 +144,12 @@ Arquitetura: Clean Architecture, SOLID, TDD, Monólito modular, Multi-tenant, Mi
 Idiomas: Português (nativo), Espanhol (básico, estudando), Inglês (básico, estudando)
 
 [link] Voltar ao topo
+
+== Build overlay (decorative, aria-hidden) ==
+
+Agents: Planejamento · Arquitetura · Layout · Tipografia · Texto · Dados · Diagrama · Mockup · i18n · A11y · Desempenho · Testes · Segurança · Movimento · Deploy · Gabriel
+Dock: Iniciando o enxame… / Construindo / Pronto · publicado
+  Ativos N / Total 16
+[button] Pular a construção
+Gabriel: aprovado
+Units: seções, palavra, palavras, item, itens, caixas, setas, desenhos, links

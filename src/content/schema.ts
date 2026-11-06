@@ -83,6 +83,10 @@ export type Project = {
   summary: Summary
   architecture: Architecture
   stack: Text[]
+  /** The status pill: "In use", "Internal", "Launched Oct 2026". */
+  status: string
+  /** Real numbers already in the summary, as tiles on the featured project. */
+  metrics?: { value: string; label: string }[]
   /** Internal systems show architecture only: fictional images, no links, no real data. */
   internal: boolean
   image: ProjectImage
@@ -106,11 +110,25 @@ export type SiteContent = {
     /** Spanish only: PT and EN must not mention relocation. */
     relocation?: string
     heroLine: string
+    /**
+     * The hero's three counters. Every number must already be in the content (about, the
+     * experience, the projects); tests/unit/content.test.ts checks it.
+     */
+    stats: { value: string; label: string }[]
     availability: string
     about: string
+    /** One sentence of `about`, word for word: how he works, for the Experience callout. */
+    approach: string
     photo: { id: ImageId; alt: string }
   }
   ui: {
+    /** The e-mail box's button, and what it says once the address is on the clipboard. */
+    copy: string
+    copied: string
+    /** The accent serif line over the name: "Hi, I'm". */
+    greeting: string
+    /** The giant outlined word behind the hero; decorative. */
+    backdrop: string
     skipToContent: string
     /** For date ranges that are still open: "2025–present". */
     present: string
@@ -147,6 +165,38 @@ export type SiteContent = {
   /** `loop` labels the three beats of the animation beside the closing line. */
   workflow: { steps: string[]; closing: string; loop: [string, string, string] }
   skills: { stack: Group[]; languages: Group }
+  /**
+   * The build overlay's words (design/COMMIT-SHEET.md §6): the sixteen role names, in roster
+   * order, and the dock. The overlay is decorative and aria-hidden; only "Skip build" is a
+   * control. Every number it shows comes from build-facts.json or the page itself, never from here.
+   */
+  swarm: {
+    /** Planner, Architect, Layout, Typography, Copy, Data, Diagram, Mockup, i18n, A11y, Perf,
+     *  Tests, Security, Motion, Deploy, and Gabriel last. */
+    agents: string[]
+    booting: string
+    building: string
+    /** "Ready · deployed", once the last section is approved. */
+    ready: string
+    active: string
+    total: string
+    skip: string
+    /** Once built: the dock's button, and the footer's, to watch the build again. */
+    replay: string
+    approved: string
+    /** Units after a real count: "62 words", "9 items"; "1 word", "1 item" for one. */
+    units: {
+      sections: string
+      word: string
+      words: string
+      item: string
+      items: string
+      boxes: string
+      arrows: string
+      drawings: string
+      links: string
+    }
+  }
   contact: {
     cta: string
     email: string

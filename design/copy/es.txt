@@ -134,7 +134,7 @@ Disponible para trasladarme a Santiago, Chile.
 Disponible para nuevos proyectos
 [link] Escríbeme
 gabriel.dev969@gmail.com
-LinkedIn · GitHub · YouTube · TikTok
+LinkedIn · GitHub
 [link] Descargar CV
 
 Stack
@@ -146,3 +146,12 @@ Arquitectura: Clean Architecture, SOLID, TDD, Monolito modular, Multi-tenant, Mi
 Idiomas: Portugués (nativo), Español (básico, en estudio), Inglés (básico, en estudio)
 
 [link] Volver arriba
+
+== Build overlay (decorative, aria-hidden) ==
+
+Agents: Planificación · Arquitectura · Layout · Tipografía · Texto · Datos · Diagrama · Mockup · i18n · A11y · Rendimiento · Pruebas · Seguridad · Movimiento · Deploy · Gabriel
+Dock: Iniciando el enjambre… / Construyendo / Listo · publicado
+  Activos N / Total 16
+[button] Saltar la construcción
+Gabriel: aprobado
+Units: secciones, palabra, palabras, elemento, elementos, cajas, flechas, dibujos, enlaces

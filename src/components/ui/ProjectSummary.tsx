@@ -1,6 +1,6 @@
 import type { Project, SiteContent } from '@/content/schema'
 import { resolveProse } from '@/lib/text'
-import { ArchitectureDiagram } from './ArchitectureDiagram'
+import { Pipeline } from './Pipeline'
 
 type Props = { project: Project; ui: SiteContent['ui'] }
 
@@ -27,7 +27,7 @@ export function ProjectSummary({ project, ui }: Props) {
       <div className="project-part project-architecture">
         <dt>{ui.project.architecture}</dt>
         <dd>
-          <ArchitectureDiagram id={`${project.id}-diagram`} architecture={project.architecture} />
+          <Pipeline architecture={project.architecture} />
         </dd>
       </div>
       {part('result', ui.project.result, resolveProse(summary.result))}

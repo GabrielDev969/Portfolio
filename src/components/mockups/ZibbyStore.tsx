@@ -103,25 +103,32 @@ export function ZibbyStore({ locale }: { locale: Locale }) {
       })}
 
       {/* Admin */}
-      <rect x="648" y="120" width="520" height="382" className="fill-ink" />
-      <text x="676" y="166" fontSize="30" className="fill-screen font-display font-bold">
+      <rect
+        x="648"
+        y="120"
+        width="520"
+        height="382"
+        strokeWidth="1.5"
+        className="fill-screen-2 stroke-ink/30"
+      />
+      <text x="676" y="166" fontSize="30" className="fill-ink font-display font-bold">
         {copy.orders}
       </text>
-      <text x="1140" y="164" fontSize="14" textAnchor="end" className="fill-screen/70 italic">
+      <text x="1140" y="164" fontSize="14" textAnchor="end" className="fill-ink-2 italic">
         {copy.admin}
       </text>
       {orders.map((o, i) => {
         const rowY = 216 + i * 52
         return (
           <g key={o.id}>
-            <line x1="676" x2="1140" y1={rowY - 28} y2={rowY - 28} className="stroke-screen/20" />
-            <text x="676" y={rowY} fontSize="17" className="fill-screen font-semibold">
+            <line x1="676" x2="1140" y1={rowY - 28} y2={rowY - 28} className="stroke-ink/20" />
+            <text x="676" y={rowY} fontSize="17" className="fill-ink font-semibold">
               {o.id}
             </text>
-            <text x="770" y={rowY} fontSize="17" className="fill-screen">
+            <text x="770" y={rowY} fontSize="17" className="fill-ink">
               {copy.status[o.status]}
             </text>
-            <text x="1140" y={rowY} fontSize="17" textAnchor="end" className="fill-screen">
+            <text x="1140" y={rowY} fontSize="17" textAnchor="end" className="fill-ink">
               {o.total}
             </text>
           </g>

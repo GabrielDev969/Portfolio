@@ -3,3 +3,6 @@
 
 /** localStorage: 'full' | 'quick'. */
 export const viewModeStorageKey = 'viewMode'
+
+/** sessionStorage: '1' once the page has been built in front of the reader this session. */
+export const builtStorageKey = 'swarm:built'

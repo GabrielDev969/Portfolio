@@ -14,21 +14,33 @@
 /* Only when JavaScript runs (set by the head script). */
 @custom-variant js (&:where([data-js], [data-js] *));
 
-/* Tokens from design/COMMIT-SHEET.md. tests/unit/contrast.test.ts checks every text pairing. */
+/* Tokens from design/COMMIT-SHEET.md §2: the engineering console (Gabriel, 2026-11-06: the
+   reference reel's design is the target). tests/unit/contrast.test.ts checks every text pairing,
+   every agent color against the ground and under its label, and that the agents stay apart from
+   each other and from the accent. */
 @theme {
   --color-*: initial;
-  --color-screen: oklch(0.94 0.006 240);
-  --color-screen-2: oklch(0.895 0.008 240);
-  --color-ink: oklch(0.22 0.025 255);
-  --color-ink-2: oklch(0.42 0.02 255);
-  --color-velvet: oklch(0.47 0.17 22);
+  /* Near-black ground (#0a0a0a) and the one surface tone for cards (#121212). */
+  --color-screen: oklch(0.145 0 0);
+  --color-screen-2: oklch(0.182 0 0);
+  /* Near-white text (#f2f2f0) and the muted slate (#7c8491): 5.3:1 on the ground. */
+  --color-ink: oklch(0.961 0.003 106.4);
+  --color-ink-2: oklch(0.611 0.022 260.2);
+  /* One electric blue (#4f7dff, Gabriel 2026-11-06): Hi I'm, the section badges, the primary
+     button, Copy. 5.4:1 on the ground, 5.1:1 on a card, and dark text on it 5.4:1. */
+  --color-accent: oklch(0.627 0.2 266.1);
+  /* Cyan (#22d3ee) for selection and focus only; the swarm reuses it. */
+  --color-cyan: oklch(0.797 0.134 211.5);
+  /* Hairlines on every card and panel. */
+  --color-line: oklch(1 0 0 / 0.12);
   --color-transparent: transparent;
   --color-current: currentColor;
 
-  /* Title: capped by height too, so the 5-second test passes on short laptop screens. */
-  --text-title: min(30vw, 22svh, 13rem);
-  --text-title--line-height: 0.86;
-  --text-title--letter-spacing: -0.03em;
+  /* Title: the name, sized by the narrower of its column and the screen's height, so the
+     5-second test passes on short laptop screens. Archivo 900 at 118% width. */
+  --text-title: min(15vw, 13svh, 8rem);
+  --text-title--line-height: 0.9;
+  --text-title--letter-spacing: -0.035em;
   --text-heading: clamp(2.75rem, 6vw, 5rem);
   --text-heading--line-height: 0.95;
   --text-heading--letter-spacing: -0.02em;
@@ -38,9 +50,32 @@
   --text-small--line-height: 1.4;
 }
 
+/* The swarm's sixteen agents: two lightness steps, hues 22.5° apart. Swarm UI only. `static`,
+   because the engine sets them from JS and Tailwind would otherwise drop them as unused. */
+@theme static {
+  --color-agent-1: oklch(0.74 0.157 10);
+  --color-agent-2: oklch(0.82 0.099 32.5);
+  --color-agent-3: oklch(0.74 0.17 55);
+  --color-agent-4: oklch(0.82 0.13 77.5);
+  --color-agent-5: oklch(0.74 0.149 100);
+  --color-agent-6: oklch(0.82 0.13 122.5);
+  --color-agent-7: oklch(0.74 0.17 145);
+  --color-agent-8: oklch(0.82 0.13 167.5);
+  --color-agent-9: oklch(0.74 0.124 190);
+  --color-agent-10: oklch(0.82 0.13 212.5);
+  --color-agent-11: oklch(0.74 0.151 235);
+  --color-agent-12: oklch(0.82 0.087 257.5);
+  --color-agent-13: oklch(0.74 0.132 280);
+  --color-agent-14: oklch(0.82 0.105 302.5);
+  --color-agent-15: oklch(0.74 0.17 325);
+  --color-agent-16: oklch(0.82 0.12 347.5);
+}
+
 @theme inline {
-  --font-display: var(--font-big-shoulders), 'Arial Narrow', sans-serif;
+  --font-display: var(--font-archivo), 'Arial Black', sans-serif;
   --font-text: var(--font-newsreader), Georgia, serif;
+  /* Tags, badges, key/value data, the nav, stat labels, chips and the dock (COMMIT-SHEET §3). */
+  --font-mono: var(--font-spline-mono), ui-monospace, Menlo, monospace;
 }
 
 :root {
@@ -48,12 +83,27 @@
   --page-margin: clamp(16px, 4vw, 64px);
   --grid-gap: clamp(12px, 1.6vw, 24px);
   scroll-padding-top: calc(var(--top-bar) + 16px);
-  color-scheme: light;
+  color-scheme: dark;
+}
+
+/* Paper goes light: the ground and ink of the 2026-10-28 page, which print well. */
+@media print {
+  :root {
+    --color-screen: oklch(1 0 0);
+    --color-screen-2: oklch(0.94 0.006 240);
+    --color-ink: oklch(0.22 0.025 255);
+    --color-ink-2: oklch(0.42 0.02 255);
+    --color-accent: oklch(0.488 0.217 264.4);
+    color-scheme: light;
+  }
 }
 
 @layer base {
+  /* The ground, with a faint dotted grid over the whole page (24 px pitch, white at 6%). */
   body {
-    background: var(--color-screen);
+    background:
+      radial-gradient(oklch(1 0 0 / 0.06) 1px, transparent 1.4px) 0 0 / 24px 24px,
+      var(--color-screen);
     color: var(--color-ink);
     font-family: var(--font-text);
     font-size: var(--text-body);
@@ -62,13 +112,14 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* Cyan is for focus and selection only (COMMIT-SHEET §2). */
   :focus-visible {
-    outline: 2px solid currentColor;
+    outline: 2px solid var(--color-cyan);
     outline-offset: 3px;
   }
 
   ::selection {
-    background: var(--color-ink);
+    background: var(--color-cyan);
     color: var(--color-screen);
   }
 }
@@ -89,17 +140,291 @@
   font-variant-numeric: tabular-nums lining-nums;
 }
 
-/* The top bar: fixed, on the page's own ground, with a hairline under it. */
+/* The top bar: fixed, on the page's own ground, with a hairline under it; mono throughout. */
 .top-bar {
   position: fixed;
   inset: 0 0 auto;
   z-index: 50;
   height: var(--top-bar);
   background: var(--color-screen);
-  border-bottom: 1px solid color-mix(in oklch, var(--color-ink) 15%, transparent);
+  border-bottom: 1px solid var(--color-line);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
-/* ---- Hero: family A, the name rises from behind its mask (CSS, so first paint needs no JS) ---- */
+.monogram {
+  display: inline-grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--color-line);
+  border-radius: 3px;
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-weight: 900;
+  font-stretch: 118%;
+  letter-spacing: 0;
+  transition: border-color 150ms var(--ease-out);
+
+  &:hover {
+    border-color: var(--color-accent);
+  }
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding-inline: 0.625rem;
+  color: var(--color-ink-2);
+  transition: color 150ms var(--ease-out);
+
+  &:hover {
+    color: var(--color-ink);
+  }
+}
+
+/* Shared pieces and the hero live in the components layer, so a utility on the same element
+   (quick:hidden, say) always wins over them. */
+@layer components {
+  /* ---- Shared pieces: cards, tags, pills, chips ---- */
+
+  /* A surface with a 1 px hairline; the border brightens on hover (150 ms). */
+  .card {
+    position: relative;
+    border: 1px solid var(--color-line);
+    border-radius: 4px;
+    background: var(--color-screen-2);
+    padding: 1rem 1.125rem;
+    transition: border-color 150ms var(--ease-out);
+
+    &:hover {
+      border-color: oklch(1 0 0 / 0.24);
+    }
+  }
+
+  /* Small corner brackets on feature cards, as on a drafting sheet. */
+  .card-brackets::before,
+  .card-brackets::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-color: var(--color-ink-2);
+    border-style: solid;
+    pointer-events: none;
+  }
+
+  .card-brackets::before {
+    top: -1px;
+    left: -1px;
+    border-width: 1px 0 0 1px;
+  }
+
+  .card-brackets::after {
+    right: -1px;
+    bottom: -1px;
+    border-width: 0 1px 1px 0;
+  }
+
+  /* Key/value and labels in mono, sentence-case content left alone. */
+  .tag {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+  }
+
+  .pill {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.5rem;
+    padding: 0.375rem 0.75rem;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .pill-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-accent);
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+  }
+
+  .chip {
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--color-line);
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-ink);
+  }
+
+  /* ---- Hero (design/STORYBOARD.md §1) ----
+   The introduction, the photo card and three small cards, over the giant outlined word. Phones
+   stack them in that order; from 1024 px they sit side by side (6 · 3 · 3 columns). */
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    align-content: center;
+    row-gap: 2rem;
+    padding-top: calc(var(--top-bar) + clamp(20px, 5svh, 56px));
+    padding-bottom: clamp(24px, 5svh, 56px);
+    overflow-x: clip;
+  }
+
+  .hero-intro {
+    grid-column: 1 / -1;
+  }
+
+  .hero-photo,
+  .hero-cards {
+    grid-column: 1 / -1;
+  }
+
+  .hero-photo {
+    padding: 0.75rem;
+  }
+
+  .hero-cards {
+    display: grid;
+    gap: 0.75rem;
+    align-content: center;
+  }
+
+  /* The giant outlined word: the serif, no fill, white at 7%. Decorative (aria-hidden). */
+  .hero-backdrop {
+    position: absolute;
+    inset: auto 0 6% 0;
+    z-index: -1;
+    overflow: hidden;
+    font-family: var(--font-text);
+    font-size: clamp(6rem, 22vw, 22rem);
+    font-style: italic;
+    line-height: 0.8;
+    text-align: center;
+    white-space: nowrap;
+    color: transparent;
+    -webkit-text-stroke: 1px oklch(1 0 0 / 0.07);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .hero-greeting {
+    font-family: var(--font-text);
+    font-size: clamp(1.375rem, 2.2vw, 2rem);
+    font-style: italic;
+    color: var(--color-accent);
+  }
+
+  .hero-name {
+    margin-top: 0.25rem;
+    font-family: var(--font-display);
+    font-size: var(--text-title);
+    font-weight: 900;
+    font-stretch: 118%;
+    line-height: var(--text-title--line-height);
+    letter-spacing: var(--text-title--letter-spacing);
+    text-transform: uppercase;
+  }
+
+  .hero-line {
+    margin-top: 1rem;
+    max-width: 34ch;
+    font-size: 1.125rem;
+    color: var(--color-ink-2);
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column-reverse;
+    /* The label comes first in the markup (dt, dd); the numbers line up at the top. */
+    justify-content: flex-end;
+    gap: 0.25rem;
+  }
+
+  .stat-value {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    font-weight: 800;
+    font-stretch: 112%;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+    line-height: 1.35;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+  }
+
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .hero-photo {
+      grid-column: 1 / 7;
+    }
+
+    .hero-cards {
+      grid-column: 7 / -1;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hero {
+      --text-title: min(8.4vw, 13svh, 8rem);
+    }
+
+    .hero-intro {
+      grid-column: 1 / 7;
+    }
+
+    .hero-photo {
+      grid-column: 7 / 10;
+      align-self: center;
+    }
+
+    .hero-cards {
+      grid-column: 10 / -1;
+    }
+  }
+
+  /* Quick view: one column, no photo, no backdrop. */
+  [data-view='quick'] .hero {
+    min-height: 0;
+    --text-title: var(--text-heading);
+  }
+
+  [data-view='quick'] .hero-intro,
+  [data-view='quick'] .hero-cards {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ---- Hero: the name rises from behind its mask (CSS, so first paint needs no JS) ---- */
 .rise-line {
   display: block;
   /* The mask only needs to hide the line below it. Clip vertically, never sideways: a single
@@ -126,21 +451,48 @@
   }
 }
 
-/* ---- Section titles: plain words on a hairline that spans the grid ---- */
+/* ---- Section titles: the mono tag line with its badge, then the title ----
+   `[01] // EXPERIENCE ────────── [01/04]`, then the title in the display face. */
 .section-heading {
-  padding-top: clamp(5rem, 10vw, 9rem);
-  padding-bottom: clamp(2rem, 4vw, 3.5rem);
+  padding-top: clamp(5rem, 10vw, 8rem);
+  padding-bottom: clamp(1.75rem, 3.5vw, 3rem);
+}
+
+.section-tag {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink-2);
+}
+
+/* The section's number in the accent: a small solid badge, dark type on blue (5.4:1). */
+.badge {
+  padding: 0.125rem 0.4rem;
+  border-radius: 2px;
+  background: var(--color-accent);
+  color: var(--color-screen);
+  font-weight: 500;
+}
+
+.section-rule {
+  flex: 1;
+  height: 1px;
+  background: var(--color-line);
 }
 
 /* Heading size, unless the longest word (--chars, set by SectionHeading) would overflow the
-   page: "EXPERIÊNCIA" is wider than "PROJECTS". 0.44 em is the widest letter average. */
+   page: "EXPERIÊNCIA" is wider than "PROJECTS". Archivo at 112% width averages 0.72 em. */
 .section-title {
-  padding-top: 1.25rem;
-  border-top: 1px solid color-mix(in oklch, var(--color-ink) 15%, transparent);
+  margin-top: 1rem;
   font-size: min(
     var(--text-heading),
-    calc((100vw - 2 * var(--page-margin)) / (var(--chars) * 0.44))
+    calc((100vw - 2 * var(--page-margin)) / (var(--chars) * 0.74))
   );
+  font-stretch: 112%;
   line-height: var(--text-heading--line-height);
   letter-spacing: var(--text-heading--letter-spacing);
 }
@@ -150,68 +502,72 @@
   padding-bottom: 1rem;
 }
 
-/* ---- Experience: a dated timeline ----
-   A vertical list on a hairline below 1024 px; from 1024 px the five entries sit side by side
-   on a horizontal hairline. A dot marks each entry where it meets the line. */
+/* ---- Experience: a bordered card per role, then the callout ---- */
 .timeline {
   display: grid;
-  gap: 2.5rem;
-  padding-left: 1.5rem;
-  border-left: 1px solid color-mix(in oklch, var(--color-ink) 25%, transparent);
+  gap: 0.75rem;
 }
 
 .timeline-item {
-  position: relative;
-  display: grid;
-  align-content: start;
-  gap: 0.5rem;
-}
-
-.timeline-item::before {
-  content: '';
-  position: absolute;
-  top: 0.55rem;
-  left: calc(-1.5rem - 4.5px);
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--color-ink);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .timeline-years {
-  font-family: var(--font-display);
-  font-weight: 700;
-  line-height: var(--text-heading--line-height);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-accent);
 }
 
-.timeline-start {
-  font-size: var(--text-heading);
-  letter-spacing: var(--text-heading--letter-spacing);
+.timeline-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
-.timeline-end {
-  display: block;
-  font-size: var(--text-body);
+.timeline-body h3 {
+  font-size: 1.125rem;
+  line-height: 1.3;
 }
 
 .timeline-summary {
-  max-width: 40ch;
+  margin-top: 0.5rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--color-ink-2);
+}
+
+@media (min-width: 768px) {
+  .timeline {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (min-width: 1024px) {
   .timeline {
     grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: var(--grid-gap);
-    padding-top: 2rem;
-    padding-left: 0;
-    border-top: 1px solid color-mix(in oklch, var(--color-ink) 25%, transparent);
-    border-left: 0;
   }
+}
 
-  .timeline-item::before {
-    top: calc(-2rem - 4.5px);
-    left: 0;
-  }
+/* An accent-bordered callout: a line Gabriel stands by. */
+.callout {
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--color-line);
+  border-left: 2px solid var(--color-accent);
+  border-radius: 4px;
+  background: var(--color-screen-2);
+}
+
+.callout-text {
+  margin-top: 0.5rem;
+  font-family: var(--font-text);
+  font-size: clamp(1.25rem, 2vw, 1.625rem);
+  font-style: italic;
+  line-height: 1.35;
 }
 
 /* Quick view: a dated list, one entry per line. */
@@ -219,17 +575,14 @@
   .timeline {
     display: block;
     max-width: 62ch;
-    padding: 0;
-    border: 0;
   }
 
   .timeline-item {
     display: block;
     margin-bottom: 0.75rem;
-
-    &::before {
-      display: none;
-    }
+    padding: 0;
+    border: 0;
+    background: none;
   }
 
   .timeline-years,
@@ -240,15 +593,7 @@
 
   .timeline-years {
     margin-right: 0.5em;
-    font-family: var(--font-text);
-    line-height: inherit;
-  }
-
-  .timeline-start,
-  .timeline-end {
-    display: inline;
-    font-size: inherit;
-    letter-spacing: normal;
+    color: var(--color-ink);
   }
 
   .timeline-body h3::after {
@@ -262,38 +607,51 @@
   .timeline-summary::after {
     content: ' ';
   }
+
+  .callout {
+    padding: 0;
+    border: 0;
+    background: none;
+  }
 }
 
 /* Section components live in a layer, so Tailwind utilities on the same element (quick:hidden,
    say) always win over them, the way utilities are meant to. */
 @layer components {
-  /* ---- Projects ----
-   Phones and tablets stack the parts in reading order: image (full bleed), title, problem, what
-   I built, architecture, result, stack, links. From 1024 px the grid break
-   (design/COMMIT-SHEET.md §5): the image bleeds off the left edge to column 8 with the title,
-   problem and what I built beside it in 9–12; the stack panel overlaps the image's bottom-right
-   corner across columns 8–10; the architecture sits under the image and the result and links
-   under the text. */
+  /* ---- Projects: the feature card, then a grid of bordered cards ----
+   Every card: the image as its header, then the body. The feature card spans the row and, from
+   1024 px, sets its body in two columns (the head and summary on the left; the pipeline, result,
+   metrics, stack and links on the right). The others sit two to a row from 1024 px. */
   .projects {
-    display: grid;
-    row-gap: clamp(6rem, 14vw, 12rem);
-    padding-bottom: clamp(6rem, 12vw, 12rem);
+    row-gap: var(--grid-gap);
+    padding-bottom: clamp(5rem, 10vw, 9rem);
+  }
+
+  .project-cell {
+    grid-column: 1 / -1;
+    min-width: 0;
   }
 
   .project {
-    --stack-overlap: 4rem;
-    row-gap: 1.5rem;
-    align-items: start;
-
-    /* :where keeps this at the weight of one class, so each part's grid area below wins. */
-    > *,
-    :where(.project-part) {
-      grid-column: 1 / -1;
-    }
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 0;
+    overflow: clip;
   }
 
   .project-image {
-    margin-inline: calc(-1 * var(--page-margin));
+    border-bottom: 1px solid var(--color-line);
+
+    figure {
+      border: 0;
+      padding: 0;
+    }
+  }
+
+  /* The mockups' titles were drawn for a condensed face: Archivo at its narrowest width is it. */
+  .project-image svg .font-display {
+    font-stretch: 62%;
   }
 
   /* The push-in scales this layer inside the frame's crop. */
@@ -303,131 +661,192 @@
     transform-origin: 50% 50%;
   }
 
-  /* Each part is a grid item of the project, so the list itself takes no box. */
+  .project-body {
+    display: grid;
+    /* One track that may shrink below its longest chip, so a card never widens the page. */
+    grid-template-columns: minmax(0, 1fr);
+    flex: 1;
+    align-content: start;
+    gap: 1.25rem;
+    padding: clamp(1.125rem, 2vw, 1.75rem);
+  }
+
+  .project-title {
+    margin-top: 0.25rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    font-weight: 900;
+    font-stretch: 112%;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+  }
+
+  .project-feature .project-title {
+    font-size: clamp(2.25rem, 4.5vw, 3.75rem);
+  }
+
+  /* Each part is a grid item of the body, so the list itself takes no box. */
   .project-summary {
     display: contents;
   }
 
   .project-part {
-    max-width: 62ch;
+    max-width: 68ch;
 
     > dt {
-      margin-bottom: 0.25rem;
-      font-size: var(--text-small);
-      font-style: italic;
+      margin-bottom: 0.375rem;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
       color: var(--color-ink-2);
     }
-  }
 
-  /* Small and inline: about 13 px text in the boxes. */
-  .project-architecture .diagram svg {
-    max-width: 24rem;
-  }
-
-  .project-stack {
-    /* The heading on the left, one tool per line on the right. */
-    display: grid;
-    grid-template-columns: auto auto;
-    justify-content: start;
-    column-gap: 1.5rem;
-    justify-self: start;
-    min-width: min(100%, 22rem);
-    padding: 1.25rem 1.5rem;
-    background: var(--color-screen-2);
-  }
-
-  /* Each stack line rises from behind its own mask. */
-  .stack-line {
-    overflow: clip;
-
-    > span {
-      display: block;
+    > dd {
+      font-size: 1.0625rem;
+      line-height: 1.55;
     }
+  }
+
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+
+  .metric {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    gap: 0.25rem;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--color-line);
+    border-radius: 3px;
+  }
+
+  .project-links {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
   }
 
   @media (min-width: 1024px) {
-    /* The last row takes whatever height the architecture needs beyond the rows beside it, so
-       the result and links stay right under the stack panel. */
-    .project {
-      grid-template-rows: repeat(6, auto) 1fr;
-      row-gap: 0;
+    .project-cell:not(.project-cell-feature) {
+      grid-column: span 6;
     }
 
-    /* Rows 1–3 hold the title, problem and what I built; the image spans them and sits on
-       their last line. */
-    .project-image {
-      grid-area: 1 / 1 / 4 / 9;
-      align-self: end;
-      margin-inline: calc(-1 * var(--page-margin)) 0;
-    }
+    .project-feature .project-body {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      grid-auto-flow: row dense;
+      column-gap: clamp(1.5rem, 3vw, 3rem);
 
-    .project-head {
-      grid-area: 1 / 9 / 2 / 13;
-    }
+      > .project-head,
+      .project-problem,
+      .project-built {
+        grid-column: 1;
+      }
 
-    .project-problem {
-      grid-area: 2 / 9 / 3 / 13;
-      margin-top: 1.5rem;
-    }
-
-    /* Room under it for the stack panel, so the two never meet. */
-    .project-built {
-      grid-area: 3 / 9 / 4 / 13;
-      margin-top: 1.25rem;
-      padding-bottom: calc(var(--stack-overlap) + 2rem);
-    }
-
-    .project-stack {
-      position: relative;
-      grid-area: 4 / 8 / 5 / 11;
-      margin-top: calc(-1 * var(--stack-overlap));
-    }
-
-    .project-architecture {
-      grid-area: 4 / 1 / 8 / 8;
-      margin-top: 2.5rem;
-    }
-
-    .project-result {
-      grid-area: 5 / 9 / 6 / 13;
-      margin-top: 2rem;
-    }
-
-    .project-links {
-      grid-area: 6 / 9 / 7 / 13;
-      margin-top: 1rem;
+      .project-architecture,
+      .project-result,
+      > .metrics,
+      > .project-stack,
+      > .project-links {
+        grid-column: 2;
+      }
     }
   }
 
-  /* Quick view: one column inside the grid, no bleed, no images, the parts in reading order. */
+  /* ---- The architecture as a pipeline: steps of mono chips, arrows between ---- */
+  .pipeline-steps {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0;
+  }
+
+  .pipeline-step {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .pipeline-step + .pipeline-step {
+    position: relative;
+    margin-left: 1.75rem;
+
+    &::before {
+      content: '→';
+      position: absolute;
+      top: 50%;
+      left: -1.375rem;
+      translate: 0 -50%;
+      font-family: var(--font-mono);
+      color: var(--color-accent);
+    }
+  }
+
+  .node {
+    padding: 0.3rem 0.55rem;
+    border: 1px solid oklch(1 0 0 / 0.22);
+    border-radius: 3px;
+    background: var(--color-screen);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.3;
+  }
+
+  .node-service {
+    border-color: var(--color-ink-2);
+    background: oklch(1 0 0 / 0.06);
+  }
+
+  .node-data {
+    border-top: 2px solid var(--color-accent);
+  }
+
+  .node-external {
+    border-style: dashed;
+    color: var(--color-ink-2);
+  }
+
+  .node-device {
+    border-radius: 999px;
+  }
+
+  /* Quick view: one column, no images, the parts in reading order. */
   [data-view='quick'] {
     .projects {
-      row-gap: 3rem;
+      row-gap: 2.5rem;
       padding-bottom: 2rem;
     }
 
+    .project-cell {
+      grid-column: 1 / -1;
+    }
+
     .project {
-      grid-template-rows: none;
-      row-gap: 0.75rem;
+      border: 0;
+      background: none;
+    }
+
+    .project-body {
+      display: grid;
+      grid-template-columns: none;
+      padding: 0;
+      gap: 0.75rem;
 
       > *,
       .project-part {
-        grid-area: auto / 1 / auto / -1;
-        margin: 0;
-        padding: 0;
+        grid-column: auto;
       }
-    }
-
-    .project-architecture .diagram svg {
-      max-width: 22rem;
     }
   }
 
-  /* ---- How I work: six numbered steps ----
+  /* ---- How I work: six numbered cards ----
    One column on phones, two from 768 px, three from 1024 px. */
   .steps {
     display: grid;
-    gap: clamp(2rem, 4vw, 3rem) var(--grid-gap);
+    gap: var(--grid-gap);
   }
 
   @media (min-width: 768px) {
@@ -442,29 +861,75 @@
     }
   }
 
-  /* Ink line drawings on the tone step. StepsDraw sets the dashes from JS. */
+  .step {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  /* Hairline drawings, StepsDraw sets the dashes from JS. */
   .step-drawing {
     display: block;
     width: 100%;
+    max-width: 16rem;
     height: auto;
-    padding: clamp(0.75rem, 2vw, 1.5rem);
-    background: var(--color-screen-2);
+    margin-inline: auto;
     fill: none;
-    stroke: var(--color-ink);
-    stroke-width: 2;
+    stroke: var(--color-ink-2);
+    stroke-width: 1.25;
     stroke-linecap: round;
     stroke-linejoin: round;
   }
 
   .step-caption {
-    margin-top: 0.75rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    font-size: 1.0625rem;
   }
 
   .step-number {
-    margin-right: 0.6em;
-    font-family: var(--font-display);
-    font-weight: 700;
-    color: var(--color-ink-2);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--color-accent);
+  }
+
+  .callout-split {
+    display: grid;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  .callout-split .closing {
+    margin: 0;
+    font-size: clamp(1.75rem, 3.6vw, 3rem);
+  }
+
+  @media (min-width: 1024px) {
+    .callout-split {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    }
+  }
+
+  /* Quick view: the numbered list, without drawings. */
+  [data-view='quick'] {
+    .steps {
+      display: block;
+    }
+
+    .step {
+      padding: 0;
+      border: 0;
+      background: none;
+    }
+
+    .step-drawing {
+      display: none;
+    }
+
+    .step-caption {
+      margin-top: 0.25rem;
+    }
   }
 
   /* ---- Build loop ----
@@ -678,57 +1143,450 @@
     }
   }
 
-  /* ---- Contact ----
-   The photo over the stack by area; each area is its label on the left and the tools on the
-   right, stacked on phones. */
-  .contact-about {
-    display: grid;
-    gap: 1.5rem;
-    align-content: start;
+  /* ---- Contact: the way to reach him on the left, the stack card on the right ---- */
+  .contact-lead {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 3.6vw, 3rem);
+    font-weight: 800;
+    font-stretch: 112%;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
   }
 
-  .contact-photo {
-    width: 8rem;
-    aspect-ratio: 4 / 5;
-    object-fit: cover;
-    object-position: 50% 20%;
+  .email-box {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    max-width: 100%;
+    padding: 0.375rem 0.375rem 0.375rem 1rem;
+    border: 1px solid var(--color-line);
+    border-radius: 4px;
+    background: var(--color-screen-2);
+  }
+
+  .email-address {
+    font-family: var(--font-mono);
+    font-size: 0.9375rem;
+    overflow-wrap: anywhere;
+  }
+
+  /* Copy: dark type on the accent (5.4:1). */
+  .email-copy {
+    min-height: 2.5rem;
+    align-items: center;
+    padding: 0 0.875rem;
+    border-radius: 3px;
+    background: var(--color-accent);
+    color: var(--color-screen);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .contact-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.25rem;
+  }
+
+  .contact-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+    transition: color 150ms var(--ease-out);
+
+    &:hover {
+      color: var(--color-ink);
+    }
+  }
+
+  .contact-about {
+    align-self: start;
   }
 
   .skill-list {
     display: grid;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
+    gap: 0.625rem;
+    margin-top: 0.75rem;
   }
 
   .skill-group dt {
-    font-size: var(--text-small);
-    font-style: italic;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     color: var(--color-ink-2);
+  }
+
+  .skill-group dd {
+    font-size: 0.9375rem;
   }
 
   @media (min-width: 640px) {
     .skill-group {
       display: grid;
-      grid-template-columns: 9rem minmax(0, 1fr);
+      grid-template-columns: 10rem minmax(0, 1fr);
       column-gap: 1rem;
     }
+  }
 
-    .skill-group dt {
-      line-height: var(--text-body--line-height);
+  .site-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .replay {
+    min-height: 2.75rem;
+    align-items: center;
+    padding: 0 0.875rem;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+    cursor: pointer;
+    transition:
+      color 150ms var(--ease-out),
+      border-color 150ms var(--ease-out);
+
+    &:hover {
+      border-color: var(--color-accent);
+      color: var(--color-ink);
     }
   }
 
-  @media (min-width: 1024px) {
-    .contact-photo {
-      width: 10rem;
-    }
+  [data-view='quick'] .contact-about {
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+}
+
+/* ---- The page opens empty and the swarm builds it (html[data-build], head script) ----
+   Opacity only: the words stay in the HTML and the accessibility tree, and no box moves. The
+   swarm reveals a piece with .b-on (it and everything in it) or .b-self (only its own box,
+   such as a hairline or a list's rule). Without the attribute everything is simply there.
+   Near zero, not zero: 0.001 of ink on the ground rounds to the ground's own value, so nothing
+   shows, but the browser paints every piece at first paint. At zero it painted each one only
+   when revealed, and a phone counted a paragraph typed twenty seconds in as the page's largest
+   content (LCP 20.9 s in PT); now that is the portrait, at first paint. */
+[data-build] :is(header.top-bar, main) :where(*) {
+  opacity: 0.001;
+}
+
+[data-build] :is(header.top-bar, main) :is(.b-on, .b-on *, .b-self) {
+  opacity: 1;
+}
+
+/* The portrait is there from the first paint, framed, and the swarm builds around it: the
+   page's largest picture, so hiding it held a phone's LCP until the engine loaded (6.7 s). */
+[data-build] :is(#top, .hero-photo, .hero-photo picture, .hero-photo img) {
+  opacity: 1;
+}
+
+/* ---- The swarm (design/COMMIT-SHEET.md §6) ----
+   One overlay in page coordinates over the finished page: cursors, outline boxes with their
+   size badges, underlines, highlights, ripples and checks. Decorative and aria-hidden; it never
+   takes a click. The dock is fixed at the bottom; only its "Skip build" button is a control. */
+.swarm {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 45;
+  overflow: hidden;
+  pointer-events: none;
+  contain: layout style;
+  font: 500 11px/1.3 var(--font-mono);
+}
+
+.swarm > * {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.swarm-cursor {
+  /* Over every mark: a veil laid after the cursor came in must not cut its label. */
+  z-index: 1;
+  will-change: transform;
+
+  > svg {
+    display: block;
+    width: 16px;
+    height: 20px;
+  }
+}
+
+.swarm-label,
+.swarm-badge {
+  position: absolute;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: var(--c);
+  color: var(--color-screen);
+  white-space: nowrap;
+}
+
+.swarm-label {
+  top: 18px;
+  left: 12px;
+}
+
+/* A transform, not left/right: moving a label must never count as a layout shift. */
+.swarm-flip .swarm-label {
+  transform: translateX(calc(-100% - 16px));
+}
+
+.swarm-box {
+  border: 1px solid var(--c);
+  outline: 1px solid color-mix(in oklch, var(--c) 25%, transparent);
+  outline-offset: 2px;
+}
+
+/* Corner handles, as in a design tool. */
+.swarm-box::before,
+.swarm-box::after {
+  content: '';
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  background: var(--color-screen);
+  border: 1px solid var(--c);
+}
+
+.swarm-box::before {
+  top: -3px;
+  left: -3px;
+}
+
+.swarm-box::after {
+  right: -3px;
+  bottom: -3px;
+}
+
+.swarm-badge {
+  bottom: calc(100% + 4px);
+  left: -1px;
+  padding: 1px 5px;
+  font-size: 10px;
+
+  &::before {
+    content: attr(data-size);
+  }
+}
+
+.swarm-mark {
+  background: var(--c);
+}
+
+/* Not typed yet: the ground at 45% over body ink keeps it at 5.4:1 (tested). */
+.swarm-veil {
+  background: color-mix(in srgb, var(--color-screen) 45%, transparent);
+}
+
+/* Where a dragged card belongs. */
+.swarm-ghost {
+  border: 1px dashed var(--c);
+  background: color-mix(in oklch, var(--c) 6%, transparent);
+}
+
+.swarm-select {
+  background: color-mix(in oklch, var(--c) 24%, transparent);
+}
+
+.swarm-paint {
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklch, var(--c) 6%, transparent),
+    color-mix(in oklch, var(--c) 22%, transparent) 92%,
+    var(--c)
+  );
+}
+
+.swarm-tick {
+  border-radius: 50%;
+  background: var(--c);
+}
+
+.swarm-ring {
+  border: 2px solid var(--c);
+  border-radius: 50%;
+}
+
+.swarm-check > svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+.swarm-trace {
+  fill: none;
+  stroke: var(--c);
+  stroke-width: 2.5;
+}
+
+/* Room at the end of the page, so the dock never sits on Back to top. */
+.swarm-on body {
+  padding-bottom: 72px;
+}
+
+.swarm-dock {
+  position: fixed;
+  right: var(--page-margin);
+  bottom: 12px;
+  z-index: 55;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 12px;
+  /* A fixed size, and a fixed width for every slot (the face is mono, so ch is exact): the
+     numbers change, the dock never moves. */
+  width: min(47rem, calc(100vw - 2 * var(--page-margin)));
+  padding: 6px 6px 6px 12px;
+  border: 1px solid color-mix(in oklch, var(--color-ink) 14%, transparent);
+  border-radius: 4px;
+  background: var(--color-screen-2);
+  color: var(--color-ink-2);
+  font: 500 11px/1.5 var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.swarm-dock-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 12px;
+  align-items: center;
+
+  > * {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
-  /* Quick view: no photo, the stack as plain lines. */
-  [data-view='quick'] {
-    .contact-about {
-      display: block;
-    }
+  > [data-k='status'] {
+    width: 22ch;
+    color: var(--color-ink);
+  }
+
+  > [data-k='active'] {
+    width: 20ch;
+  }
+
+  > [data-k='progress'] {
+    width: 4ch;
+    text-align: right;
+  }
+
+  > [data-k='js'] {
+    width: 11ch;
+  }
+
+  > [data-k='commit'] {
+    width: 7ch;
+  }
+
+  > [data-k='host'] {
+    width: 12ch;
+  }
+}
+
+.swarm-dot {
+  width: 7px;
+  height: 7px;
+  margin-right: -8px;
+  border-radius: 50%;
+  background: var(--color-agent-7);
+  animation: swarm-blink 1.4s ease-in-out infinite;
+}
+
+[data-swarm='done'] .swarm-dot {
+  animation: none;
+}
+
+@keyframes swarm-blink {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.swarm-dock-log {
+  grid-row: 2;
+  min-height: 1.5em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.swarm-skip {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  /* Fits "Skip build" and "Construir de nuevo" alike, so the swap never moves the dock. */
+  width: 21ch;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid color-mix(in oklch, var(--color-ink) 30%, transparent);
+  border-radius: 3px;
+  color: var(--color-ink);
+  cursor: pointer;
+  font: inherit;
+
+  &:hover {
+    border-color: var(--color-ink);
+  }
+}
+
+@media (max-width: 639px) {
+  .swarm-dock {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    width: auto;
+  }
+
+  /* Two lines on a phone, always the same two: the status and progress, then the count. The
+     build's size, commit and host stay on wider screens. */
+  .swarm-dock-row > :is([data-k='js'], [data-k='commit'], [data-k='host']),
+  .swarm-dock-log {
+    display: none;
+  }
+
+  .swarm-dock-row > [data-k='progress'] {
+    order: 1;
+  }
+
+  .swarm-dock-row > [data-k='active'] {
+    order: 2;
+  }
+}
+
+/* The finished page, with no one on it: Quick view, reduced motion and paper. */
+[data-view='quick'] :is(.swarm, .swarm-dock) {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce), print {
+  .swarm,
+  .swarm-dock {
+    display: none !important;
+  }
+
+  .swarm-on body {
+    padding-bottom: 0;
   }
 }
 

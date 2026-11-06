@@ -3,7 +3,7 @@
 [![CI](https://github.com/GabrielDev969/Portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/GabrielDev969/Portfolio/actions/workflows/ci.yml)
 [![Deploy](https://github.com/GabrielDev969/Portfolio/actions/workflows/deploy.yml/badge.svg)](https://github.com/GabrielDev969/Portfolio/actions/workflows/deploy.yml)
 
-The portfolio of Gabriel Santos, Full Stack Developer (Next.js, React, Node.js, NestJS, TypeScript, PostgreSQL), in Salvador, Brazil, working remotely. One bright page with four sections (Experience, Projects, How I work, Contact), each project with its problem, what was built, its architecture and its result, all inline. For anyone who just wants the facts, **Quick view** turns the motion off.
+The portfolio of Gabriel Santos, Full Stack Developer (Next.js, React, Node.js, NestJS, TypeScript, PostgreSQL), in Salvador, Brazil, working remotely. One dark page with four sections (Experience, Projects, How I work, Contact), each project with its problem, what was built, its architecture and its result, all inline. For anyone who just wants the facts, **Quick view** turns the motion off.
 
 **Live:** https://gabrieldev969.github.io/Portfolio/ · Portuguese, English and Spanish
 
@@ -13,7 +13,8 @@ The design is summarized in [`DESIGN.md`](DESIGN.md) and decided in [`design/`](
 
 - **Next.js 16** (App Router, static export under `/Portfolio`) with strict **TypeScript 6** and **React 19**
 - **Tailwind CSS v4**, with the design tokens in `@theme`
-- **GSAP** (ScrollTrigger, SplitText) for the scroll reveals, loaded after first paint through `src/motion/runtime.ts`; **Lenis** smooths the wheel only (touch stays native); **Motion** for the sections menu
+- **GSAP** (ScrollTrigger) for the drawings and the image push-in, loaded after first paint through `src/motion/runtime.ts`; **Lenis** smooths the wheel only (touch stays native); **Motion** for the sections menu
+- **The swarm** (`src/swarm/`): a dependency-free engine, its own chunk loaded once the page is idle, that draws the build over the finished page; `scripts/build-facts.ts` (postbuild) writes the numbers it shows
 - **Playwright** and **axe** for end-to-end and accessibility tests, **Lighthouse CI** for performance
 - Hosted on **GitHub Pages**, built and deployed by GitHub Actions
 

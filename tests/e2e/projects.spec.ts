@@ -83,14 +83,18 @@ test('nothing in the projects waits behind a click', async ({ context, page }) =
   }
 })
 
-test('the architecture diagram is drawn inline, with its text for screen readers', async ({
+test('the architecture is laid out inline as a pipeline, with its text for screen readers', async ({
   page,
 }) => {
   await page.goto('en/')
   for (const id of ids) {
-    await expect(page.locator(`#${id} .project-architecture .diagram svg`)).toBeVisible()
-    await expect(page.locator(`#${id} .diagram figcaption li`).first()).toBeAttached()
+    await expect(page.locator(`#${id} .project-architecture .pipeline .node`).first()).toBeVisible()
+    await expect(page.locator(`#${id} .pipeline figcaption li`).first()).toBeAttached()
   }
+  // Every node of the content is a chip, in the order of the data flow.
+  const nodes = await page.locator('#campaign-bi .pipeline .node').allInnerTexts()
+  expect(nodes[0]).toBe('RedTrack')
+  expect(nodes.at(-1)).toBe('PostgreSQL')
 })
 
 test('before the app’s JS arrives, every part is already readable', async ({ browser }) => {
@@ -230,38 +234,3 @@ test('in the full view, no project part overlaps another', async ({ browser }) =
     await context.close()
   }
 })
-
-// An arrow runs from the bottom of one box to the top of another, and never across a third.
-for (const mode of ['full', 'quick'] as const) {
-  test(`no architecture arrow crosses a box · ${mode}`, async ({ context, page }) => {
-    await startInViewMode(context, mode)
-    await page.goto('en/')
-    const crossings = await page.evaluate(() => {
-      const out: string[] = []
-      for (const svg of document.querySelectorAll<SVGSVGElement>('.diagram svg')) {
-        const boxes = [...svg.querySelectorAll<SVGRectElement>('g > rect:not(.diagram-plate)')].map(
-          (r) => r.getBBox(),
-        )
-        for (const line of svg.querySelectorAll<SVGLineElement>(
-          'g > line.stroke-ink[marker-end]',
-        )) {
-          const [x1, y1, x2, y2] = ['x1', 'y1', 'x2', 'y2'].map((a) => +line.getAttribute(a)!)
-          // Sample the inner part of the arrow; its ends touch their own boxes.
-          for (let t = 0.1; t <= 0.9; t += 0.05) {
-            const x = x1! + (x2! - x1!) * t
-            const y = y1! + (y2! - y1!) * t
-            const hit = boxes.some(
-              (b) => x > b.x && x < b.x + b.width && y > b.y && y < b.y + b.height,
-            )
-            if (hit) {
-              out.push(`${svg.closest('article')?.id}: ${x1},${y1} → ${x2},${y2}`)
-              break
-            }
-          }
-        }
-      }
-      return out
-    })
-    expect(crossings).toEqual([])
-  })
-}
